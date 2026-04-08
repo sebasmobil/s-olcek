@@ -11,274 +11,95 @@
       --bg: #f4f4f1;
       --surface: #ffffff;
       --surface2: #f1efea;
-      --border: rgba(0,0,0,0.12);
-      --border2: rgba(0,0,0,0.22);
+      --border: rgba(0,0,0,0.10);
+      --border2: rgba(0,0,0,0.20);
       --text: #1a1a18;
       --text2: #5a5a57;
       --text3: #9a9a96;
       --radius-md: 8px;
-      --radius-lg: 12px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1a1a18;
-        --surface: #242422;
-        --surface2: #2e2e2b;
-        --border: rgba(255,255,255,0.1);
-        --border2: rgba(255,255,255,0.2);
+        --bg: #141413;
+        --surface: #1e1e1c;
+        --surface2: #282826;
+        --border: rgba(255,255,255,0.08);
+        --border2: rgba(255,255,255,0.16);
         --text: #f0ede8;
-        --text2: #a8a8a4;
-        --text3: #686864;
+        --text2: #a0a09c;
+        --text3: #606060;
+        --shadow: 0 1px 4px rgba(0,0,0,0.3);
       }
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    header {
-      background: var(--surface);
-      border-bottom: 0.5px solid var(--border);
-      padding: 1rem 1.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-    }
-
-    .live-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #e24b4a;
-      animation: pulse 1.5s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    .search-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface2);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 7px 12px;
-      flex: 1;
-      max-width: 320px;
-    }
-
-    .search-wrap input {
-      border: none;
-      background: transparent;
-      font-size: 14px;
-      color: var(--text);
-      width: 100%;
-      outline: none;
-    }
-
+    header { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 0.9rem 1.25rem; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+    .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 700; letter-spacing: -0.4px; flex-shrink: 0; }
+    .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #e24b4a; animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }
+    .search-wrap { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 24px; padding: 8px 14px; flex: 1; min-width: 180px; }
+    .search-wrap input { border: none; background: transparent; font-size: 14px; color: var(--text); width: 100%; outline: none; }
     .search-wrap input::placeholder { color: var(--text3); }
 
-    .search-icon { color: var(--text3); flex-shrink: 0; }
+    /* PROXY SETUP BANNER */
+    #setupBanner { display: none; background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin: 1rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
+    #setupBanner h2 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    #setupBanner p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; }
+    #setupBanner ol { font-size: 13px; color: var(--text2); line-height: 1.8; padding-left: 1.2rem; }
+    #setupBanner a { color: #185FA5; }
+    #setupBanner pre { margin-top: 10px; background: var(--surface2); padding: 10px; border-radius: var(--radius-md); font-size: 11.5px; overflow-x: auto; white-space: pre-wrap; color: var(--text); border: 0.5px solid var(--border); }
+    #proxyInput { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    #proxyInput input { flex: 1; min-width: 220px; font-size: 13px; padding: 8px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; }
+    #proxyInput button { font-size: 13px; padding: 8px 16px; border-radius: var(--radius-md); border: none; background: #185FA5; color: #fff; cursor: pointer; }
 
-    .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; }
+    .main { max-width: 1200px; margin: 0 auto; padding: 1.25rem 1rem; }
 
-    .channels-scroll {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
-
-    .ch-btn {
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 0.5px solid var(--border2);
-      background: var(--surface);
-      color: var(--text2);
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
+    .channels { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1.1rem; }
+    .ch-btn { padding: 7px 15px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); transition: all 0.15s; white-space: nowrap; }
     .ch-btn:hover { background: var(--surface2); color: var(--text); }
     .ch-btn.active { color: #fff !important; border-color: transparent !important; }
 
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .ch-status { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1rem; }
+    .ch-pill { font-size: 11px; padding: 3px 8px; border-radius: 10px; border: 0.5px solid var(--border); display: flex; align-items: center; gap: 5px; color: var(--text2); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .ok .dot { background: #3B6D11; }
+    .fail .dot { background: #e24b4a; }
+    .loading .dot { background: #ef9f27; animation: pulse 1s ease-in-out infinite; }
 
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
     .stats { font-size: 13px; color: var(--text3); }
-
-    .refresh-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border2);
-      background: var(--surface);
-      color: var(--text2);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
+    .right-tools { display: flex; gap: 8px; align-items: center; }
+    .sort-select { font-size: 13px; padding: 6px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; outline: none; }
+    .refresh-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 6px 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; }
     .refresh-btn:hover { background: var(--surface2); color: var(--text); }
-    .refresh-btn.spinning svg { animation: spin 1s linear infinite; }
+    .refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 14px;
-    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 13px; }
 
-    .card {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: border-color 0.15s, transform 0.1s;
-      text-decoration: none;
-      color: inherit;
-    }
+    .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 7px; transition: border-color 0.15s, box-shadow 0.15s; text-decoration: none; color: inherit; box-shadow: var(--shadow); }
+    .card:hover { border-color: var(--border2); box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.3px; text-transform: uppercase; flex-shrink: 0; }
+    .card-time { font-size: 11px; color: var(--text3); white-space: nowrap; }
+    .card-title { font-size: 14px; font-weight: 600; line-height: 1.45; color: var(--text); }
+    .card-desc { font-size: 12.5px; color: var(--text2); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-footer { margin-top: auto; padding-top: 6px; font-size: 12px; font-weight: 500; color: #185FA5; border-top: 0.5px solid var(--border); }
 
-    .card:hover {
-      border-color: var(--border2);
-      transform: translateY(-1px);
-    }
+    .placeholder { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text3); }
+    .skeleton { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 10px; }
+    .sk { background: var(--surface2); border-radius: 5px; animation: shimmer 1.6s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-    .card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
+    footer { text-align: center; padding: 2rem 1rem; font-size: 12px; color: var(--text3); border-top: 0.5px solid var(--border); margin-top: 3rem; }
 
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.2px;
-    }
-
-    .card-time {
-      font-size: 11px;
-      color: var(--text3);
-      white-space: nowrap;
-    }
-
-    .card-title {
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.45;
-      color: var(--text);
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--text2);
-      line-height: 1.55;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .card-footer {
-      margin-top: auto;
-      padding-top: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #185FA5;
-    }
-
-    .placeholder {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text3);
-      font-size: 15px;
-    }
-
-    .loading-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 14px;
-    }
-
-    .skeleton {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sk {
-      background: var(--surface2);
-      border-radius: 6px;
-      animation: shimmer 1.4s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 12px;
-      color: var(--text3);
-      border-top: 0.5px solid var(--border);
-      margin-top: 3rem;
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 560px) {
       .header-inner { flex-direction: column; align-items: stretch; }
-      .search-wrap { max-width: 100%; }
-      .logo { font-size: 18px; }
+      .search-wrap { min-width: 0; }
     }
   </style>
 </head>
@@ -291,219 +112,313 @@
       Türkiye Haber Takibi
     </div>
     <div class="search-wrap">
-      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="Haberlerde ara..." oninput="filterAndRender()" />
     </div>
   </div>
 </header>
 
-<main class="main">
-  <div class="channels-scroll" id="channelButtons"></div>
+<!-- Eğer proxy kurulmamışsa bu açıkır -->
+<div id="setupBanner">
+  <h2>⚠️ Proxy kurulumu gerekiyor</h2>
+  <p>Tarayıcı güvenlik politikaları nedeniyle Türk haber sitelerine doğrudan bağlanmak mümkün olmuyor. Aşağıdaki <strong>ücretsiz</strong> Google Apps Script proxy'ini kurarak haberleri çekebilirsiniz:</p>
+  <ol>
+    <li><a href="https://script.google.com/home" target="_blank">script.google.com</a> adresine git → <strong>Yeni proje</strong> oluştur</li>
+    <li>Aşağıdaki kodu yapıştır ve kaydet</li>
+    <li><strong>Deploy → New deployment → Web app</strong> seç → "Execute as: Me", "Who has access: Anyone" yap → Deploy et</li>
+    <li>Aldığın URL'yi aşağıya yapıştır ve Kaydet'e bas</li>
+  </ol>
+  <pre>function doGet(e) {
+  var url = e.parameter.url;
+  if (!url) return ContentService.createTextOutput(JSON.stringify({error:"missing url"})).setMimeType(ContentService.MimeType.JSON);
+  try {
+    var response = UrlFetchApp.fetch(url, {muteHttpExceptions: true, followRedirects: true});
+    return ContentService.createTextOutput(response.getContentText()).setMimeType(ContentService.MimeType.TEXT);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error: err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+  <div id="proxyInput">
+    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" />
+    <button onclick="saveProxy()">Kaydet ve Yükle</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="channels" id="channelButtons"></div>
+  <div class="ch-status" id="chStatus"></div>
 
   <div class="toolbar">
-    <div class="stats" id="statsBar">Haberler yükleniyor...</div>
-    <button class="refresh-btn" id="refreshBtn" onclick="fetchAllNews()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-        <path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-        <path d="M3 21v-5h5"/>
-      </svg>
-      Yenile
-    </button>
+    <div class="stats" id="statsBar">Başlatılıyor...</div>
+    <div class="right-tools">
+      <select class="sort-select" id="sortSelect" onchange="filterAndRender()">
+        <option value="time">En yeni</option>
+        <option value="channel">Kanala göre</option>
+      </select>
+      <button class="refresh-btn" id="refreshBtn" onclick="fetchAllNews()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+          <path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+          <path d="M3 21v-5h5"/>
+        </svg>
+        Yenile
+      </button>
+    </div>
   </div>
 
   <div id="newsContainer"></div>
-</main>
+</div>
 
-<footer>
-  Haberler her 5 dakikada bir otomatik güncellenir &bull; RSS kaynakları doğrudan kanallardan çekilir
-</footer>
+<footer>Haberler 5 dakikada bir güncellenir · RSS kaynakları · Türk haber kanalları</footer>
 
 <script>
-const CHANNELS = [
-  { id: "ntv",        name: "NTV",        rss: "https://www.ntv.com.tr/son-dakika.rss",                     color: "#185FA5", bg: "#deeaf8", darkBg: "#0c3a6a", darkColor: "#85b7eb" },
-  { id: "cnn",        name: "CNN Türk",   rss: "https://www.cnnturk.com/feed/rss/all/news",                 color: "#A32D2D", bg: "#fae0e0", darkBg: "#5a1a1a", darkColor: "#f09595" },
-  { id: "hurriyet",   name: "Hürriyet",   rss: "https://www.hurriyet.com.tr/rss/anasayfa",                  color: "#854F0B", bg: "#faebd8", darkBg: "#4a2a06", darkColor: "#ef9f27" },
-  { id: "milliyet",   name: "Milliyet",   rss: "https://www.milliyet.com.tr/rss/rssnew/gundemrss.xml",      color: "#3B6D11", bg: "#dff0cc", darkBg: "#1e3a08", darkColor: "#97c459" },
-  { id: "sabah",      name: "Sabah",      rss: "https://www.sabah.com.tr/rss/anasakfa.xml",                 color: "#533AB7", bg: "#e8e6fa", darkBg: "#2d2070", darkColor: "#afa9ec" },
-  { id: "haberturk",  name: "Habertürk",  rss: "https://www.haberturk.com/rss",                             color: "#0F6E56", bg: "#d5f0e8", darkBg: "#063d30", darkColor: "#5dcaa5" },
-  { id: "sozcu",      name: "Sözcü",      rss: "https://www.sozcu.com.tr/rss.xml",                          color: "#993C1D", bg: "#f5e0d8", darkBg: "#521e0e", darkColor: "#f0997b" },
-  { id: "cumhuriyet", name: "Cumhuriyet", rss: "https://www.cumhuriyet.com.tr/rss/son_dakika.xml",          color: "#4a4a46", bg: "#eceae4", darkBg: "#2a2a28", darkColor: "#b4b2a9" },
-  { id: "aa",         name: "AA",         rss: "https://www.aa.com.tr/tr/rss/default?cat=guncel",           color: "#0c447c", bg: "#d8eaf8", darkBg: "#062c52", darkColor: "#85b7eb" },
-  { id: "trt",        name: "TRT Haber",  rss: "https://www.trthaber.com/sondakika.rss",                    color: "#6e0f2a", bg: "#f5d8e0", darkBg: "#3d0616", darkColor: "#ed93b1" },
+// ── AYARLAR ──────────────────────────────────────────────────
+// Buraya Google Apps Script URL'nizi yapıştırın (opsiyonel, localStorage'dan da okunur)
+let APPS_SCRIPT_URL = localStorage.getItem("gasProxy") || "";
+
+const FALLBACK_PROXIES = [
+  u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+  u => `https://thingproxy.freeboard.io/fetch/${u}`,
 ];
 
-const PROXY = "https://api.allorigins.win/get?url=";
-const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const CHANNELS = [
+  { id:"ntv",        name:"NTV",        rss:"https://www.ntv.com.tr/son-dakika.rss",                    color:"#185FA5", bg:"#deeaf8", dBg:"#0c2e52", dCol:"#85b7eb" },
+  { id:"cnn",        name:"CNN Türk",   rss:"https://www.cnnturk.com/feed/rss/all/news",                color:"#A32D2D", bg:"#fae0e0", dBg:"#4a1010", dCol:"#f09595" },
+  { id:"hurriyet",   name:"Hürriyet",   rss:"https://www.hurriyet.com.tr/rss/anasayfa",                 color:"#854F0B", bg:"#faebd8", dBg:"#3a2006", dCol:"#fac775" },
+  { id:"milliyet",   name:"Milliyet",   rss:"https://www.milliyet.com.tr/rss/rssnew/gundemrss.xml",     color:"#2d5c08", bg:"#dff0cc", dBg:"#172e04", dCol:"#97c459" },
+  { id:"sabah",      name:"Sabah",      rss:"https://www.sabah.com.tr/rss/anasakfa.xml",                color:"#4430a0", bg:"#e8e6fa", dBg:"#1e1650", dCol:"#afa9ec" },
+  { id:"haberturk",  name:"Habertürk",  rss:"https://www.haberturk.com/rss",                            color:"#0d5e47", bg:"#d5f0e8", dBg:"#052e22", dCol:"#5dcaa5" },
+  { id:"sozcu",      name:"Sözcü",      rss:"https://www.sozcu.com.tr/rss.xml",                         color:"#8b3016", bg:"#f5e0d8", dBg:"#40140a", dCol:"#f0997b" },
+  { id:"cumhuriyet", name:"Cumhuriyet", rss:"https://www.cumhuriyet.com.tr/rss/son_dakika.xml",         color:"#444440", bg:"#eceae4", dBg:"#222220", dCol:"#b4b2a9" },
+  { id:"aa",         name:"AA",         rss:"https://www.aa.com.tr/tr/rss/default?cat=guncel",          color:"#0c3e70", bg:"#d8eaf8", dBg:"#062040", dCol:"#85b7eb" },
+  { id:"trt",        name:"TRT Haber",  rss:"https://www.trthaber.com/sondakika.rss",                   color:"#6e0f2a", bg:"#f5d8e0", dBg:"#360614", dCol:"#ed93b1" },
+  { id:"posta",      name:"Posta",      rss:"https://www.posta.com.tr/rss/anasayfa.xml",                color:"#5a3a9a", bg:"#ece8fa", dBg:"#2a1850", dCol:"#afa9ec" },
+  { id:"takvim",     name:"Takvim",     rss:"https://www.takvim.com.tr/rss/anasayfa.xml",               color:"#0a5278", bg:"#d6eefa", dBg:"#042840", dCol:"#85b7eb" },
+];
 
+const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 let allNews = [];
+let channelStatus = {};
 let activeChannel = "all";
 let refreshTimer = null;
 
+// ── PROXY ────────────────────────────────────────────────────
+
+function saveProxy() {
+  const url = document.getElementById("scriptUrl").value.trim();
+  if (!url) return;
+  APPS_SCRIPT_URL = url;
+  localStorage.setItem("gasProxy", url);
+  document.getElementById("setupBanner").style.display = "none";
+  fetchAllNews();
+}
+
+async function fetchRSS(channel) {
+  // 1. Google Apps Script (en güvenilir)
+  if (APPS_SCRIPT_URL) {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL + "?url=" + encodeURIComponent(channel.rss), { signal: AbortSignal.timeout(10000) });
+      if (res.ok) {
+        const text = await res.text();
+        if (isXML(text)) return text;
+      }
+    } catch {}
+  }
+
+  // 2. Fallback proxy'ler
+  for (const proxyFn of FALLBACK_PROXIES) {
+    try {
+      const proxyUrl = proxyFn(channel.rss);
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const raw = await res.text();
+      // allorigins JSON wrapper
+      let text = raw;
+      if (proxyUrl.includes("allorigins")) {
+        try { text = JSON.parse(raw).contents || raw; } catch {}
+      }
+      if (isXML(text)) return text;
+    } catch {}
+  }
+
+  throw new Error("Tüm proxy'ler başarısız");
+}
+
+function isXML(text) {
+  return text && (text.includes("<item>") || text.includes("<item ") || text.includes("<entry>") || text.includes("<rss") || text.includes("<feed"));
+}
+
+// ── RSS PARSER ───────────────────────────────────────────────
+
+function parseRSS(xml, channel) {
+  try {
+    const doc = new DOMParser().parseFromString(xml, "text/xml");
+    if (doc.querySelector("parsererror")) return [];
+    return Array.from(doc.querySelectorAll("item, entry")).slice(0, 20).map(item => {
+      const title = get(item, ["title"]);
+      const desc = clean(get(item, ["description","summary","content"])).slice(0, 260);
+      const link = getLink(item);
+      const pubDate = get(item, ["pubDate","pubdate","published","updated","dc\\:date"]);
+      if (!title || title.length < 3) return null;
+      return { title, desc, link, pubDate, channel, ts: new Date(pubDate || 0).getTime() || 0 };
+    }).filter(Boolean);
+  } catch { return []; }
+}
+
+function get(el, tags) {
+  for (const t of tags) {
+    const n = el.querySelector(t);
+    if (n) return (n.textContent || "").trim();
+  }
+  return "";
+}
+function getLink(item) {
+  const l = item.querySelector("link");
+  return l ? (l.getAttribute("href") || l.textContent.trim()) : "";
+}
+function clean(s) {
+  return s.replace(/<[^>]*>/g,"").replace(/&[a-z#0-9]+;/gi," ").replace(/\s+/g," ").trim();
+}
+
+// ── TIME ─────────────────────────────────────────────────────
+
+function timeAgo(ts) {
+  if (!ts) return "";
+  const d = (Date.now() - ts) / 1000;
+  if (d < 60) return "Az önce";
+  if (d < 3600) return Math.floor(d/60) + " dk önce";
+  if (d < 86400) return Math.floor(d/3600) + " sa önce";
+  return Math.floor(d/86400) + " gün önce";
+}
+
+// ── BUTTONS & STATUS ─────────────────────────────────────────
+
 function renderChannelButtons() {
   const cont = document.getElementById("channelButtons");
-  const allBtn = document.createElement("button");
-  allBtn.className = "ch-btn active";
-  allBtn.id = "btn-all";
-  allBtn.textContent = "Tümü";
-  allBtn.style.background = dark ? "#1d4a26" : "#3B6D11";
-  allBtn.style.color = dark ? "#c0dd97" : "#fff";
-  allBtn.onclick = () => setChannel("all");
-  cont.appendChild(allBtn);
+  cont.innerHTML = "";
+  const b = mkBtn("all","Tümü",true);
+  b.style.cssText = `background:${dark?"#173408":"#2d5c08"};color:${dark?"#97c459":"#fff"}`;
+  cont.appendChild(b);
+  CHANNELS.forEach(c => cont.appendChild(mkBtn(c.id, c.name, false)));
+}
 
-  CHANNELS.forEach(c => {
-    const btn = document.createElement("button");
-    btn.className = "ch-btn";
-    btn.id = "btn-" + c.id;
-    btn.textContent = c.name;
-    btn.onclick = () => setChannel(c.id);
-    cont.appendChild(btn);
-  });
+function mkBtn(id, label, active) {
+  const b = document.createElement("button");
+  b.className = "ch-btn" + (active?" active":"");
+  b.id = "btn-"+id;
+  b.textContent = label;
+  b.onclick = () => setChannel(id);
+  return b;
 }
 
 function setChannel(id) {
   activeChannel = id;
-  document.querySelectorAll(".ch-btn").forEach(b => {
-    b.classList.remove("active");
-    b.style.background = "";
-    b.style.color = "";
-  });
-
-  const target = document.getElementById("btn-" + id);
-  if (!target) return;
-  target.classList.add("active");
-
-  if (id === "all") {
-    target.style.background = dark ? "#1d4a26" : "#3B6D11";
-    target.style.color = dark ? "#c0dd97" : "#fff";
-  } else {
-    const ch = CHANNELS.find(c => c.id === id);
-    if (ch) {
-      target.style.background = dark ? ch.darkBg : ch.color;
-      target.style.color = "#fff";
-    }
+  document.querySelectorAll(".ch-btn").forEach(b => { b.classList.remove("active"); b.style.cssText=""; });
+  const t = document.getElementById("btn-"+id);
+  if (!t) return;
+  t.classList.add("active");
+  if (id === "all") t.style.cssText = `background:${dark?"#173408":"#2d5c08"};color:${dark?"#97c459":"#fff"}`;
+  else {
+    const ch = CHANNELS.find(c=>c.id===id);
+    if (ch) t.style.cssText = `background:${dark?ch.dBg:ch.color};color:#fff`;
   }
   filterAndRender();
 }
 
-function parseRSS(xml, channel) {
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "text/xml");
-    const items = Array.from(doc.querySelectorAll("item")).slice(0, 20);
-    return items.map(item => {
-      const title = item.querySelector("title")?.textContent?.trim() || "";
-      let desc = item.querySelector("description")?.textContent?.replace(/<[^>]*>/g, "").replace(/&[^;]+;/g, " ").trim() || "";
-      desc = desc.replace(/\s+/g, " ").slice(0, 300);
-      const link = item.querySelector("link")?.textContent?.trim() ||
-                   item.getElementsByTagNameNS("*", "origLink")[0]?.textContent?.trim() || "";
-      const pubDate = item.querySelector("pubDate")?.textContent?.trim() ||
-                      item.querySelector("pubdate")?.textContent?.trim() || "";
-      return { title, desc, link, pubDate, channel };
-    }).filter(n => n.title.length > 5);
-  } catch {
-    return [];
-  }
+function renderStatus() {
+  document.getElementById("chStatus").innerHTML = CHANNELS.map(c => {
+    const st = channelStatus[c.id] || "loading";
+    return `<span class="ch-pill ${st}"><span class="dot"></span>${c.name}</span>`;
+  }).join("");
 }
 
-function timeAgo(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d)) return "";
-  const diff = (Date.now() - d) / 1000;
-  if (diff < 60) return "Az önce";
-  if (diff < 3600) return Math.floor(diff / 60) + " dk önce";
-  if (diff < 86400) return Math.floor(diff / 3600) + " saat önce";
-  return Math.floor(diff / 86400) + " gün önce";
-}
-
-async function fetchChannel(channel) {
-  try {
-    const url = PROXY + encodeURIComponent(channel.rss);
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return parseRSS(json.contents || "", channel);
-  } catch {
-    return [];
-  }
-}
-
-function showSkeletons() {
-  const skels = Array.from({ length: 6 }, () => `
-    <div class="skeleton">
-      <div class="sk" style="height:18px;width:60%"></div>
-      <div class="sk" style="height:14px;width:100%"></div>
-      <div class="sk" style="height:14px;width:90%"></div>
-      <div class="sk" style="height:14px;width:75%"></div>
-    </div>
-  `).join("");
-  document.getElementById("newsContainer").innerHTML = `<div class="loading-grid">${skels}</div>`;
-}
+// ── FETCH ────────────────────────────────────────────────────
 
 async function fetchAllNews() {
-  const btn = document.getElementById("refreshBtn");
-  btn.classList.add("spinning");
+  document.getElementById("refreshBtn").classList.add("spinning");
   showSkeletons();
-  document.getElementById("statsBar").textContent = "Haberler yükleniyor...";
+  allNews = [];
+  CHANNELS.forEach(c => { channelStatus[c.id]="loading"; });
+  renderStatus();
 
-  const results = await Promise.allSettled(CHANNELS.map(c => fetchChannel(c)));
-  allNews = results.flatMap(r => r.status === "fulfilled" ? r.value : []);
-  allNews.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+  let anySuccess = false;
 
-  btn.classList.remove("spinning");
+  await Promise.allSettled(CHANNELS.map(async ch => {
+    try {
+      const xml = await fetchRSS(ch);
+      const items = parseRSS(xml, ch);
+      channelStatus[ch.id] = items.length ? "ok" : "fail";
+      if (items.length) {
+        anySuccess = true;
+        allNews.push(...items);
+        allNews.sort((a,b) => (b.ts||0)-(a.ts||0));
+        filterAndRender();
+      }
+    } catch { channelStatus[ch.id] = "fail"; }
+    renderStatus();
+  }));
+
+  document.getElementById("refreshBtn").classList.remove("spinning");
   filterAndRender();
 
+  if (!anySuccess) {
+    document.getElementById("setupBanner").style.display = "block";
+  }
+
   clearTimeout(refreshTimer);
-  refreshTimer = setTimeout(fetchAllNews, 5 * 60 * 1000);
+  refreshTimer = setTimeout(fetchAllNews, 5*60*1000);
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+
+function showSkeletons() {
+  const sk = Array.from({length:9}, ()=>`
+    <div class="skeleton">
+      <div style="display:flex;gap:8px;align-items:center"><div class="sk" style="height:18px;width:72px"></div><div class="sk" style="height:12px;width:55px;margin-left:auto"></div></div>
+      <div class="sk" style="height:16px;width:95%"></div><div class="sk" style="height:16px;width:78%"></div>
+      <div class="sk" style="height:13px;width:100%"></div><div class="sk" style="height:13px;width:85%"></div>
+    </div>`).join("");
+  document.getElementById("newsContainer").innerHTML = `<div class="grid">${sk}</div>`;
 }
 
 function filterAndRender() {
-  const query = document.getElementById("searchInput").value.toLowerCase().trim();
-  let filtered = allNews;
+  const q = document.getElementById("searchInput").value.toLowerCase().trim();
+  const sort = document.getElementById("sortSelect").value;
+  let list = [...allNews];
+  if (activeChannel!=="all") list = list.filter(n=>n.channel.id===activeChannel);
+  if (q) list = list.filter(n=>n.title.toLowerCase().includes(q)||n.desc.toLowerCase().includes(q));
+  if (sort==="channel") list.sort((a,b)=>a.channel.name.localeCompare(b.channel.name,"tr")||(b.ts-a.ts));
+  else list.sort((a,b)=>(b.ts||0)-(a.ts||0));
 
-  if (activeChannel !== "all") {
-    filtered = filtered.filter(n => n.channel.id === activeChannel);
-  }
+  const ok = CHANNELS.filter(c=>channelStatus[c.id]==="ok").length;
+  const now = new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("statsBar").textContent = list.length
+    ? `${list.length} haber · ${ok}/${CHANNELS.length} kanal · ${now}`
+    : allNews.length ? "Eşleşen haber yok" : "Yükleniyor...";
 
-  if (query) {
-    filtered = filtered.filter(n =>
-      n.title.toLowerCase().includes(query) ||
-      n.desc.toLowerCase().includes(query)
-    );
-  }
-
-  document.getElementById("statsBar").textContent =
-    filtered.length === 0 ? "Haber bulunamadı" :
-    `${filtered.length} haber · Son güncelleme: ${new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}`;
-
-  const container = document.getElementById("newsContainer");
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="placeholder">Aradığınız kriterlere uygun haber bulunamadı.</div>`;
+  if (!list.length) {
+    if (!allNews.length) return; // skeletons still showing
+    document.getElementById("newsContainer").innerHTML = `<div class="grid"><div class="placeholder">Haber bulunamadı.</div></div>`;
     return;
   }
 
-  container.innerHTML = `<div class="grid">${filtered.map(n => {
-    const ch = n.channel;
-    const badgeBg = dark ? ch.darkBg : ch.bg;
-    const badgeColor = dark ? ch.darkColor : ch.color;
-    return `
-      <a class="card" href="${n.link || "#"}" target="_blank" rel="noopener noreferrer">
-        <div class="card-top">
-          <span class="badge" style="background:${badgeBg};color:${badgeColor}">${ch.name}</span>
-          <span class="card-time">${timeAgo(n.pubDate)}</span>
-        </div>
-        <div class="card-title">${n.title}</div>
-        ${n.desc ? `<div class="card-desc">${n.desc}</div>` : ""}
-        ${n.link ? `<div class="card-footer">Devamını oku →</div>` : ""}
-      </a>
-    `;
+  document.getElementById("newsContainer").innerHTML = `<div class="grid">${list.map(n=>{
+    const ch=n.channel;
+    return `<a class="card" href="${n.link||"#"}" target="_blank" rel="noopener noreferrer">
+      <div class="card-top">
+        <span class="badge" style="background:${dark?ch.dBg:ch.bg};color:${dark?ch.dCol:ch.color}">${ch.name}</span>
+        <span class="card-time">${timeAgo(n.ts)}</span>
+      </div>
+      <div class="card-title">${n.title}</div>
+      ${n.desc?`<div class="card-desc">${n.desc}</div>`:""}
+      ${n.link?`<div class="card-footer">Haberin tamamı →</div>`:""}
+    </a>`;
   }).join("")}</div>`;
 }
 
+// ── INIT ─────────────────────────────────────────────────────
 renderChannelButtons();
 fetchAllNews();
 </script>
