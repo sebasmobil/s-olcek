@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Not Sistemi – Sinan Akdemir</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --blue:#2563eb;--blue-l:#dbeafe;--blue-d:#1d4ed8;
+  --teal:#0d9488;--teal-l:#ccfbf1;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --red:#dc2626;--red-l:#fee2e2;
+  --green:#16a34a;--green-l:#dcfce7;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --orange:#ea580c;--orange-l:#ffedd5;
+  --bg:#f1f5f9;--surf:#fff;--surf2:#f8fafc;--border:#e2e8f0;
+  --text:#0f172a;--text2:#64748b;--text3:#94a3b8;
+  --r:12px;--rs:8px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shm:0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:200}
+.hdr-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:12px;height:56px}
+.logo{font-size:17px;font-weight:800;color:var(--blue);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.nav{display:flex;gap:2px;overflow-x:auto;padding:6px 0;flex:1;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nb{padding:6px 13px;border-radius:20px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;transition:.15s;font-family:inherit}
+.nb.active{background:var(--blue);color:#fff}
+.nb:hover:not(.active){background:var(--surf2)}
+.main{max-width:1280px;margin:0 auto;padding:24px 20px}
+.section{display:none}.section.active{display:block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.ct{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.fr{margin-bottom:13px}
+label{font-size:11.5px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+input,select,textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--rs);font-family:inherit;font-size:13.5px;color:var(--text);background:var(--surf);transition:.15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:60px;font-size:12px}
+input[type=range]{padding:0;height:6px;accent-color:var(--blue)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:.15s}
+.btn-p{background:var(--blue);color:#fff}.btn-p:hover{background:var(--blue-d)}
+.btn-g{background:var(--surf2);color:var(--text);border:1px solid var(--border)}.btn-g:hover{background:var(--border)}
+.btn-s{background:var(--green);color:#fff}.btn-s:hover{background:#15803d}
+.btn-d{background:var(--red);color:#fff}.btn-d:hover{background:#b91c1c}
+.btn-t{background:var(--teal);color:#fff}
+.btn-pu{background:var(--purple);color:#fff}.btn-pu:hover{background:#6d28d9}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bb{background:var(--blue-l);color:var(--blue)}.bg{background:var(--green-l);color:var(--green)}
+.br{background:var(--red-l);color:var(--red)}.ba{background:var(--amber-l);color:var(--amber)}
+.bpu{background:var(--purple-l);color:var(--purple)}.bt{background:var(--teal-l);color:var(--teal)}
+.bor{background:var(--orange-l);color:var(--orange)}
+.msel{display:flex;background:var(--surf2);border-radius:var(--rs);padding:3px;gap:3px}
+.mb{flex:1;padding:7px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);background:none;transition:.15s}
+.mb.active{background:var(--surf);color:var(--blue);box-shadow:var(--sh)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;background:var(--surf2);border-bottom:1px solid var(--border);font-weight:700;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--surf);border-radius:var(--r);padding:24px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.modal.wide{max-width:920px}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mtitle{font-size:16px;font-weight:800}
+.mclose{width:28px;height:28px;border-radius:6px;border:none;background:var(--surf2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+.rtable{width:100%;border-collapse:collapse;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.rtable th{background:var(--blue);color:#fff;padding:10px 12px;font-size:11.5px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.2)}
+.rtable th:first-child{text-align:left}
+.rtable td{border:1px solid var(--border);padding:0;vertical-align:top}
+.rtable .cn{padding:10px 12px;font-weight:700;font-size:12.5px;background:var(--surf2);min-width:120px}
+.rtable .cw{font-size:10.5px;color:var(--text2);font-weight:600;margin-top:2px}
+.lvl{padding:9px 11px;cursor:pointer;transition:.15s;border-left:3px solid transparent;min-height:72px;position:relative;user-select:none}
+.lvl:hover{background:#eff6ff}
+.lvl.sel{background:var(--blue-l);border-left-color:var(--blue)}
+.lvl .ls{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:var(--blue);line-height:1}
+.lvl .ln{font-size:11px;font-weight:700;color:var(--text);margin:3px 0 3px}
+.lvl .ld{font-size:10.5px;color:var(--text2);line-height:1.4}
+.lvl .chk{position:absolute;top:6px;right:6px;width:15px;height:15px;border-radius:50%;background:var(--blue);color:#fff;font-size:8px;display:none;align-items:center;justify-content:center}
+.lvl.sel .chk{display:flex}
+.rp{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:var(--r);padding:22px;text-align:center}
+.rs{font-size:68px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
+.rg{font-size:18px;font-weight:700;margin-top:6px;opacity:.9}
+.rl{font-size:11px;opacity:.65;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.stat{background:var(--surf);border:1px solid var(--border);border-radius:var(--rs);padding:16px;text-align:center}
+.sv{font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--blue)}
+.sl{font-size:11px;color:var(--text2);font-weight:700;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.fl{display:flex}.fw{flex-wrap:wrap}.ic{align-items:center}.jb{justify-content:space-between}.je{justify-content:flex-end}
+.f1{flex:1}.mono{font-family:'JetBrains Mono',monospace}
+.tsm{font-size:13px}.txs{font-size:11.5px}.tm{color:var(--text2)}
+.bold{font-weight:700}.fw8{font-weight:800}
+.div{height:1px;background:var(--border);margin:14px 0}
+.empty{text-align:center;padding:36px 20px;color:var(--text3)}
+.eico{font-size:28px;margin-bottom:10px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;background:var(--surf2);border:1px solid var(--border);cursor:pointer;transition:.15s}
+.tag:hover{border-color:var(--blue);color:var(--blue)}
+.tag.sel{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+.pr{height:6px;background:var(--surf2);border-radius:3px;overflow:hidden;margin-top:5px}
+.pf{height:100%;border-radius:3px;transition:width .4s}
+.ler{display:flex;align-items:flex-start;gap:8px;padding:10px;background:var(--surf2);border-radius:var(--rs);margin-bottom:8px}
+.lenum{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.lef{flex:1;display:grid;gap:6px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="logo">🎓 Not Sistemi</div>
+    <div class="nav">
+      <button class="nb active" onclick="nav('home',this)">🏠 Ana Sayfa</button>
+      <button class="nb" onclick="nav('students',this)">👥 Öğrenciler</button>
+      <button class="nb" onclick="nav('rubrics',this)">📐 Ölçekler</button>
+      <button class="nb" onclick="nav('evaluate',this)">✏️ Değerlendir</button>
+      <button class="nb" onclick="nav('auto',this)">⚡ Otomatik Not</button>
+      <button class="nb" onclick="nav('reports',this)">📊 Raporlar</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- HOME -->
+<div class="section active" id="s-home">
+  <div style="margin-bottom:18px">
+    <h1 style="font-size:22px;font-weight:800">Hoş Geldiniz 👋</h1>
+    <p class="tm tsm" style="margin-top:6px">Değerlendirme ölçekleri oluşturun — kriter puanlarını tıklayın, not otomatik hesaplansın.</p>
+  </div>
+  <div class="g4" style="margin-bottom:16px">
+    <div class="stat"><div class="sv" id="st-s">0</div><div class="sl">Öğrenci</div></div>
+    <div class="stat"><div class="sv" id="st-r">0</div><div class="sl">Ölçek</div></div>
+    <div class="stat"><div class="sv" id="st-rec">0</div><div class="sl">Kayıt</div></div>
+    <div class="stat"><div class="sv" id="st-avg">—</div><div class="sl">Ortalama</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct"><div class="ico" style="background:var(--blue-l);color:var(--blue)">📋</div>Nasıl Çalışır?</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div class="fl ic" style="gap:12px;padding:10px;background:var(--surf2);border-radius:var(--rs)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+          <div><div class="bold tsm">Öğrenci ekle</div><div class="txs tm">İsim, sınıf, numara girin</div></div>
+        </div>
+        <div class="fl ic" style="gap:12px;padding:10px;background:var(--surf2);border-radius:var(--rs)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+          <div><div class="bold tsm">Ölçek oluştur</div><div class="txs tm">Seviye sayısı, isim, puan ve kriter açıklamaları</div></div>
+        </div>
+        <div class="fl ic" style="gap:12px;padding:10px;background:var(--surf2);border-radius:var(--rs)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+          <div><div class="bold tsm">Tıklayarak değerlendir</div><div class="txs tm">Her kriter kutucuğuna tık → not hesaplandı</div></div>
+        </div>
+        <div class="fl ic" style="gap:12px;padding:10px;background:var(--surf2);border-radius:var(--rs)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+          <div><div class="bold tsm">PDF & Excel indir</div><div class="txs tm">Özet + kriter detay raporları</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ico" style="background:var(--teal-l);color:var(--teal)">🚀</div>Hızlı Ölçek Oluştur</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <button class="btn btn-g btn-full" onclick="nav('rubrics',document.querySelectorAll('.nb')[2]);openNewRubric('genel')">📚 Genel Dersler</button>
+        <button class="btn btn-g btn-full" onclick="nav('rubrics',document.querySelectorAll('.nb')[2]);openNewRubric('dil')">🌐 Dil Dersleri</button>
+        <button class="btn btn-g btn-full" onclick="nav('rubrics',document.querySelectorAll('.nb')[2]);openNewRubric('ingilizce')">🏳️ İngilizce</button>
+        <button class="btn btn-g btn-full" onclick="nav('rubrics',document.querySelectorAll('.nb')[2]);openNewRubric('english')">🏳️ English</button>
+        <button class="btn btn-g btn-full" onclick="nav('rubrics',document.querySelectorAll('.nb')[2]);openNewRubric('beden')">⛹️ Beden Eğitimi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENTS -->
+<div class="section" id="s-students">
+  <div class="fl ic jb" style="margin-bottom:16px">
+    <h2 style="font-size:18px;font-weight:800">Öğrenciler</h2>
+    <button class="btn btn-p" onclick="openM('m-student')">+ Öğrenci Ekle</button>
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>Ad Soyad</th><th>No</th><th>Sınıf</th><th>Kademe</th><th>Kayıt</th><th></th></tr></thead>
+    <tbody id="tb-students"><tr><td colspan="6"><div class="empty"><div class="eico">👥</div><p>Henüz öğrenci eklenmedi.</p></div></td></tr></tbody>
+  </table></div></div>
+</div>
+
+<!-- RUBRICS -->
+<div class="section" id="s-rubrics">
+  <div class="fl ic jb fw" style="gap:8px;margin-bottom:16px">
+    <h2 style="font-size:18px;font-weight:800">Değerlendirme Ölçekleri</h2>
+    <button class="btn btn-p" onclick="openNewRubric()">+ Yeni Ölçek</button>
+  </div>
+  <div id="rubric-list">
+    <div class="empty card" style="padding:48px">
+      <div class="eico">📐</div>
+      <p class="bold">Henüz ölçek oluşturulmadı.</p>
+      <p class="txs tm" style="margin-top:6px">Ders içi performans, performans ödevi veya proje için ölçek oluşturun.</p>
+      <button class="btn btn-p" style="margin-top:16px" onclick="openNewRubric()">İlk Ölçeği Oluştur</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVALUATE -->
+<div class="section" id="s-evaluate">
+  <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">Öğrenci Değerlendirme</h2>
+  <div class="g2" style="align-items:start;margin-bottom:16px">
+    <div>
+      <div class="card">
+        <div class="ct"><div class="ico" style="background:var(--blue-l);color:var(--blue)">⚙️</div>Ayarlar</div>
+        <div class="fr"><label>Öğrenci</label><select id="ev-student"><option value="">-- Seç --</option></select></div>
+        <div class="fr"><label>Ölçek</label><select id="ev-rubric" onchange="loadEvalRubric()"><option value="">-- Seç --</option></select></div>
+        <div class="fr" id="ev-type-wrap" style="display:none">
+          <label>Değerlendirme Türü</label>
+          <div class="msel" id="ev-type-sel"></div>
+        </div>
+      </div>
+    </div>
+    <div id="ev-res-col" style="display:none">
+      <div class="rp">
+        <div class="rl">Hesaplanan Not</div>
+        <div class="rs" id="ev-score">—</div>
+        <div class="rg" id="ev-grade">Tüm kriterleri seçin</div>
+      </div>
+      <div class="fl fw" style="gap:8px;margin-top:12px">
+        <button class="btn btn-s f1" onclick="saveEval()">💾 Kaydet</button>
+        <button class="btn btn-g btn-sm" onclick="resetEval()">↺ Sıfırla</button>
+      </div>
+    </div>
+  </div>
+  <div id="ev-area" style="display:none">
+    <div class="card">
+      <div class="ct" id="ev-rtitle"><div class="ico" style="background:var(--purple-l);color:var(--purple)">📋</div>Ölçek</div>
+      <div id="ev-table-wrap" class="tw"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTO -->
+<div class="section" id="s-auto">
+  <h2 style="font-size:18px;font-weight:800;margin-bottom:4px">Sonuçtan Otomatik Not</h2>
+  <p class="tsm tm" style="margin-bottom:16px">Hedef notu girin — ölçek seviyesi her kritere otomatik atanır.</p>
+  <div class="g2" style="align-items:start">
+    <div>
+      <div class="card">
+        <div class="ct"><div class="ico" style="background:var(--purple-l);color:var(--purple)">🎯</div>Parametreler</div>
+        <div class="fr"><label>Öğrenci</label><select id="au-student"><option value="">-- Seç --</option></select></div>
+        <div class="fr"><label>Ölçek</label><select id="au-rubric" onchange="loadAutoInfo()"><option value="">-- Seç --</option></select></div>
+        <div class="fr" id="au-type-wrap" style="display:none">
+          <label>Tür</label><div class="msel" id="au-type-sel"></div>
+        </div>
+        <div class="fr">
+          <label>Hedef Not: <span id="au-tval" class="mono" style="color:var(--blue)">85</span></label>
+          <input type="range" id="au-sl" min="0" max="100" value="85" style="margin-bottom:6px;display:block;width:100%" oninput="document.getElementById('au-tval').textContent=this.value;document.getElementById('au-ti').value=this.value">
+          <input type="number" id="au-ti" min="0" max="100" value="85" oninput="document.getElementById('au-sl').value=this.value;document.getElementById('au-tval').textContent=this.value">
+        </div>
+        <button class="btn btn-pu btn-full" onclick="runAuto()">⚡ Otomatik Dağıt</button>
+      </div>
+    </div>
+    <div id="au-result" style="display:none">
+      <div class="rp" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
+        <div class="rl">Gerçekleşen Not</div>
+        <div class="rs" id="au-score">—</div>
+        <div class="rg" id="au-grade"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="ct"><div class="ico" style="background:var(--purple-l);color:var(--purple)">📋</div>Kriter Dağılımı</div>
+        <div id="au-bk"></div>
+      </div>
+      <button class="btn btn-s btn-full" style="margin-top:12px" onclick="saveAuto()">💾 Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div class="section" id="s-reports">
+  <div class="fl ic jb fw" style="gap:8px;margin-bottom:16px">
+    <h2 style="font-size:18px;font-weight:800">Raporlar</h2>
+    <div class="fl" style="gap:8px">
+      <button class="btn btn-t" onclick="exportXLSX()">📊 Excel</button>
+      <button class="btn btn-d" onclick="exportPDF()">📄 PDF</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="g3">
+      <div class="fr" style="margin:0"><label>Öğrenci</label><select id="rf-s" onchange="renderRep()"><option value="">Tümü</option></select></div>
+      <div class="fr" style="margin:0"><label>Tür</label>
+        <select id="rf-t" onchange="renderRep()"><option value="">Tümü</option><option value="performans">Ders İçi Perf.</option><option value="proje">Perf./Proje</option></select>
+      </div>
+      <div class="fr" style="margin:0"><label>Mod</label>
+        <select id="rf-m" onchange="renderRep()"><option value="">Tümü</option><option value="manuel">Manuel</option><option value="otomatik">Otomatik</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Ölçek</th><th>Tür</th><th>Mod</th><th>Not</th><th>Harf</th><th>Tarih</th><th></th></tr></thead>
+    <tbody id="tb-report"></tbody>
+  </table></div></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ── MODAL: STUDENT ── -->
+<div class="overlay" id="m-student">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle">Öğrenci Ekle</div><button class="mclose" onclick="closeM('m-student')">✕</button></div>
+    <div class="fr"><label>Ad Soyad *</label><input id="ms-n" placeholder="Ahmet Yılmaz"></div>
+    <div class="fr"><label>Öğrenci No</label><input id="ms-no" placeholder="1001"></div>
+    <div class="fr"><label>Sınıf</label><input id="ms-c" placeholder="8/A"></div>
+    <div class="fr"><label>Kademe</label><select id="ms-k"><option value="ortaokul">Ortaokul</option><option value="lise">Lise</option></select></div>
+    <div class="fl je" style="gap:8px;margin-top:16px">
+      <button class="btn btn-g" onclick="closeM('m-student')">İptal</button>
+      <button class="btn btn-p" onclick="addStudent()">Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: RUBRIC BUILDER ── -->
+<div class="overlay" id="m-rubric">
+  <div class="modal wide">
+    <div class="mhdr"><div class="mtitle" id="mrb-title">Yeni Ölçek</div><button class="mclose" onclick="closeM('m-rubric')">✕</button></div>
+
+    <div class="g2">
+      <div class="fr"><label>Ölçek Adı *</label><input id="rb-name" placeholder="Genel Dersler – Ders İçi Performans"></div>
+      <div class="fr"><label>Ders Türü</label>
+        <select id="rb-ders" onchange="rbDersChange()">
+          <option value="genel">Genel Dersler</option>
+          <option value="dil">Dil Dersleri</option>
+          <option value="ingilizce">İngilizce (Dinleme+Konuşma+Perf+Proje)</option>
+          <option value="english">English (Speaking & Performance)</option>
+          <option value="beden">Beden Eğitimi ve Spor</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="fr"><label>Değerlendirme Tipi</label>
+        <div class="fl fw" style="gap:8px" id="rb-types">
+          <div class="tag sel" data-t="performans" onclick="toggleTag(this)">✓ Ders İçi Performans</div>
+          <div class="tag" data-t="proje" onclick="toggleTag(this)">Performans / Proje</div>
+        </div>
+      </div>
+      <div class="fr"><label>Not Sistemi</label>
+        <select id="rb-ns"><option value="100">100'lük</option><option value="5">5'lik (100'e çevrilir)</option></select>
+      </div>
+    </div>
+
+    <div class="div"></div>
+
+    <!-- LEVELS -->
+    <div class="fl ic jb" style="margin-bottom:10px">
+      <div class="bold tsm">🔢 Değerlendirme Seviyeleri</div>
+      <div class="fl" style="gap:6px">
+        <button class="btn btn-g btn-sm" onclick="addLevel()">+ Seviye</button>
+        <button class="btn btn-d btn-sm" onclick="removeLevel()">− Seviye</button>
+      </div>
+    </div>
+    <p class="txs tm" style="margin-bottom:10px">Her seviye için: isim · kısa açıklama · 100 üzerinden puan (bu puan, o seviyeye tıklandığında kritere verilir)</p>
+    <div id="rb-levels"></div>
+
+    <div class="div"></div>
+
+    <!-- CRITERIA -->
+    <div class="fl ic jb" style="margin-bottom:10px">
+      <div class="bold tsm">📋 Kriterler & Seviye Açıklamaları</div>
+      <button class="btn btn-g btn-sm" onclick="addCrit()">+ Kriter</button>
+    </div>
+    <p class="txs tm" style="margin-bottom:10px">Her kriter için isim, ağırlık (%) ve her seviyede öğrencinin ne yapacağını yazın.</p>
+    <div id="rb-crits"></div>
+    <div class="fl ic jb" style="margin-top:8px">
+      <div class="txs tm">Toplam ağırlık: <span id="rb-wt" class="mono bold">0</span>%</div>
+    </div>
+
+    <div class="fl je" style="gap:8px;margin-top:18px">
+      <button class="btn btn-g" onclick="closeM('m-rubric')">İptal</button>
+      <button class="btn btn-p" onclick="saveRubric()">💾 Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────
+var S={students:[],rubrics:[],records:[],editId:null,evalSel:{},evalRubric:null,evalType:'performans',autoRes:null};
+(function(){try{S.students=JSON.parse(localStorage.getItem('ns3_s')||'[]')}catch(e){S.students=[]}
+try{S.rubrics=JSON.parse(localStorage.getItem('ns3_r')||'[]')}catch(e){S.rubrics=[]}
+try{S.records=JSON.parse(localStorage.getItem('ns3_rec')||'[]')}catch(e){S.records=[]}})();
+function persist(){localStorage.setItem('ns3_s',JSON.stringify(S.students));localStorage.setItem('ns3_r',JSON.stringify(S.rubrics));localStorage.setItem('ns3_rec',JSON.stringify(S.records))}
+
+// ── DEFAULTS ──────────────────────────────
+var DEF_LVL=[
+  {name:'Başlangıç',desc:'Temel beklentilerin altında',score:40},
+  {name:'Gelişiyor',desc:'Kısmen karşılıyor',score:65},
+  {name:'Yeterli',desc:'Beklentileri karşılıyor',score:80},
+  {name:'İyi',desc:'Beklentilerin üzerinde',score:90},
+  {name:'Mükemmel',desc:'Olağanüstü performans',score:100}
+];
+var DEF_CRIT={
+  genel:[{name:'Derse Katılım & Hazırlık',w:20},{name:'Soru–Cevap & Tartışma',w:30},{name:'Sınıf İçi Görev',w:30},{name:'Ödev & Çalışma',w:20}],
+  dil:[{name:'Dinleme Becerisi',w:25},{name:'Konuşma Akıcılığı',w:30},{name:'Kelime Bilgisi',w:25},{name:'Katılım & Girişim',w:20}],
+  ingilizce:[{name:'Dinleme (Listening)',w:25},{name:'Konuşma (Speaking)',w:30},{name:'Performans Değerlendirme',w:25},{name:'Proje',w:20}],
+  english:[{name:'Speaking Fluency',w:30},{name:'Pronunciation',w:20},{name:'Vocabulary & Grammar',w:25},{name:'Performance Scale',w:25}],
+  beden:[{name:'Fiziksel Katılım',w:30},{name:'Beceri & Teknik',w:35},{name:'Takım Çalışması',w:20},{name:'Sağlık & Hijyen',w:15}]
+};
+
+var _rb={levels:[],crits:[]};
+
+// ── NAV ───────────────────────────────────
+function nav(p,el){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('s-'+p).classList.add('active');
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active')});
+  if(el) el.classList.add('active');
+  if(p==='students') renderStudents();
+  if(p==='rubrics')  renderRubrics();
+  if(p==='evaluate') initEv();
+  if(p==='auto')     initAuto();
+  if(p==='reports')  initRep();
+  updateStats();
+}
+
+// ── MODAL ─────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+
+// ── UTILS ─────────────────────────────────
+function uid(){return Date.now()+'_'+Math.random().toString(36).slice(2,6)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function today(){return new Date().toLocaleDateString('tr-TR')}
+function avBg(n){var c=['#2563eb','#0d9488','#7c3aed','#d97706','#dc2626','#16a34a'];return c[n.charCodeAt(0)%c.length]}
+function init2(n){return n.split(' ').map(function(x){return x[0]||''}).join('').toUpperCase().slice(0,2)}
+function gradeInfo(n){n=Math.round(n);
+  if(n>=90)return{l:'AA',c:['#14532d','#dcfce7']};if(n>=85)return{l:'BA',c:['#0d9488','#ccfbf1']};
+  if(n>=80)return{l:'BB',c:['#1d4ed8','#dbeafe']};if(n>=75)return{l:'CB',c:['#2563eb','#dbeafe']};
+  if(n>=70)return{l:'CC',c:['#d97706','#fef3c7']};if(n>=60)return{l:'DC',c:['#ea580c','#ffedd5']};
+  if(n>=50)return{l:'DD',c:['#dc2626','#fee2e2']};return{l:'FF',c:['#7f1d1d','#fee2e2']}}
+function gradeDesc(n){if(n>=90)return'Mükemmel 🌟';if(n>=80)return'Çok İyi 👍';if(n>=70)return'İyi 👌';if(n>=60)return'Orta 📖';if(n>=50)return'Geçer ✔';return'Başarısız ❌'}
+
+// ── STUDENTS ──────────────────────────────
+function addStudent(){
+  var n=document.getElementById('ms-n').value.trim();
+  if(!n){alert('Ad Soyad zorunlu!');return}
+  S.students.push({id:uid(),name:n,no:document.getElementById('ms-no').value.trim(),cls:document.getElementById('ms-c').value.trim(),kademe:document.getElementById('ms-k').value});
+  persist();renderStudents();updateStats();syncDDs();closeM('m-student');
+  ['ms-n','ms-no','ms-c'].forEach(function(i){document.getElementById(i).value=''});
+}
+function delStudent(id){if(!confirm('Öğrenciyi sil?'))return;S.students=S.students.filter(function(s){return s.id!==id});persist();renderStudents();updateStats();syncDDs()}
+function renderStudents(){
+  var tb=document.getElementById('tb-students');
+  if(!S.students.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="eico">👥</div><p>Henüz öğrenci eklenmedi.</p></div></td></tr>';return}
+  tb.innerHTML=S.students.map(function(s){
+    var rc=S.records.filter(function(r){return r.studentId===s.id}).length;
+    return'<tr><td><div class="fl ic" style="gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:'+avBg(s.name)+';color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+init2(s.name)+'</div><span class="bold">'+esc(s.name)+'</span></div></td><td>'+esc(s.no||'—')+'</td><td>'+esc(s.cls||'—')+'</td><td><span class="badge '+(s.kademe==='ortaokul'?'bb':'bpu')+'">'+s.kademe+'</span></td><td><span class="badge bt">'+rc+' kayıt</span></td><td><button class="btn btn-d btn-sm" onclick="delStudent(\''+s.id+'\')">Sil</button></td></tr>'
+  }).join('');
+}
+
+// ── RUBRIC BUILDER ────────────────────────
+function openNewRubric(pre){
+  S.editId=null;document.getElementById('mrb-title').textContent='Yeni Ölçek';
+  document.getElementById('rb-name').value='';
+  if(pre)document.getElementById('rb-ders').value=pre;
+  document.getElementById('rb-ns').value='100';
+  document.querySelectorAll('#rb-types .tag').forEach(function(t){t.classList.remove('sel');t.textContent=(t.dataset.t==='performans'?'Ders İçi Performans':'Performans / Proje')});
+  document.querySelector('#rb-types .tag[data-t="performans"]').classList.add('sel');
+  document.querySelector('#rb-types .tag[data-t="performans"]').textContent='✓ Ders İçi Performans';
+  _rb.levels=DEF_LVL.map(function(l){return{name:l.name,desc:l.desc,score:l.score}});
+  var ders=pre||document.getElementById('rb-ders').value||'genel';
+  _rb.crits=(DEF_CRIT[ders]||DEF_CRIT.genel).map(function(c){return{name:c.name,w:c.w,descs:_rb.levels.map(function(){return''})}});
+  renderRbLvl();renderRbCrit();renderRbWT();openM('m-rubric');
+}
+function rbDersChange(){
+  var ders=document.getElementById('rb-ders').value;
+  _rb.crits=(DEF_CRIT[ders]||DEF_CRIT.genel).map(function(c){return{name:c.name,w:c.w,descs:_rb.levels.map(function(){return''})}});
+  renderRbCrit();renderRbWT();
+}
+function toggleTag(el){
+  el.classList.toggle('sel');
+  var sel=el.classList.contains('sel');
+  el.textContent=(sel?'✓ ':'')+(el.dataset.t==='performans'?'Ders İçi Performans':'Performans / Proje');
+}
+function addLevel(){_rb.levels.push({name:'Yeni',desc:'',score:Math.min(100,(_rb.levels[_rb.levels.length-1]?.score||80)+5)});_rb.crits.forEach(function(c){c.descs.push('')});renderRbLvl();renderRbCrit()}
+function removeLevel(){if(_rb.levels.length<=1){alert('En az 1 seviye!');return}_rb.levels.pop();_rb.crits.forEach(function(c){c.descs.pop()});renderRbLvl();renderRbCrit()}
+function renderRbLvl(){
+  document.getElementById('rb-levels').innerHTML=_rb.levels.map(function(lv,i){
+    return'<div class="ler"><div class="lenum">'+(i+1)+'</div><div class="lef" style="grid-template-columns:1fr 2fr 80px">'+
+      '<input placeholder="Seviye adı" value="'+esc(lv.name)+'" oninput="_rb.levels['+i+'].name=this.value;syncLH()">'+
+      '<input placeholder="Kısa açıklama" value="'+esc(lv.desc)+'" oninput="_rb.levels['+i+'].desc=this.value">'+
+      '<input type="number" placeholder="Puan" min="0" max="100" value="'+lv.score+'" oninput="_rb.levels['+i+'].score=+this.value">'+
+    '</div></div>'
+  }).join('');
+}
+function syncLH(){document.querySelectorAll('.lh-name').forEach(function(el,i){if(_rb.levels[i])el.textContent=_rb.levels[i].name+' ('+_rb.levels[i].score+'p)'})}
+function addCrit(){_rb.crits.push({name:'Yeni Kriter',w:10,descs:_rb.levels.map(function(){return''})});renderRbCrit();renderRbWT()}
+function delCrit(i){if(_rb.crits.length<=1){alert('En az 1 kriter!');return}_rb.crits.splice(i,1);renderRbCrit();renderRbWT()}
+function renderRbCrit(){
+  var cols='repeat('+_rb.levels.length+',1fr)';
+  document.getElementById('rb-crits').innerHTML=_rb.crits.map(function(cr,ci){
+    return'<div style="background:var(--surf2);border-radius:var(--rs);padding:12px;margin-bottom:10px">'+
+      '<div class="fl ic" style="gap:8px;margin-bottom:8px">'+
+        '<input style="flex:1;margin:0" placeholder="Kriter adı" value="'+esc(cr.name)+'" oninput="_rb.crits['+ci+'].name=this.value">'+
+        '<input type="number" style="width:72px;margin:0" placeholder="%" min="0" max="100" value="'+cr.w+'" oninput="_rb.crits['+ci+'].w=+this.value;renderRbWT()">'+
+        '<button class="btn btn-d btn-sm" onclick="delCrit('+ci+')">✕</button>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:'+cols+';gap:6px">'+
+        _rb.levels.map(function(lv,li){return'<div><div class="txs bold tm lh-name" style="margin-bottom:3px">'+esc(lv.name)+' ('+lv.score+'p)</div>'+
+          '<textarea placeholder="Bu seviyede öğrenci ne yapar?" oninput="_rb.crits['+ci+'].descs['+li+']=this.value">'+esc(cr.descs[li]||'')+'</textarea></div>'}).join('')+
+      '</div></div>'
+  }).join('');
+}
+function renderRbWT(){
+  var t=_rb.crits.reduce(function(s,c){return s+(+c.w||0)},0);
+  var el=document.getElementById('rb-wt');el.textContent=t;
+  el.style.color=Math.abs(t-100)<1?'var(--green)':'var(--red)';
+}
+function saveRubric(){
+  var name=document.getElementById('rb-name').value.trim();
+  if(!name){alert('Ölçek adı zorunlu!');return}
+  var types=[...document.querySelectorAll('#rb-types .tag.sel')].map(function(t){return t.dataset.t});
+  if(!types.length){alert('En az bir tip seçin!');return}
+  var tot=_rb.crits.reduce(function(s,c){return s+(+c.w||0)},0);
+  if(Math.abs(tot-100)>1){alert('Ağırlık toplamı %100 olmalı! Şu an: %'+tot);return}
+  // sync from DOM
+  document.querySelectorAll('#rb-levels .ler').forEach(function(row,i){
+    var inp=row.querySelectorAll('input');
+    _rb.levels[i]={name:inp[0].value,desc:inp[1].value,score:+inp[2].value};
+  });
+  var rb={id:S.editId||uid(),name:name,ders:document.getElementById('rb-ders').value,notsys:document.getElementById('rb-ns').value,types:types,
+    levels:JSON.parse(JSON.stringify(_rb.levels)),crits:JSON.parse(JSON.stringify(_rb.crits)),createdAt:today()};
+  if(S.editId){var idx=S.rubrics.findIndex(function(r){return r.id===S.editId});if(idx>-1)S.rubrics[idx]=rb}
+  else S.rubrics.push(rb);
+  persist();renderRubrics();syncDDs();closeM('m-rubric');updateStats();
+}
+function renderRubrics(){
+  var el=document.getElementById('rubric-list');
+  if(!S.rubrics.length){el.innerHTML='<div class="empty card" style="padding:48px"><div class="eico">📐</div><p class="bold">Henüz ölçek oluşturulmadı.</p><button class="btn btn-p" style="margin-top:16px" onclick="openNewRubric()">İlk Ölçeği Oluştur</button></div>';return}
+  var dl={genel:'Genel',dil:'Dil',ingilizce:'İngilizce',english:'English',beden:'Beden Ed.'};
+  el.innerHTML=S.rubrics.map(function(r){
+    return'<div class="card" style="margin-bottom:14px;border-left:4px solid var(--blue)">'+
+      '<div class="fl ic jb fw" style="gap:8px;margin-bottom:12px">'+
+        '<div><div class="bold" style="font-size:15px">'+esc(r.name)+'</div>'+
+          '<div class="fl fw" style="gap:6px;margin-top:6px">'+
+            '<span class="badge bb">'+esc(dl[r.ders]||r.ders)+'</span>'+
+            r.types.map(function(t){return'<span class="badge bt">'+(t==='performans'?'Ders İçi Perf.':'Perf./Proje')+'</span>'}).join('')+
+            '<span class="badge ba">'+r.levels.length+' seviye</span>'+
+            '<span class="badge bpu">'+r.crits.length+' kriter</span>'+
+          '</div>'+
+        '</div>'+
+        '<div class="fl" style="gap:8px"><button class="btn btn-g btn-sm" onclick="editRubric(\''+r.id+'\')">✏️ Düzenle</button><button class="btn btn-d btn-sm" onclick="delRubric(\''+r.id+'\')">Sil</button></div>'+
+      '</div>'+
+      '<div class="tw"><table class="rtable" style="font-size:11px"><thead><tr>'+
+        '<th style="text-align:left;min-width:110px">Kriter</th><th style="min-width:50px;text-align:center">Ağırlık</th>'+
+        r.levels.map(function(l){return'<th style="min-width:100px">'+esc(l.name)+'<br><span style="font-weight:400;opacity:.75;font-size:10px">'+l.score+' puan</span></th>'}).join('')+
+      '</tr></thead><tbody>'+
+      r.crits.map(function(c){return'<tr><td class="cn">'+esc(c.name)+'<div class="cw">%'+c.w+'</div></td><td style="text-align:center;padding:8px;font-weight:800;color:var(--blue)">%'+c.w+'</td>'+
+        r.levels.map(function(lv,li){return'<td style="padding:8px;font-size:10.5px;color:var(--text2)">'+esc((c.descs&&c.descs[li])||'—')+'</td>'}).join('')+'</tr>'}).join('')+
+      '</tbody></table></div></div>'
+  }).join('');
+}
+function editRubric(id){
+  var r=S.rubrics.find(function(x){return x.id===id});if(!r)return;
+  S.editId=id;document.getElementById('mrb-title').textContent='Ölçek Düzenle';
+  document.getElementById('rb-name').value=r.name;document.getElementById('rb-ders').value=r.ders;document.getElementById('rb-ns').value=r.notsys||'100';
+  document.querySelectorAll('#rb-types .tag').forEach(function(t){var sel=r.types.includes(t.dataset.t);t.classList.toggle('sel',sel);t.textContent=(sel?'✓ ':'')+( t.dataset.t==='performans'?'Ders İçi Performans':'Performans / Proje')});
+  _rb.levels=JSON.parse(JSON.stringify(r.levels));
+  _rb.crits=JSON.parse(JSON.stringify(r.crits));
+  _rb.crits.forEach(function(c){if(!c.descs)c.descs=_rb.levels.map(function(){return''})});
+  renderRbLvl();renderRbCrit();renderRbWT();openM('m-rubric');
+}
+function delRubric(id){if(!confirm('Ölçeği sil?'))return;S.rubrics=S.rubrics.filter(function(r){return r.id!==id});persist();renderRubrics();syncDDs();updateStats()}
+
+// ── EVALUATE ──────────────────────────────
+function initEv(){syncDDs();document.getElementById('ev-area').style.display='none';document.getElementById('ev-res-col').style.display='none';S.evalSel={}}
+function loadEvalRubric(){
+  var rid=document.getElementById('ev-rubric').value;
+  var r=S.rubrics.find(function(x){return x.id===rid});
+  S.evalRubric=r||null;S.evalSel={};
+  if(!r){['ev-area','ev-res-col'].forEach(function(i){document.getElementById(i).style.display='none'});document.getElementById('ev-type-wrap').style.display='none';return}
+  if(r.types.length>1){
+    document.getElementById('ev-type-wrap').style.display='block';
+    document.getElementById('ev-type-sel').innerHTML=r.types.map(function(t,i){return'<button class="mb'+(i===0?' active':'')+'" onclick="setEvType(\''+t+'\',this)">'+(t==='performans'?'Ders İçi Performans':'Performans / Proje')+'</button>'}).join('');
+    S.evalType=r.types[0];
+  }else{document.getElementById('ev-type-wrap').style.display='none';S.evalType=r.types[0]||'performans'}
+  renderEvTable(r);
+}
+function setEvType(t,el){S.evalType=t;document.querySelectorAll('#ev-type-sel .mb').forEach(function(b){b.classList.remove('active')});el.classList.add('active')}
+function renderEvTable(r){
+  document.getElementById('ev-area').style.display='block';
+  document.getElementById('ev-res-col').style.display='block';
+  document.getElementById('ev-rtitle').innerHTML='<div class="ico" style="background:var(--purple-l);color:var(--purple)">📋</div>'+esc(r.name);
+  var html='<table class="rtable"><thead><tr><th style="text-align:left;min-width:130px">Kriter</th><th style="text-align:center;min-width:50px">%</th>'+
+    r.levels.map(function(l){return'<th style="min-width:115px">'+esc(l.name)+'<br><span style="font-weight:400;opacity:.75;font-size:10px">'+l.score+' puan</span></th>'}).join('')+'</tr></thead><tbody>';
+  r.crits.forEach(function(c,ci){
+    html+='<tr><td class="cn">'+esc(c.name)+'<div class="cw">%'+c.w+'</div></td><td style="text-align:center;padding:8px;font-weight:800;font-size:14px;color:var(--blue)">'+c.w+'</td>';
+    r.levels.forEach(function(lv,li){
+      var sel=S.evalSel[ci]===li;
+      html+='<td><div class="lvl'+(sel?' sel':'')+'" onclick="selLvl('+ci+','+li+')" id="lv_'+ci+'_'+li+'">'+
+        '<div class="chk">✓</div><div class="ls">'+lv.score+'</div><div class="ln">'+esc(lv.name)+'</div>'+
+        '<div class="ld">'+esc((c.descs&&c.descs[li])||lv.desc||'')+'</div></div></td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('ev-table-wrap').innerHTML=html;
+  calcEv();
+}
+function selLvl(ci,li){
+  if(!S.evalRubric)return;
+  S.evalSel[ci]=li;
+  S.evalRubric.crits.forEach(function(_,i){S.evalRubric.levels.forEach(function(_,j){var el=document.getElementById('lv_'+i+'_'+j);if(el)el.className='lvl'+(i===ci&&j===li?' sel':'')})});
+  calcEv();
+}
+function calcEv(){
+  if(!S.evalRubric)return;
+  var r=S.evalRubric,tot=0,all=true;
+  r.crits.forEach(function(c,ci){if(S.evalSel[ci]===undefined){all=false;return}tot+=r.levels[S.evalSel[ci]].score*(c.w/100)});
+  var sc=Math.round(tot*10)/10;
+  var g=gradeInfo(sc);
+  document.getElementById('ev-score').textContent=all?sc.toFixed(1):'—';
+  document.getElementById('ev-grade').textContent=all?(g.l+' · '+gradeDesc(sc)):'Tüm kriterleri seçin';
+}
+function saveEval(){
+  var sid=document.getElementById('ev-student').value;var r=S.evalRubric;
+  if(!sid){alert('Öğrenci seçin!');return}if(!r){alert('Ölçek seçin!');return}
+  for(var i=0;i<r.crits.length;i++){if(S.evalSel[i]===undefined){alert('Tüm kriterleri değerlendirin!');return}}
+  var tot=0,det={};
+  r.crits.forEach(function(c,ci){var li=S.evalSel[ci];var lv=r.levels[li];tot+=lv.score*(c.w/100);det[c.name]={level:lv.name,score:lv.score,weight:c.w}});
+  var st=S.students.find(function(s){return s.id===sid});
+  S.records.push({id:uid(),studentId:sid,studentName:st?st.name:'—',cls:st?st.cls:'—',rubricId:r.id,rubricName:r.name,type:S.evalType,mode:'manuel',score:Math.round(tot*10)/10,detail:det,date:today()});
+  persist();updateStats();alert('Kayıt eklendi ✅');resetEval();
+}
+function resetEval(){S.evalSel={};if(S.evalRubric)renderEvTable(S.evalRubric)}
+
+// ── AUTO ──────────────────────────────────
+function initAuto(){syncDDs();document.getElementById('au-result').style.display='none'}
+function loadAutoInfo(){
+  var rid=document.getElementById('au-rubric').value;var r=S.rubrics.find(function(x){return x.id===rid});
+  var w=document.getElementById('au-type-wrap');var s=document.getElementById('au-type-sel');
+  if(!r){w.style.display='none';return}
+  if(r.types.length>1){w.style.display='block';s.innerHTML=r.types.map(function(t,i){return'<button class="mb'+(i===0?' active':'')+'" onclick="this.closest(\'.msel\').querySelectorAll(\'.mb\').forEach(b=>b.classList.remove(\'active\'));this.classList.add(\'active\')">'+(t==='performans'?'Ders İçi Performans':'Performans / Proje')+'</button>'}).join('')}
+  else w.style.display='none';
+}
+function runAuto(){
+  var rid=document.getElementById('au-rubric').value;var target=+document.getElementById('au-ti').value;
+  var r=S.rubrics.find(function(x){return x.id===rid});
+  if(!r){alert('Ölçek seçin!');return}if(isNaN(target)||target<0||target>100){alert('0–100 arası hedef girin!');return}
+  var assigned=r.crits.map(function(c){
+    var want=Math.max(0,Math.min(100,target+(Math.random()-.5)*22));
+    var best=0,bd=9999;
+    r.levels.forEach(function(lv,li){var d=Math.abs(lv.score-want);if(d<bd){bd=d;best=li}});
+    return best;
+  });
+  var actual=0;r.crits.forEach(function(c,ci){actual+=r.levels[assigned[ci]].score*(c.w/100)});
+  actual=Math.round(actual*10)/10;
+  var g=gradeInfo(actual);
+  document.getElementById('au-score').textContent=actual.toFixed(1);
+  document.getElementById('au-grade').textContent=g.l+' · '+gradeDesc(actual);
+  document.getElementById('au-result').style.display='block';
+  document.getElementById('au-bk').innerHTML=r.crits.map(function(c,ci){
+    var lv=r.levels[assigned[ci]];
+    return'<div style="margin-bottom:12px"><div class="fl ic jb"><div class="bold tsm">'+esc(c.name)+' <span class="badge bb txs">%'+c.w+'</span></div><div class="mono bold" style="color:var(--purple)">'+lv.score+'</div></div>'+
+      '<div class="txs tm">'+esc(lv.name)+'</div><div class="pr"><div class="pf" style="width:'+lv.score+'%;background:var(--purple)"></div></div></div>';
+  }).join('');
+  S.autoRes={r,assigned,actual};
+}
+function saveAuto(){
+  if(!S.autoRes){alert('Önce dağıt!');return}
+  var sid=document.getElementById('au-student').value;var{r,assigned,actual}=S.autoRes;
+  var st=S.students.find(function(s){return s.id===sid});
+  var ab=document.querySelector('#au-type-sel .mb.active');
+  var type=ab?(ab.textContent.includes('Proje')?'proje':'performans'):r.types[0];
+  var det={};r.crits.forEach(function(c,ci){var lv=r.levels[assigned[ci]];det[c.name]={level:lv.name,score:lv.score,weight:c.w}});
+  S.records.push({id:uid(),studentId:sid,studentName:st?st.name:'—',cls:st?st.cls:'—',rubricId:r.id,rubricName:r.name,type,mode:'otomatik',score:actual,detail:det,date:today()});
+  persist();updateStats();alert('Kayıt eklendi ✅');S.autoRes=null;document.getElementById('au-result').style.display='none';
+}
+
+// ── REPORTS ───────────────────────────────
+function initRep(){syncDDs();renderRep()}
+function getFiltered(){
+  var sid=document.getElementById('rf-s')?.value||'',type=document.getElementById('rf-t')?.value||'',mode=document.getElementById('rf-m')?.value||'';
+  return S.records.filter(function(r){return(!sid||r.studentId===sid)&&(!type||r.type===type)&&(!mode||r.mode===mode)});
+}
+function renderRep(){
+  var data=getFiltered();var tb=document.getElementById('tb-report');
+  if(!data.length){tb.innerHTML='<tr><td colspan="9"><div class="empty"><div class="eico">📋</div><p>Kayıt bulunamadı.</p></div></td></tr>';return}
+  tb.innerHTML=data.map(function(rec){
+    var g=gradeInfo(rec.score);
+    return'<tr><td class="bold">'+esc(rec.studentName)+'</td><td>'+esc(rec.cls)+'</td><td>'+esc(rec.rubricName||'—')+'</td>'+
+      '<td><span class="badge '+(rec.type==='performans'?'bb':'bt')+'">'+(rec.type==='performans'?'Performans':'Proje')+'</span></td>'+
+      '<td><span class="badge '+(rec.mode==='manuel'?'ba':'bpu')+'">'+rec.mode+'</span></td>'+
+      '<td class="mono bold" style="font-size:15px">'+rec.score.toFixed(1)+'</td>'+
+      '<td><span class="badge" style="background:'+g.c[1]+';color:'+g.c[0]+'">'+g.l+'</span></td>'+
+      '<td class="tm txs">'+rec.date+'</td>'+
+      '<td><button class="btn btn-d btn-sm" onclick="delRec(\''+rec.id+'\')">Sil</button></td></tr>';
+  }).join('');
+}
+function delRec(id){if(!confirm('Kaydı sil?'))return;S.records=S.records.filter(function(r){return r.id!==id});persist();renderRep();updateStats()}
+
+// ── EXPORT ────────────────────────────────
+function exportXLSX(){
+  var data=getFiltered();if(!data.length){alert('Kayıt yok!');return}
+  var wb=XLSX.utils.book_new();
+  var sum=[['Öğrenci','Sınıf','Ölçek','Tür','Mod','Not','Harf','Tarih'],...data.map(function(r){return[r.studentName,r.cls,r.rubricName,r.type,r.mode,r.score.toFixed(1),gradeInfo(r.score).l,r.date]})];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'Özet');
+  var det=[['Öğrenci','Ölçek','Kriter','Seviye','Puan','Ağırlık']];
+  data.forEach(function(r){Object.entries(r.detail||{}).forEach(function(e){det.push([r.studentName,r.rubricName,e[0],e[1].level||'',e[1].score||'','%'+(e[1].weight||'')])})});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(det),'Kriter Detay');
+  XLSX.writeFile(wb,'not_raporu_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+function exportPDF(){
+  var data=getFiltered();if(!data.length){alert('Kayıt yok!');return}
+  var{jsPDF}=window.jspdf;var doc=new jsPDF({orientation:'landscape'});
+  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('Not Sistemi – Rapor',14,15);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Oluşturma: '+new Date().toLocaleString('tr-TR'),14,21);
+  doc.autoTable({startY:26,head:[['Öğrenci','Sınıf','Ölçek','Tür','Mod','Not','Harf','Tarih']],
+    body:data.map(function(r){return[r.studentName,r.cls,r.rubricName,r.type,r.mode,r.score.toFixed(1),gradeInfo(r.score).l,r.date]}),
+    styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[37,99,235],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[241,245,249]},columnStyles:{5:{fontStyle:'bold'},6:{fontStyle:'bold'}}});
+  var det=[];data.forEach(function(r){Object.entries(r.detail||{}).forEach(function(e){det.push([r.studentName,r.rubricName,e[0],e[1].level||'',String(e[1].score||''),'%'+String(e[1].weight||'')])})});
+  if(det.length){doc.addPage();doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text('Kriter Detayı',14,15);
+    doc.autoTable({startY:20,head:[['Öğrenci','Ölçek','Kriter','Seviye','Puan','Ağırlık']],body:det,styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[241,245,249]}})}
+  doc.save('not_raporu_'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+
+// ── SYNC DROPDOWNS ────────────────────────
+function syncDDs(){
+  var so='<option value="">-- Seç --</option>'+S.students.map(function(s){return'<option value="'+s.id+'">'+esc(s.name)+' ('+esc(s.cls||'-')+')</option>'}).join('');
+  var ro='<option value="">-- Seç --</option>'+S.rubrics.map(function(r){return'<option value="'+r.id+'">'+esc(r.name)+'</option>'}).join('');
+  var fo='<option value="">Tümü</option>'+S.students.map(function(s){return'<option value="'+s.id+'">'+esc(s.name)+'</option>'}).join('');
+  ['ev-student','au-student'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=so});
+  ['ev-rubric','au-rubric'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=ro});
+  var rf=document.getElementById('rf-s');if(rf)rf.innerHTML=fo;
+}
+
+// ── STATS ─────────────────────────────────
+function updateStats(){
+  document.getElementById('st-s').textContent=S.students.length;
+  document.getElementById('st-r').textContent=S.rubrics.length;
+  document.getElementById('st-rec').textContent=S.records.length;
+  if(S.records.length){var avg=S.records.reduce(function(s,r){return s+r.score},0)/S.records.length;document.getElementById('st-avg').textContent=avg.toFixed(1)}
+  else document.getElementById('st-avg').textContent='—';
+}
+
+updateStats();syncDDs();
+</script>
+</body>
+</html>
