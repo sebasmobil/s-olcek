@@ -348,6 +348,36 @@ body{
   transform:translateX(-50%);
 }
 
+/* Tooltip above the playhead line */
+.ph-tooltip{
+  pointer-events:none;
+  position:absolute;
+  top:-38px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--a1);
+  color:#fff;
+  font-family:'Fira Code',monospace;
+  font-size:12px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:8px;
+  white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  opacity:0;
+  transition:opacity .15s;
+  z-index:40;
+}
+.ph-tooltip::after{
+  content:'';
+  position:absolute;
+  top:100%; left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:var(--a1);
+}
+.ph-tooltip.show{ opacity:1; }
+
 /* Big draggable circle sitting at the bottom of the line */
 .ph-circle{
   pointer-events:all;
@@ -785,6 +815,7 @@ body{
       <div class="hdl" id="hR"><div class="hdl-bar"></div></div>
       <!-- Playhead line + draggable circle -->
       <div class="playhead" id="ph" style="left:0">
+        <div class="ph-tooltip" id="phTooltip">0:00.00</div>
         <div class="ph-circle" id="phCircle"></div>
       </div>
     </div>
@@ -1121,7 +1152,8 @@ waveWrap.addEventListener('click', (e) => {
 });
 
 // ─── Playhead circle drag ─────────────────────────────────────────────
-const phCircle = document.getElementById('phCircle');
+const phCircle  = document.getElementById('phCircle');
+const phTooltip = document.getElementById('phTooltip');
 let scrubDragging = false;
 
 // syncPosition: given absolute track time t, move the playhead line+circle
@@ -1131,11 +1163,20 @@ function syncPosition(t) {
   ph.style.left = ((t / dur) * W) + 'px';
 }
 
+function fmtTooltip(t) {
+  const m  = Math.floor(t / 60);
+  const s  = Math.floor(t % 60);
+  const ms = Math.floor((t % 1) * 100);
+  return `${m}:${String(s).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;
+}
+
 phCircle.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   e.stopPropagation();
   scrubDragging = true;
   phCircle.setPointerCapture(e.pointerId);
+  phTooltip.textContent = fmtTooltip(pauseAt);
+  phTooltip.classList.add('show');
 });
 phCircle.addEventListener('pointermove', (e) => {
   if (!scrubDragging || !audioBuf) return;
@@ -1145,19 +1186,24 @@ phCircle.addEventListener('pointermove', (e) => {
   const t = ratio * dur;
   pauseAt = Math.max(trimS, Math.min(t, trimE));
   syncPosition(pauseAt);
+  phTooltip.textContent = fmtTooltip(pauseAt);
   playTime.textContent = fmtTime(pauseAt) + ' / ' + fmtTime(trimE);
 });
 phCircle.addEventListener('pointerup', () => {
   if (!scrubDragging) return;
   scrubDragging = false;
+  phTooltip.classList.remove('show');
   if (isPlaying) {
-    const seekTo = pauseAt; // save dragged position before stopAudio overwrites it
+    const seekTo = pauseAt;
     stopAudio();
-    pauseAt = seekTo;       // restore so startAudio uses the dragged position
+    pauseAt = seekTo;
     startAudio();
   }
 });
-phCircle.addEventListener('pointercancel', () => { scrubDragging = false; });
+phCircle.addEventListener('pointercancel', () => {
+  scrubDragging = false;
+  phTooltip.classList.remove('show');
+});
 
 // ─── Time inputs ──────────────────────────────────────────────────────
 function syncInputs() {
