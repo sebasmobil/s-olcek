@@ -21,6 +21,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0c0d10" id="metaThemeColor">
+<meta name="msapplication-navbutton-color" content="#0c0d10">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Timer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -897,17 +899,36 @@ body {
 
 <script>
 // ═══ THEME ════════════════════════════════════════
+const THEME_COLORS = {
+  dark:  '#0c0d10',
+  light: '#f4f3ee'
+};
+
+function applyThemeColor(theme) {
+  const color = THEME_COLORS[theme] || THEME_COLORS.dark;
+  // Standard theme-color (Chrome, Samsung, Firefox)
+  const meta = document.getElementById('metaThemeColor');
+  if (meta) meta.setAttribute('content', color);
+  // MS
+  const msMeta = document.querySelector('meta[name="msapplication-navbutton-color"]');
+  if (msMeta) msMeta.setAttribute('content', color);
+  // Apple status bar style
+  const appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (appleMeta) appleMeta.setAttribute('content', theme === 'dark' ? 'black-translucent' : 'default');
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
   html.dataset.theme = next;
   localStorage.setItem('timerTheme', next);
-  // Update accent color in preset color options
+  applyThemeColor(next);
   updateColorOptions();
 }
 // Restore theme
 const savedTheme = localStorage.getItem('timerTheme');
 if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+applyThemeColor(savedTheme || 'dark');
 
 function updateColorOptions() {
   // Nothing needed – CSS vars handle it via color-mix
