@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  S-Zaman Pro 2.0
+  S-Zaman Pro 2.01
   Copyright (C) 2026 sebasmobil
   Licensed under the GNU Affero General Public License v3.0
   https://www.gnu.org/licenses/agpl-3.0.html
@@ -31,7 +31,7 @@
 <style>
 
 
-/* S-Zaman Pro 2.0 — © sebasmobil 2026 — GNU AGPL v3.0 */
+/* S-Zaman Pro 2.01 — © sebasmobil 2026 — GNU AGPL v3.0 */
 :root{
   --bg:#080810;--s1:#0f0f1c;--s2:#161628;
   --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.12);
@@ -372,7 +372,7 @@ body.theme-amber{--a:#f4a261;--a2:#e76f51;--a3:#2a9d8f;--a4:#e9c46a;--glow:rgba(
 
 
 <div id="topbar">
-  <span>Pro 2.0 <span class="d">|</span> ©sebasmobil 2026 <span class="d">|</span> <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a></span>
+  <span>Pro 2.01 <span class="d">|</span> ©sebasmobil 2026 <span class="d">|</span> <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a></span>
 </div>
 
 <!-- AYARLAR ÇEKMECESİ -->
@@ -521,7 +521,7 @@ body.theme-amber{--a:#f4a261;--a2:#e76f51;--a3:#2a9d8f;--a4:#e9c46a;--glow:rgba(
 <div id="toast"></div>
 
 <script>
-/* S-Zaman Pro 2.0 — © sebasmobil 2026 — GNU AGPL v3.0 <https://www.gnu.org/licenses/agpl-3.0.html> */
+/* S-Zaman Pro 2.01 — © sebasmobil 2026 — GNU AGPL v3.0 <https://www.gnu.org/licenses/agpl-3.0.html> */
 window.addEventListener('unhandledrejection',function(e){e.preventDefault();});
 window.onerror=function(){return true;};
 
@@ -755,8 +755,8 @@ document.addEventListener('click', function askOnce(){
 }, {once:true});
 
 function notify(title,body){
-  if(notifOk && document.hidden){
-    try{ new Notification(title,{body,silent:false}); }catch(e){}
+  if(notifOk && Notification.permission==='granted'){
+    try{ new Notification(title,{body,silent:false,tag:'szaman'}); }catch(e){}
   }
 }
 
@@ -904,10 +904,25 @@ document.addEventListener('visibilitychange',()=>{
   }
 });
 
+let bgNotifTimer=null;
+function scheduleBgNotif(delaySec){
+  if(bgNotifTimer){clearTimeout(bgNotifTimer);bgNotifTimer=null;}
+  if(!notifOk||Notification.permission!=='granted')return;
+  /* Arka planda çalışan setTimeout — iOS PWA'da çalışır */
+  bgNotifTimer=setTimeout(function(){
+    try{ new Notification('⏰ S-Zaman — Süre Doldu!',{body:fHMS(tTotal)+' tamamlandı.',tag:'szaman',silent:false}); }catch(e){}
+    bgNotifTimer=null;
+  }, delaySec*1000);
+}
+function cancelBgNotif(){
+  if(bgNotifTimer){clearTimeout(bgNotifTimer);bgNotifTimer=null;}
+}
+
 function startTimer(){
   tEndTime=Date.now()+(tRem*1000);
   tRunning=true;
   tRingCurrent=CIRC*(1-tRem/tTotal);tRingTarget=tRingCurrent;
+  scheduleBgNotif(tRem); /* Arka plan bildirimi planla */
   /* SW bildirimi planla */
   tPlay.textContent='⏸';tPlay.classList.add('go');
   tLbl.className='state-lbl running';tLbl.textContent='ÇALIŞIYOR';
@@ -923,6 +938,7 @@ function pauseTimer(){
 }
 function resetTimer(){
   finisherCalled=false;
+  cancelBgNotif();
   stopAlarmLoop();
   tRunning=false;cancelAnimationFrame(tRafId);tEndTime=null;
   tRem=getSec()||0;tTotal=tRem;updateTimerUI();
@@ -935,6 +951,7 @@ function resetTimer(){
 function finishTimer(){
   if(finisherCalled)return; /* Çift tetiklemeyi engelle */
   finisherCalled=true;
+  cancelBgNotif(); /* Artık gerekmez, uygulama zaten açık */
   tRunning=false;cancelAnimationFrame(tRafId);tRem=0;updateTimerUI();
   tPlay.textContent='▶';tPlay.classList.remove('go');
   tLbl.className='state-lbl done';tLbl.textContent='TAMAMLANDI ✓';
@@ -1271,6 +1288,7 @@ function splashDismiss(){
 }
 function splashRepeat(){
   /* Her şeyi temizle */
+  cancelBgNotif();
   stopAlarmLoop();
   finisherCalled=false;
   tRunning=false;
