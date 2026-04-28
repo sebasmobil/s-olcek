@@ -131,6 +131,21 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
   .delay-opt{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;}
   .delay-opt.active{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+
+  .counter-box{border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden;transition:all .3s;}
+  .counter-box.clean{background:linear-gradient(135deg,#0a3020,#0d4028);border-color:#2a7a50;}
+  .counter-box.recent{background:linear-gradient(135deg,#300a0a,#3d0f0f);border-color:#7a2a2a;}
+  .counter-box.neutral{background:var(--card2);border-color:var(--border);}
+  .counter-num{font-family:'Playfair Display',serif;font-size:34px;line-height:1;font-weight:700;}
+  .counter-box.clean .counter-num{color:#4cd964;}
+  .counter-box.recent .counter-num{color:#ff6b6b;}
+  .counter-box.neutral .counter-num{color:var(--muted);}
+  .counter-unit{font-size:11px;margin-top:2px;opacity:0.7;}
+  .counter-box.clean .counter-unit{color:#4cd964;}
+  .counter-box.recent .counter-unit{color:#ff6b6b;}
+  .counter-label{font-size:12px;margin-top:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .counter-icon{font-size:20px;margin-bottom:4px;}
+  .counter-streak{font-size:10px;margin-top:4px;opacity:0.6;color:var(--muted);}
 </style>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -321,6 +336,12 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   <div class="card">
     <div class="card-title">🚿 Banyo & Şey Analizi</div>
     <div id="lifestyle-analysis"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔢 Kaç Gündür?</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Son kayıtlarına göre hesaplanır. Yeşil = uzak kaldın, Kırmızı = bugün/dün yaptın.</p>
+    <div id="counter-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
   </div>
 
   <div class="card">
@@ -776,6 +797,7 @@ function renderAnalysis(){
   wL.innerHTML=days.map(d=>{const dt=new Date(d+'T12:00:00');return '<div style="flex:1;text-align:center;font-size:10px;color:var(--muted);min-width:0">'+dn[dt.getDay()]+'</div>';}).join('');
 
   // Öneri
+  renderCounters();
   const tipEl=document.getElementById('tip-box');
   const topRows=fList.length>0?fList.map(food=>{
     const daysAte=[...new Set(logs.filter(l=>(l.foods||[]).some(f=>f.toLowerCase().includes(food))).map(l=>l.date))];
@@ -876,6 +898,90 @@ function restoreData(event){
     }
   };
   reader.readAsText(file);
+}
+
+
+// ===== SAYAÇLAR =====
+function daysBetween(dateStr){
+  if(!dateStr) return null;
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  const d = new Date(dateStr+'T00:00:00');
+  d.setHours(0,0,0,0);
+  return Math.floor((now-d)/(1000*60*60*24));
+}
+
+function renderCounters(){
+  const grid = document.getElementById('counter-grid');
+  if(!grid) return;
+  
+  const today = new Date().toISOString().split('T')[0];
+  const items = [];
+  
+  // --- GIDALAR: en çok seçilen 6 gıda için son ne zaman yenildi ---
+  const foodCount = {};
+  logs.forEach(l=>(l.foods||[]).forEach(f=>{
+    const k=f.trim();if(k) foodCount[k]=(foodCount[k]||0)+1;
+  }));
+  const topFoods = Object.entries(foodCount).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([f])=>f);
+  
+  topFoods.forEach(food=>{
+    const logsWithFood = logs.filter(l=>(l.foods||[]).some(f=>f.trim()===food)).sort((a,b)=>b.date.localeCompare(a.date));
+    const lastDate = logsWithFood.length ? logsWithFood[0].date : null;
+    const days = daysBetween(lastDate);
+    items.push({icon:'🍽️', label: food, days, type:'food'});
+  });
+  
+  // --- BANYO ---
+  const showerLogs = logs.filter(l=>l.shower===true).sort((a,b)=>b.date.localeCompare(a.date));
+  const lastShower = showerLogs.length ? showerLogs[0].date : null;
+  items.push({icon:'🚿', label:'Banyo', days: daysBetween(lastShower), type:'shower'});
+  
+  // --- DİĞER ---
+  const seyLogs = logs.filter(l=>l.sey===true).sort((a,b)=>b.date.localeCompare(a.date));
+  const lastSey = seyLogs.length ? seyLogs[0].date : null;
+  items.push({icon:'🌿', label:'Diğer', days: daysBetween(lastSey), type:'sey'});
+
+  if(items.length === 0){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:16px">Kayıt girdikçe sayaçlar burada görünür.</div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(item=>{
+    if(item.days === null){
+      return `<div class="counter-box neutral">
+        <div class="counter-icon">${item.icon}</div>
+        <div class="counter-num" style="font-size:20px;margin-top:4px">—</div>
+        <div class="counter-label">${item.label}</div>
+        <div class="counter-streak">Henüz kayıt yok</div>
+      </div>`;
+    }
+    
+    const cls = item.days === 0 ? 'recent' : item.days === 1 ? 'recent' : 'clean';
+    let suffix = '';
+    if(item.days === 0) suffix = 'Bugün yaptın';
+    else if(item.days === 1) suffix = 'Dün yaptın';
+    else suffix = item.days + '. gün';
+    
+    const unitText = item.days <= 1 ? '' : 'gündür';
+    const numDisplay = item.days <= 1 ? (item.days === 0 ? '0' : '1') : item.days.toString();
+    
+    // Renk gradyanı - gün sayısına göre
+    let extraStyle = '';
+    if(item.days >= 7 && cls==='clean'){
+      extraStyle = 'border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,0.15);';
+    } else if(item.days >= 14 && cls==='clean'){
+      extraStyle = 'border-color:#4cd964;box-shadow:0 0 18px rgba(76,217,100,0.2);';
+    }
+    
+    return `<div class="counter-box ${cls}" style="${extraStyle}">
+      <div class="counter-icon">${item.icon}</div>
+      <div class="counter-num">${numDisplay}</div>
+      <div class="counter-unit">${unitText}</div>
+      <div class="counter-label">${item.label}</div>
+      <div class="counter-streak">${suffix}</div>
+    </div>`;
+  }).join('');
 }
 
 </script>
