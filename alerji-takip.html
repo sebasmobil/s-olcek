@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 2.0
+  Alerji Takip Defteri - Pro 1.0
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -128,6 +128,9 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   /* iOS zoom fix - tüm input'lar 16px */
   input, select, textarea { font-size: 16px !important; }
   input[type=text], input[type=date], input[type=time] { font-size: 16px !important; }
+
+  .delay-opt{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .delay-opt.active{border-color:var(--accent);color:var(--accent);background:var(--a1);}
 </style>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -141,7 +144,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 2.0</span>
+  <span>Pro 1.0</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -286,18 +289,18 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
 <!-- ANALİZ -->
 <div id="tab-analiz" class="page">
-  <div class="delay-box">
-    <lbl>🕐 Sivilce kaç gün sonra çıkıyor?</lbl>
-    <select id="delay-select" onchange="renderAnalysis()">
-      <option value="0">Aynı gün</option>
-      <option value="1" selected>1 gün sonra</option>
-      <option value="2">2 gün sonra</option>
-      <option value="3">3 gün sonra</option>
-      <option value="4">4 gün sonra</option>
-      <option value="5">5 gün sonra</option>
-    </select>
+  <div class="card" style="margin-bottom:10px">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px">🕐 Sivilce kaç gün sonra çıkıyor?</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="delay-btns">
+      <button class="delay-opt" data-v="0" onclick="setDelay(0)">Aynı gün</button>
+      <button class="delay-opt active" data-v="1" onclick="setDelay(1)">1 gün</button>
+      <button class="delay-opt" data-v="2" onclick="setDelay(2)">2 gün</button>
+      <button class="delay-opt" data-v="3" onclick="setDelay(3)">3 gün</button>
+      <button class="delay-opt" data-v="4" onclick="setDelay(4)">4 gün</button>
+      <button class="delay-opt" data-v="5" onclick="setDelay(5)">5 gün</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px;margin-bottom:0">Sivilceli günlerin <strong id="delay-desc">1 gün önceki</strong> verileriyle karşılaştırılır.</p>
   </div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:14px;padding:0 2px">Sivilceli günlerin <strong id="delay-desc">1 gün önceki</strong> verileriyle karşılaştırılır.</p>
 
   <div class="card">
     <div class="card-title">📊 Genel Durum</div>
@@ -365,6 +368,7 @@ let soapList=JSON.parse(localStorage.getItem('alerji-soap')||JSON.stringify(['Be
 let locList=JSON.parse(localStorage.getItem('alerji-locs')||JSON.stringify(['😀 Alın','👃 Burun','🫦 Çene','🔙 Ense','🫁 Göğüs','💆 Kafa derisi','🔼 Sırt','👩 Yanak']));
 let acneValue = null, selectedLocs = [], selectedFoods = [], selectedShampoo=null, selectedSoap=null, showerVal = null, seyVal = null;
 let shampooEditMode=false, soapEditMode=false, locEditMode=false;
+let currentDelay=parseInt(localStorage.getItem('alerji-delay')||'1');
 let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
@@ -693,8 +697,16 @@ function formatDate(d){
 function addDays(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 
 // ===== ANALYSIS =====
+function setDelay(v){
+  currentDelay=v;
+  localStorage.setItem('alerji-delay', v);
+  document.querySelectorAll('.delay-opt').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.v)===v);
+  });
+  renderAnalysis();
+}
 function renderAnalysis(){
-  const delay=parseInt(document.getElementById('delay-select').value);
+  const delay=currentDelay;
   document.getElementById('delay-desc').textContent=delay===0?'aynı günün':delay+' gün önceki';
   document.getElementById('delay-days-label').textContent=delay===0?'aynı gün':delay+' gün sonra';
 
