@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.01
+  Alerji Takip Defteri - Pro 1.0.02
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -159,6 +159,18 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   [data-theme="light"] .counter-box.recent .counter-label,
   [data-theme="light"] .counter-box.recent .counter-streak{color:rgba(255,255,255,0.85);}
   [data-theme="light"] .counter-box.neutral{background:var(--card2);border-color:var(--border);}
+
+  .sec-type-btn{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .sec-type-btn.active{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+  .custom-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .custom-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .custom-card-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);}
+  .custom-card-actions{display:flex;gap:6px;}
+  .scale-btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .scale-btn{width:52px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:18px;font-weight:700;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+  .scale-btn.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+  .custom-list-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;display:inline-block;margin:3px;}
+  .custom-list-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
 </style>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -172,7 +184,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.01</span>
+  <span>Pro 1.0.02</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -294,6 +306,14 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
       <button class="yn-btn" id="sey-no" onclick="setSey(false)">❌ Hayır</button>
     </div>
   </div>
+
+  <!-- ÖZEL BÖLÜMLER -->
+  <div id="custom-sections-area"></div>
+
+  <!-- Yeni bölüm ekle butonu -->
+  <button class="btn btn-ghost" onclick="showAddSectionModal()" style="width:100%;justify-content:center;margin-bottom:12px;border-style:dashed">
+    ＋ Yeni Bölüm Ekle
+  </button>
 
   <div class="card">
     <div class="card-title">📝 Notlar</div>
@@ -689,7 +709,8 @@ function saveLog(){
     shampoo:shampoo,
     soap:soap,
     sey:seyVal,
-    notes
+    notes,
+    customData: getCustomValuesForLog()
   });
   logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   save();
@@ -706,6 +727,7 @@ function saveLog(){
   renderFoodQuick();
   renderShampooList();
   renderSoapList();
+  resetCustomValues();
   setDateTime();
   toast('✅ Kaydedildi!');
 }
@@ -719,7 +741,7 @@ function toast(msg, isSuccess=true){
   const bg=isSuccess?'#1a7a40':'#7a1a1a';
   const border=isSuccess?'#2db55d':'#c03030';
   const color=isSuccess?'#4cd964':'#ff6b6b';
-  el.style.cssText=`position:fixed;top:0;left:0;right:0;z-index:99999;background:${bg};border-bottom:2px solid ${border};color:${color};padding:14px 20px;font-size:15px;font-weight:600;text-align:center;font-family:DM Sans,sans-serif;letter-spacing:0.3px;animation:slideDown .3s ease`;
+  el.style.cssText=`position:fixed;top:0;left:0;right:0;z-index:99999;background:${bg};border-bottom:2px solid ${border};color:${color};padding-top:max(env(safe-area-inset-top,0px) + 10px, 14px);padding-bottom:12px;padding-left:20px;padding-right:20px;font-size:15px;font-weight:600;text-align:center;font-family:DM Sans,sans-serif;letter-spacing:0.3px;animation:slideDown .3s ease`;
   document.body.appendChild(el);
   let count=0;
   function blink(){
@@ -758,6 +780,7 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.value}</span>`).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px"><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
@@ -894,13 +917,17 @@ function resetAll(){
 // ===== YEDEKLEME =====
 function backupData(){
   const backup = {
-    version: 1,
+    version: 2,
     date: new Date().toISOString(),
     logs: logs,
     foodList: foodList,
     shampooList: shampooList,
     soapList: soapList,
-    locList: locList
+    locList: locList,
+    customSections: customSections,
+    digerTitle: digerTitle,
+    currentDelay: currentDelay,
+    theme: theme
   };
   const json = JSON.stringify(backup, null, 2);
   const blob = new Blob([json], {type:'application/json'});
@@ -936,17 +963,30 @@ function restoreData(event){
       shampooList = backup.shampooList || shampooList;
       soapList = backup.soapList || soapList;
       locList = backup.locList || locList;
+      if(backup.customSections) customSections = backup.customSections;
+      if(backup.digerTitle) digerTitle = backup.digerTitle;
+      if(backup.currentDelay !== undefined) currentDelay = backup.currentDelay;
+      if(backup.theme) { theme = backup.theme; applyTheme(theme); }
       // Save all
       save();
       saveFL();
       localStorage.setItem('alerji-shampoo', JSON.stringify(shampooList));
       localStorage.setItem('alerji-soap', JSON.stringify(soapList));
       localStorage.setItem('alerji-locs', JSON.stringify(locList));
+      localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
+      localStorage.setItem('alerji-diger-title', digerTitle);
+      localStorage.setItem('alerji-delay', currentDelay);
       // Re-render
       renderFoodQuick();
       renderLocs();
+      renderCustomSections();
       renderHistory();
       renderAnalysis();
+      const dt=document.getElementById('diger-title-text');
+      if(dt) dt.textContent=digerTitle;
+      document.querySelectorAll('.delay-opt').forEach(b=>{
+        b.classList.toggle('active', parseInt(b.dataset.v)===currentDelay);
+      });
       statusEl.style.color='var(--green)';
       statusEl.textContent='✅ ' + logs.length + ' kayıt başarıyla geri yüklendi!';
       event.target.value='';
@@ -1064,6 +1104,7 @@ function copyAllLogs(){
     if(l.locs&&l.locs.length) lines.push('📍 Konum: '+l.locs.join(', '));
     lines.push('🚿 Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
     lines.push('🌿 '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
+    if(l.customData){Object.values(l.customData).forEach(cd=>{if(cd.value!==null&&cd.value!==undefined){const v=Array.isArray(cd.value)?cd.value.join(', '):String(cd.value);lines.push('📌 '+cd.title+': '+v);}});}
     if(l.notes) lines.push('📝 Not: '+l.notes);
     lines.push('---');
   });
@@ -1082,6 +1123,226 @@ function copyAllLogs(){
   });
 }
 
+
+// ===== ÖZEL BÖLÜMLER =====
+let customSections = JSON.parse(localStorage.getItem('alerji-custom-sections') || '[]');
+// Her oturum için değerler (kayıt sırasında dolar, kayıt sonrası sıfırlanır)
+let customValues = {}; // {sectionId: value}
+let editingSectionId = null;
+let currentSecType = 'yesno';
+
+function saveCustomSections(){
+  localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
+}
+
+function renderCustomSections(){
+  const area = document.getElementById('custom-sections-area');
+  if(!area) return;
+  if(customSections.length === 0){ area.innerHTML=''; return; }
+  area.innerHTML = customSections.map(sec => {
+    const icon = sec.icon ? sec.icon + ' ' : '';
+    let bodyHtml = '';
+
+    if(sec.type === 'yesno'){
+      const val = customValues[sec.id];
+      const yesLabel = sec.yesLabel || 'Evet';
+      const noLabel = sec.noLabel || 'Hayır';
+      bodyHtml = `<div class="yn-group">
+        <button class="yn-btn${val===true?' yes':''}" onclick="setCustomVal('${sec.id}',true,this.parentElement)">${val===true?'✅':''} ${yesLabel}</button>
+        <button class="yn-btn${val===false?' no':''}" onclick="setCustomVal('${sec.id}',false,this.parentElement)">${val===false?'❌':''} ${noLabel}</button>
+      </div>`;
+    } else if(sec.type === 'list'){
+      const val = customValues[sec.id] || [];
+      const items = (sec.listItems||[]);
+      bodyHtml = '<div style="display:flex;flex-wrap:wrap;gap:4px">' +
+        items.map(item => `<span class="custom-list-item${val.includes(item)?' sel':''}" onclick="toggleCustomList('${sec.id}','${item.replace(/'/g,"\'")}')">${item}</span>`).join('') +
+        '</div>';
+    } else if(sec.type === 'scale'){
+      const val = customValues[sec.id];
+      bodyHtml = '<div class="scale-btns">' +
+        [1,2,3,4,5].map(n => `<button class="scale-btn${val===n?' sel':''}" onclick="setCustomVal('${sec.id}',${n})">${n}</button>`).join('') +
+        '</div>';
+    } else if(sec.type === 'text'){
+      const val = customValues[sec.id] || '';
+      bodyHtml = `<textarea onchange="customValues['${sec.id}']=this.value" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 12px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;min-height:68px;resize:vertical" placeholder="${sec.placeholder||'Buraya yaz...'}">${val}</textarea>`;
+    }
+
+    return `<div class="custom-card">
+      <div class="custom-card-header">
+        <div class="custom-card-title">${icon}${sec.title}</div>
+        <div class="custom-card-actions">
+          <button class="edit-btn" onclick="editSection('${sec.id}')">✏️</button>
+          <button class="edit-btn active" onclick="deleteSection('${sec.id}')" style="color:var(--red);border-color:var(--red)">🗑️</button>
+        </div>
+      </div>
+      ${bodyHtml}
+    </div>`;
+  }).join('');
+}
+
+function setCustomVal(id, val, container){
+  customValues[id] = val;
+  renderCustomSections();
+}
+function toggleCustomList(id, item){
+  if(!customValues[id]) customValues[id] = [];
+  if(customValues[id].includes(item)){
+    customValues[id] = customValues[id].filter(x=>x!==item);
+  } else {
+    customValues[id].push(item);
+  }
+  renderCustomSections();
+}
+
+// Modal
+function showAddSectionModal(editId=null){
+  editingSectionId = editId;
+  const modal = document.getElementById('section-modal');
+  const titleEl = document.getElementById('modal-title');
+  document.getElementById('sec-title').value = '';
+  document.getElementById('sec-icon').value = '';
+  document.getElementById('sec-yes-label').value = '';
+  document.getElementById('sec-no-label').value = '';
+  document.getElementById('sec-list-items').value = '';
+  document.getElementById('sec-text-placeholder').value = '';
+  currentSecType = 'yesno';
+  document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='yesno'));
+  showSecTypeOptions('yesno');
+
+  if(editId){
+    const sec = customSections.find(s=>s.id===editId);
+    if(sec){
+      titleEl.textContent = 'Bölümü Düzenle';
+      document.getElementById('sec-title').value = sec.title || '';
+      document.getElementById('sec-icon').value = sec.icon || '';
+      document.getElementById('sec-yes-label').value = sec.yesLabel || '';
+      document.getElementById('sec-no-label').value = sec.noLabel || '';
+      document.getElementById('sec-list-items').value = (sec.listItems||[]).join('\n');
+      document.getElementById('sec-text-placeholder').value = sec.placeholder || '';
+      currentSecType = sec.type || 'yesno';
+      document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentSecType));
+      showSecTypeOptions(currentSecType);
+    }
+  } else {
+    titleEl.textContent = 'Yeni Bölüm';
+  }
+  modal.style.display = 'flex';
+}
+function closeSectionModal(){
+  document.getElementById('section-modal').style.display='none';
+  editingSectionId=null;
+}
+function selectSecType(btn){
+  currentSecType = btn.dataset.type;
+  document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  showSecTypeOptions(currentSecType);
+}
+function showSecTypeOptions(type){
+  document.getElementById('yesno-options').style.display = type==='yesno'?'block':'none';
+  document.getElementById('list-options').style.display = type==='list'?'block':'none';
+  document.getElementById('scale-options').style.display = type==='scale'?'block':'none';
+  document.getElementById('text-options').style.display = type==='text'?'block':'none';
+}
+function saveSectionModal(){
+  const title = document.getElementById('sec-title').value.trim();
+  if(!title){ alert('Başlık boş olamaz!'); return; }
+  const sec = {
+    id: editingSectionId || ('sec_'+Date.now()),
+    title,
+    icon: document.getElementById('sec-icon').value.trim(),
+    type: currentSecType,
+    yesLabel: document.getElementById('sec-yes-label').value.trim() || 'Evet',
+    noLabel: document.getElementById('sec-no-label').value.trim() || 'Hayır',
+    listItems: document.getElementById('sec-list-items').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    placeholder: document.getElementById('sec-text-placeholder').value.trim() || 'Buraya yaz...'
+  };
+  if(editingSectionId){
+    const idx = customSections.findIndex(s=>s.id===editingSectionId);
+    if(idx>=0) customSections[idx]=sec;
+  } else {
+    customSections.push(sec);
+  }
+  saveCustomSections();
+  closeSectionModal();
+  renderCustomSections();
+}
+function editSection(id){ showAddSectionModal(id); }
+function deleteSection(id){
+  if(!confirm('Bu bölümü silmek istiyor musun?')) return;
+  customSections = customSections.filter(s=>s.id!==id);
+  delete customValues[id];
+  saveCustomSections();
+  renderCustomSections();
+}
+
+// Kayıt sırasında özel değerleri ekle
+function getCustomValuesForLog(){
+  const result = {};
+  customSections.forEach(sec=>{
+    result[sec.id] = {title: sec.title, type: sec.type, value: customValues[sec.id]||null};
+  });
+  return result;
+}
+// Kayıt sonrası özel değerleri sıfırla
+function resetCustomValues(){
+  customValues = {};
+  renderCustomSections();
+}
+
 </script>
+
+<!-- ÖZEL BÖLÜM MODAL -->
+<div id="section-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeSectionModal()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px;max-height:85vh;overflow-y:auto">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:20px" id="modal-title">Yeni Bölüm</div>
+
+    <lbl>Bölüm Başlığı</lbl>
+    <input type="text" id="sec-title" placeholder="Örn: Stres, Egzersiz, Uyku..." style="margin-bottom:12px">
+
+    <lbl>Emoji / İkon (isteğe bağlı)</lbl>
+    <input type="text" id="sec-icon" placeholder="Örn: 😴 💪 🧘" style="margin-bottom:12px">
+
+    <lbl>Bölüm Türü</lbl>
+    <div style="display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap">
+      <button class="sec-type-btn active" data-type="yesno" onclick="selectSecType(this)">✅ Evet/Hayır</button>
+      <button class="sec-type-btn" data-type="list" onclick="selectSecType(this)">📋 Liste Seçim</button>
+      <button class="sec-type-btn" data-type="scale" onclick="selectSecType(this)">📊 Skala (1-5)</button>
+      <button class="sec-type-btn" data-type="text" onclick="selectSecType(this)">✏️ Metin</button>
+    </div>
+
+    <!-- Evet/Hayır seçenekleri -->
+    <div id="yesno-options" style="margin-bottom:12px">
+      <lbl>Evet butonu yazısı</lbl>
+      <input type="text" id="sec-yes-label" placeholder="Evet" style="margin-bottom:8px">
+      <lbl>Hayır butonu yazısı</lbl>
+      <input type="text" id="sec-no-label" placeholder="Hayır">
+    </div>
+
+    <!-- Liste seçenekleri -->
+    <div id="list-options" style="display:none;margin-bottom:12px">
+      <lbl>Liste Öğeleri (her satıra bir tane)</lbl>
+      <textarea id="sec-list-items" placeholder="Örn:
+Hafif
+Orta
+Ağır" style="min-height:100px"></textarea>
+    </div>
+
+    <!-- Skala & Metin - ek ayar yok -->
+    <div id="scale-options" style="display:none;margin-bottom:12px">
+      <p style="font-size:12px;color:var(--muted)">1'den 5'e kadar derecelendirme. Kullanıcı bir değer seçer.</p>
+    </div>
+    <div id="text-options" style="display:none;margin-bottom:12px">
+      <lbl>Placeholder yazısı</lbl>
+      <input type="text" id="sec-text-placeholder" placeholder="Buraya yaz...">
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-primary" onclick="saveSectionModal()" style="flex:1;justify-content:center">💾 Kaydet</button>
+      <button class="btn btn-ghost" onclick="closeSectionModal()" style="flex:1;justify-content:center">İptal</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
