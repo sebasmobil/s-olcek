@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.02
+  Alerji Takip Defteri - Pro 1.0.03
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -184,7 +184,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.02</span>
+  <span>Pro 1.0.03</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -239,7 +239,10 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   </div>
 
   <div class="card">
-    <div class="card-title">🔴 Sivilce Durumu</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div class="card-title" style="margin-bottom:0;flex:1">🔴 <span id="sivilce-title-text" onclick="editSivilceTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span></div>
+      <span onclick="editSivilceTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+    </div>
     <div class="acne-rating">
       <button class="acne-btn" data-v="0" onclick="setAcne(0)">😊 Hiç yok</button>
       <button class="acne-btn" data-v="1" onclick="setAcne(1)">😐 Hafif</button>
@@ -247,15 +250,17 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
       <button class="acne-btn" data-v="3" onclick="setAcne(3)">😣 Fazla</button>
       <button class="acne-btn" data-v="4" onclick="setAcne(4)">😤 Çok Kötü</button>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;margin-bottom:5px">
-      <lbl style="margin:0">📍 Konum</lbl>
-      <button class="edit-btn" id="loc-edit-btn" onclick="toggleLocEdit()">✏️ Düzenle</button>
-    </div>
-    <div class="loc-group" id="loc-group"></div>
-    <div id="loc-add-area" style="display:none;margin:5px 0">
-      <div class="fq-add-row">
-        <input type="text" id="loc-new" placeholder="Yeni konum ekle... (ör: Sırt)" onkeydown="if(event.key==='Enter')addLocItem()">
-        <button class="btn btn-ghost btn-sm" onclick="addLocItem()">+ Ekle</button>
+    <div id="loc-section" style="margin-top:10px;display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <lbl style="margin:0">📍 Konum</lbl>
+        <button class="edit-btn" id="loc-edit-btn" onclick="toggleLocEdit()">✏️ Düzenle</button>
+      </div>
+      <div class="loc-group" id="loc-group"></div>
+      <div id="loc-add-area" style="display:none;margin:5px 0">
+        <div class="fq-add-row">
+          <input type="text" id="loc-new" placeholder="Yeni konum ekle... (ör: Sırt)" onkeydown="if(event.key==='Enter')addLocItem()">
+          <button class="btn btn-ghost btn-sm" onclick="addLocItem()">+ Ekle</button>
+        </div>
       </div>
     </div>
   </div>
@@ -399,8 +404,8 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   </div>
 
   <div class="card">
-    <div class="card-title">🤖 Claude ile Analiz Et</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlarını kopyala, Claude'a yapıştır ve daha derin analiz yaptır.</p>
+    <div class="card-title">🤖 Yapay Zeka ile Analiz Et</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlarını kopyala, yapay zekaya yapıştır ve daha derin analiz yaptır.</p>
     <button class="btn btn-primary" onclick="copyAllLogs()" style="width:100%;justify-content:center">📋 Tüm Kayıtları Kopyala</button>
     <div id="copy-status" style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px"></div>
   </div>
@@ -441,6 +446,7 @@ let acneValue = null, selectedLocs = [], selectedFoods = [], selectedShampoo=nul
 let shampooEditMode=false, soapEditMode=false, locEditMode=false;
 let currentDelay=parseInt(localStorage.getItem('alerji-delay')||'1');
 let digerTitle=localStorage.getItem('alerji-diger-title')||'Diğer';
+let sivilceTitle=localStorage.getItem('alerji-sivilce-title')||'Sivilce Durumu';
 let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
@@ -458,8 +464,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   }, 60000);
   renderFoodQuick();
   renderFoodListEdit();
+  renderLocs();
   renderHistory();
   renderAnalysis();
+  // Diğer başlıkları yükle
+  const dt=document.getElementById('diger-title-text');
+  if(dt) dt.textContent=digerTitle;
+  const st=document.getElementById('sivilce-title-text');
+  if(st) st.textContent=sivilceTitle;
+  // Özel bölümler
+  renderCustomSections();
 });
 
 function setDateTime(){
@@ -487,7 +501,12 @@ function showTab(t,btn){
   if(t==='gecmis')renderHistory();
   if(t==='analiz')renderAnalysis();
   if(t==='ayarlar')renderFoodListEdit();
-  if(t==='kayit'){setDateTime();const dt=document.getElementById('diger-title-text');if(dt)dt.textContent=digerTitle;}
+  if(t==='kayit'){
+    setDateTime();
+    const dt=document.getElementById('diger-title-text');if(dt)dt.textContent=digerTitle;
+    const st=document.getElementById('sivilce-title-text');if(st)st.textContent=sivilceTitle;
+    setTimeout(()=>{ renderLocs(); renderCustomSections(); }, 10);
+  }
 }
 
 // ===== FOOD QUICK =====
@@ -564,8 +583,11 @@ function setAcne(v){
 
 // ===== LOCATION =====
 function renderLocs(){
+  const section=document.getElementById('loc-section');
   const wrap=document.getElementById('loc-group');
-  if(!wrap)return;
+  if(!wrap){ console.warn('loc-group not found'); return; }
+  // Edit modunda section'ı göster
+  if(locEditMode && section) section.style.display='block';
   if(locEditMode){
     wrap.innerHTML=locList.map((f,i)=>`
       <div class="fq-item" style="cursor:default;border-color:var(--red);color:var(--text);background:var(--b4)">
@@ -574,13 +596,20 @@ function renderLocs(){
         <span style="font-size:11px;opacity:0.5" onclick="renameLocItem(${i})">✏️</span>
       </div>`).join('');
   } else {
-    wrap.innerHTML=locList.map(f=>`<button class="loc-btn${selectedLocs.includes(f)?' active':''}" onclick="toggleLoc('${f.replace(/'/g,"\\'")}',this)">${f}</button>`).join('');
+    // Her zaman tüm konumları göster, seçililer vurgulu
+    wrap.innerHTML=locList.map((f,i)=>`<button class="loc-btn${selectedLocs.includes(f)?' active':''}" onclick="toggleLocByIndex(${i},this)">${f}</button>`).join('');
   }
+  // Seçili konumları önizle
+  const prev=document.getElementById('loc-selected-preview');
+  if(prev) prev.textContent=selectedLocs.length?'Seçili: '+selectedLocs.join(', '):'';
 }
 function toggleLoc(v,btn){
   if(selectedLocs.includes(v)) selectedLocs=selectedLocs.filter(x=>x!==v);
   else selectedLocs.push(v);
   btn.classList.toggle('active');
+}
+function toggleLocByIndex(i,btn){
+  toggleLoc(locList[i],btn);
 }
 function toggleLocEdit(){
   locEditMode=!locEditMode;
@@ -676,13 +705,26 @@ function setShower(v){
 function editDigerTitle(){
   const newTitle=prompt('Bu bölümün adı ne olsun?', digerTitle);
   if(newTitle&&newTitle.trim()){
+    const old=digerTitle;
     digerTitle=newTitle.trim();
     localStorage.setItem('alerji-diger-title',digerTitle);
     const el=document.getElementById('diger-title-text');
     if(el) el.textContent=digerTitle;
-    // Analiz başlığını da güncelle
     const at=document.getElementById('diger-analysis-title');
     if(at) at.textContent='🌿 '+digerTitle+' Analizi';
+    // Geçmiş kayıtlara da yansıt
+    logs.forEach(l=>{ if(l.digerTitleSnapshot!==undefined) l.digerTitleSnapshot=digerTitle; });
+    save();
+    renderHistory();
+  }
+}
+function editSivilceTitle(){
+  const newTitle=prompt('Bu bölümün adı ne olsun?', sivilceTitle);
+  if(newTitle&&newTitle.trim()){
+    sivilceTitle=newTitle.trim();
+    localStorage.setItem('alerji-sivilce-title',sivilceTitle);
+    const el=document.getElementById('sivilce-title-text');
+    if(el) el.textContent=sivilceTitle;
   }
 }
 function setSey(v){
@@ -715,7 +757,9 @@ function saveLog(){
   logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   save();
   // RESET
-  acneValue=null;selectedLocs=[];selectedFoods=[];selectedShampoo=null;selectedSoap=null;showerVal=null;seyVal=null;
+  acneValue=null;selectedLocs=[];selectedFoods=[];
+  const locSecR=document.getElementById('loc-section');
+  if(locSecR) locSecR.style.display='none';selectedShampoo=null;selectedSoap=null;showerVal=null;seyVal=null;
   document.querySelectorAll('.acne-btn').forEach(b=>b.className='acne-btn');
   document.querySelectorAll('#loc-group .loc-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('shower-yes').className='yn-btn';
@@ -767,8 +811,8 @@ function renderHistory(){
     const meta=[];
     if(l.shower===true)meta.push('🚿 Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
     else if(l.shower===false)meta.push('🚿 Banyo: Hayır');
-    if(l.sey===true)meta.push('✅ Diğer: Evet');
-    else if(l.sey===false)meta.push('❌ Diğer: Hayır');
+    if(l.sey===true)meta.push('✅ '+digerTitle+': Evet');
+    else if(l.sey===false)meta.push('❌ '+digerTitle+': Hayır');
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
@@ -781,7 +825,7 @@ function renderHistory(){
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
       ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.value}</span>`).join('')}</div>`:''}
-      <div style="text-align:right;margin-top:7px"><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
+      <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
 }
@@ -926,6 +970,7 @@ function backupData(){
     locList: locList,
     customSections: customSections,
     digerTitle: digerTitle,
+    sivilceTitle: sivilceTitle,
     currentDelay: currentDelay,
     theme: theme
   };
@@ -965,6 +1010,7 @@ function restoreData(event){
       locList = backup.locList || locList;
       if(backup.customSections) customSections = backup.customSections;
       if(backup.digerTitle) digerTitle = backup.digerTitle;
+      if(backup.sivilceTitle) sivilceTitle = backup.sivilceTitle;
       if(backup.currentDelay !== undefined) currentDelay = backup.currentDelay;
       if(backup.theme) { theme = backup.theme; applyTheme(theme); }
       // Save all
@@ -975,6 +1021,7 @@ function restoreData(event){
       localStorage.setItem('alerji-locs', JSON.stringify(locList));
       localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
       localStorage.setItem('alerji-diger-title', digerTitle);
+      localStorage.setItem('alerji-sivilce-title', sivilceTitle);
       localStorage.setItem('alerji-delay', currentDelay);
       // Re-render
       renderFoodQuick();
@@ -1263,6 +1310,10 @@ function saveSectionModal(){
   } else {
     customSections.push(sec);
   }
+  // Liste türüyse alfabetik sırala
+  if(sec.type==='list' && sec.listItems){
+    sec.listItems.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+  }
   saveCustomSections();
   closeSectionModal();
   renderCustomSections();
@@ -1288,6 +1339,96 @@ function getCustomValuesForLog(){
 function resetCustomValues(){
   customValues = {};
   renderCustomSections();
+}
+
+
+// ===== GEÇMİŞ KAYIT DÜZENLE =====
+let editingLogId = null;
+let editShowerVal = null;
+let editSeyVal = null;
+let editAcneVal = null;
+
+function editLog(id){
+  const log = logs.find(l=>l.id===id);
+  if(!log) return;
+  editingLogId = id;
+  editShowerVal = log.shower;
+  editSeyVal = log.sey;
+  editAcneVal = log.acne;
+
+  document.getElementById('edit-log-date-label').textContent = formatDate(log.date) + ' — ' + log.time;
+  document.getElementById('edit-inp-date').value = log.date;
+  document.getElementById('edit-inp-time').value = log.time;
+  document.getElementById('edit-inp-foods').value = (log.foods||[]).join(', ');
+  document.getElementById('edit-inp-locs').value = (log.locs||[]).join(', ');
+  document.getElementById('edit-inp-shampoo').value = log.shampoo||'';
+  document.getElementById('edit-inp-soap').value = log.soap||'';
+  document.getElementById('edit-inp-notes').value = log.notes||'';
+  document.getElementById('edit-sivilce-lbl').textContent = sivilceTitle;
+  document.getElementById('edit-diger-lbl').textContent = digerTitle;
+
+  // Acne butonları
+  document.querySelectorAll('#edit-acne-rating .acne-btn').forEach(b=>{
+    b.className='acne-btn';
+    if(parseInt(b.dataset.v)===editAcneVal) b.classList.add('sel-'+editAcneVal);
+  });
+  // Shower
+  document.getElementById('edit-shower-yes').className='yn-btn'+(editShowerVal===true?' yes':'');
+  document.getElementById('edit-shower-no').className='yn-btn'+(editShowerVal===false?' no':'');
+  document.getElementById('edit-shower-details').style.display=editShowerVal===true?'block':'none';
+  // Sey
+  document.getElementById('edit-sey-yes').className='yn-btn'+(editSeyVal===true?' yes':'');
+  document.getElementById('edit-sey-no').className='yn-btn'+(editSeyVal===false?' no':'');
+
+  document.getElementById('edit-log-modal').style.display='flex';
+}
+function closeEditLogModal(){
+  document.getElementById('edit-log-modal').style.display='none';
+  editingLogId=null;
+}
+function setEditAcne(v){
+  editAcneVal=v;
+  document.querySelectorAll('#edit-acne-rating .acne-btn').forEach(b=>{
+    b.className='acne-btn';
+    if(parseInt(b.dataset.v)===v) b.classList.add('sel-'+v);
+  });
+}
+function setEditShower(v){
+  editShowerVal=v;
+  document.getElementById('edit-shower-yes').className='yn-btn'+(v?' yes':'');
+  document.getElementById('edit-shower-no').className='yn-btn'+(!v&&v!==null?' no':'');
+  document.getElementById('edit-shower-details').style.display=v?'block':'none';
+}
+function setEditSey(v){
+  editSeyVal=v;
+  document.getElementById('edit-sey-yes').className='yn-btn'+(v?' yes':'');
+  document.getElementById('edit-sey-no').className='yn-btn'+(!v&&v!==null?' no':'');
+}
+function saveEditLog(){
+  if(editAcneVal===null){alert('Sivilce durumunu seç!');return;}
+  const idx=logs.findIndex(l=>l.id===editingLogId);
+  if(idx<0) return;
+  const foodsRaw=document.getElementById('edit-inp-foods').value;
+  const locsRaw=document.getElementById('edit-inp-locs').value;
+  logs[idx] = {
+    ...logs[idx],
+    date: document.getElementById('edit-inp-date').value,
+    time: document.getElementById('edit-inp-time').value,
+    foods: foodsRaw.split(',').map(s=>s.trim()).filter(Boolean),
+    acne: editAcneVal,
+    locs: locsRaw.split(',').map(s=>s.trim()).filter(Boolean),
+    shower: editShowerVal,
+    shampoo: document.getElementById('edit-inp-shampoo').value.trim(),
+    soap: document.getElementById('edit-inp-soap').value.trim(),
+    sey: editSeyVal,
+    notes: document.getElementById('edit-inp-notes').value.trim()
+  };
+  logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  save();
+  closeEditLogModal();
+  renderHistory();
+  renderAnalysis();
+  toast('✅ Kayıt güncellendi!');
 }
 
 </script>
@@ -1340,6 +1481,61 @@ Ağır" style="min-height:100px"></textarea>
     <div style="display:flex;gap:10px;margin-top:20px">
       <button class="btn btn-primary" onclick="saveSectionModal()" style="flex:1;justify-content:center">💾 Kaydet</button>
       <button class="btn btn-ghost" onclick="closeSectionModal()" style="flex:1;justify-content:center">İptal</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- GEÇMİŞ KAYIT DÜZENLE MODAL -->
+<div id="edit-log-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeEditLogModal()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px;max-height:90vh;overflow-y:auto">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:6px">Kaydı Düzenle</div>
+    <div id="edit-log-date-label" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
+
+    <lbl>📅 Tarih</lbl>
+    <input type="date" id="edit-inp-date" style="margin-bottom:8px">
+    <lbl>🕐 Saat</lbl>
+    <input type="time" id="edit-inp-time" style="margin-bottom:12px">
+
+    <lbl>🍽️ Yenilen Gıdalar (virgülle ayır)</lbl>
+    <input type="text" id="edit-inp-foods" placeholder="Et, Ekmek, Süt..." style="margin-bottom:12px">
+
+    <lbl>🔴 <span id="edit-sivilce-lbl">Sivilce</span> Durumu</lbl>
+    <div class="acne-rating" id="edit-acne-rating" style="margin-bottom:12px">
+      <button class="acne-btn" data-v="0" onclick="setEditAcne(0)">😊 Hiç yok</button>
+      <button class="acne-btn" data-v="1" onclick="setEditAcne(1)">😐 Hafif</button>
+      <button class="acne-btn" data-v="2" onclick="setEditAcne(2)">😕 Orta</button>
+      <button class="acne-btn" data-v="3" onclick="setEditAcne(3)">😣 Fazla</button>
+      <button class="acne-btn" data-v="4" onclick="setEditAcne(4)">😤 Çok Kötü</button>
+    </div>
+
+    <lbl>📍 Konum (virgülle ayır)</lbl>
+    <input type="text" id="edit-inp-locs" placeholder="Alın, Yanak..." style="margin-bottom:12px">
+
+    <lbl>🚿 Banyo</lbl>
+    <div class="yn-group" style="margin-bottom:12px">
+      <button class="yn-btn" id="edit-shower-yes" onclick="setEditShower(true)">✅ Evet</button>
+      <button class="yn-btn" id="edit-shower-no" onclick="setEditShower(false)">❌ Hayır</button>
+    </div>
+    <div id="edit-shower-details">
+      <lbl>🧴 Şampuan</lbl>
+      <input type="text" id="edit-inp-shampoo" placeholder="Şampuan..." style="margin-bottom:8px">
+      <lbl>🧼 Sabun</lbl>
+      <input type="text" id="edit-inp-soap" placeholder="Sabun..." style="margin-bottom:12px">
+    </div>
+
+    <lbl>🌿 <span id="edit-diger-lbl">Diğer</span></lbl>
+    <div class="yn-group" style="margin-bottom:12px">
+      <button class="yn-btn" id="edit-sey-yes" onclick="setEditSey(true)">✅ Evet</button>
+      <button class="yn-btn" id="edit-sey-no" onclick="setEditSey(false)">❌ Hayır</button>
+    </div>
+
+    <lbl>📝 Notlar</lbl>
+    <textarea id="edit-inp-notes" style="margin-bottom:16px" placeholder="Not..."></textarea>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="saveEditLog()" style="flex:1;justify-content:center">💾 Kaydet</button>
+      <button class="btn btn-ghost" onclick="closeEditLogModal()" style="flex:1;justify-content:center">İptal</button>
     </div>
   </div>
 </div>
