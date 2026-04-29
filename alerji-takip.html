@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.14
+  Alerji Takip Defteri - Pro 1.0.15
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -908,16 +908,35 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
-      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>{
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.entries(l.customData).filter(([,cd])=>cd.value!==null&&cd.value!==undefined).map(([sid,cd])=>{
         let display='';
         if(cd.type==='yesno_sub'){
           if(cd.value===true||cd.value===false){
             const lbl=cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır');
-            const allItems=[];
-            if(cd.subValues&&typeof cd.subValues==='object'){
-              Object.values(cd.subValues).forEach(arr=>{if(Array.isArray(arr))allItems.push(...arr.filter(x=>x&&x.trim()));});
+            // subNames: yeni kayıtlarda doğrudan kayıtlı, eski kayıtlar için customSections'dan bul
+            let subNames=cd.subNames||[];
+            if(!subNames.length){
+              const secDef=customSections.find(s=>s.id===sid);
+              if(secDef){
+                const sideArr=cd.value===true?(secDef.yesSubs||[]):(secDef.noSubs||[]);
+                subNames=sideArr.map(s=>s.name);
+              }
             }
-            display=(cd.value===true?'✅':'❌')+' '+lbl+(allItems.length?' ('+allItems.join(', ')+')':'');
+            const subParts=[];
+            if(cd.subValues&&typeof cd.subValues==='object'){
+              const keys=Object.keys(cd.subValues).sort((a,b)=>parseInt(a)-parseInt(b));
+              keys.forEach(k=>{
+                const arr=cd.subValues[k];
+                if(Array.isArray(arr)&&arr.length){
+                  const items=arr.filter(x=>x&&x.trim());
+                  if(items.length){
+                    const name=subNames[parseInt(k)];
+                    subParts.push(name?name+': '+items.join(', '):items.join(', '));
+                  }
+                }
+              });
+            }
+            display=(cd.value===true?'✅':'❌')+' '+lbl+(subParts.length?' ('+subParts.join(' | ')+')'  :'');
           } else { display='—'; }
         } else if(Array.isArray(cd.value)){ display=cd.value.join(', ');
         } else if(cd.value===true){ display='✅ Evet';
@@ -1064,7 +1083,7 @@ function resetAll(){
 // ===== YEDEKLEME =====
 function backupData(){
   const backup = {
-    version: 2,
+    version: 3,
     date: new Date().toISOString(),
     logs: logs,
     foodList: foodList,
@@ -1075,7 +1094,8 @@ function backupData(){
     digerTitle: digerTitle,
     sivilceTitle: sivilceTitle,
     currentDelay: currentDelay,
-    theme: theme
+    theme: theme,
+    builtinVisibility: { banyo: banyoHidden, diger: digerHidden }
   };
   const json = JSON.stringify(backup, null, 2);
   const blob = new Blob([json], {type:'application/json'});
@@ -1116,6 +1136,13 @@ function restoreData(event){
       if(backup.sivilceTitle) sivilceTitle = backup.sivilceTitle;
       if(backup.currentDelay !== undefined) currentDelay = backup.currentDelay;
       if(backup.theme) { theme = backup.theme; applyTheme(theme); }
+      // Builtin visibility restore
+      if(backup.builtinVisibility !== undefined){
+        banyoHidden = !!backup.builtinVisibility.banyo;
+        digerHidden = !!backup.builtinVisibility.diger;
+        if(banyoHidden) localStorage.setItem('alerji-banyo-hidden','1'); else localStorage.removeItem('alerji-banyo-hidden');
+        if(digerHidden) localStorage.setItem('alerji-diger-hidden','1'); else localStorage.removeItem('alerji-diger-hidden');
+      }
       // Save all
       save();
       saveFL();
@@ -1127,6 +1154,7 @@ function restoreData(event){
       localStorage.setItem('alerji-sivilce-title', sivilceTitle);
       localStorage.setItem('alerji-delay', currentDelay);
       // Re-render
+      applyBuiltinVisibility();
       renderFoodQuick();
       renderLocs();
       renderCustomSections();
@@ -1134,6 +1162,8 @@ function restoreData(event){
       renderAnalysis();
       const dt=document.getElementById('diger-title-text');
       if(dt) dt.textContent=digerTitle;
+      const st=document.getElementById('sivilce-title-text');
+      if(st) st.textContent=sivilceTitle;
       document.querySelectorAll('.delay-opt').forEach(b=>{
         b.classList.toggle('active', parseInt(b.dataset.v)===currentDelay);
       });
@@ -1254,7 +1284,30 @@ function copyAllLogs(){
     if(l.locs&&l.locs.length) lines.push('📍 Konum: '+l.locs.join(', '));
     lines.push('🚿 Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
     lines.push('🌿 '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
-    if(l.customData){Object.values(l.customData).forEach(cd=>{if(cd.value!==null&&cd.value!==undefined){const v=Array.isArray(cd.value)?cd.value.join(', '):String(cd.value);lines.push('📌 '+cd.title+': '+v);}});}
+    if(l.customData){Object.entries(l.customData).forEach(([sid,cd])=>{
+      if(cd.value===null||cd.value===undefined) return;
+      let v='';
+      if(cd.type==='yesno_sub'){
+        const lbl=cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır');
+        let subNames=cd.subNames||[];
+        if(!subNames.length){const secDef=customSections.find(s=>s.id===sid);if(secDef){const sa=cd.value===true?(secDef.yesSubs||[]):(secDef.noSubs||[]);subNames=sa.map(s=>s.name);}}
+        const subParts=[];
+        if(cd.subValues&&typeof cd.subValues==='object'){
+          Object.keys(cd.subValues).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(k=>{
+            const arr=cd.subValues[k];
+            if(Array.isArray(arr)&&arr.length){const items=arr.filter(x=>x&&x.trim());if(items.length){const nm=subNames[parseInt(k)];subParts.push(nm?nm+': '+items.join(', '):items.join(', '));}}
+          });
+        }
+        v=(cd.value===true?'Evet':'Hayır')+(subParts.length?' ('+subParts.join(' | ')+')':'');
+      } else if(cd.type==='percent'){ v=cd.value+'%';
+      } else if(cd.type==='scale'){ v=cd.value+'/10';
+      } else if(cd.type==='stars'){ v='⭐'.repeat(cd.value||0)+' ('+cd.value+'/5)';
+      } else if(cd.value===true){ v='Evet';
+      } else if(cd.value===false){ v='Hayır';
+      } else if(Array.isArray(cd.value)){ v=cd.value.join(', ');
+      } else { v=String(cd.value); }
+      lines.push('📌 '+cd.title+': '+v);
+    });}
     if(l.notes) lines.push('📝 Not: '+l.notes);
     lines.push('---');
   });
@@ -1928,6 +1981,14 @@ function getCustomValuesForLog(){
       // Hangi tarafın seçili olduğunu da kaydet
       entry.yesLabel = sec.yesLabel || 'Evet';
       entry.noLabel = sec.noLabel || 'Hayır';
+      // Alt bölüm adlarını da kaydet (geçmişte doğru gösterim için)
+      if(entry.value === true) {
+        entry.subNames = (sec.yesSubs||[]).map(s=>s.name);
+      } else if(entry.value === false) {
+        entry.subNames = (sec.noSubs||[]).map(s=>s.name);
+      } else {
+        entry.subNames = [];
+      }
     }
     result[sec.id] = entry;
   });
