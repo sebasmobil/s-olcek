@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.07
+  Alerji Takip Defteri - Pro 1.0.08
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.07</span>
+  <span>Pro 1.0.08</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -1273,27 +1273,73 @@ function renderCustomSections(){
       const val = customValues[sec.id];
       const yesLabel = sec.yesLabel || 'Evet';
       const noLabel = sec.noLabel || 'Hayır';
-      const subs = val === true ? (sec.yesSubs||[]) : val === false ? (sec.noSubs||[]) : [];
-      const subVals = customValues[sec.id+'__subs'] || {};
-      let subsHtml = subs.map((sub,si) => {
-        const sv = subVals[si] || [];
-        return `<div style="margin-top:10px">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')">  ${item}</span>`).join('')}</div>
-        </div>`;
-      }).join('');
-      bodyHtml = `<div class="yn-group">
-        <button class="yn-btn${val===true?' yes':''}" onclick="setCustomVal('${sec.id}',true)">${val===true?'✅':''} ${yesLabel}</button>
-        <button class="yn-btn${val===false?' no':''}" onclick="setCustomVal('${sec.id}',false)">${val===false?'❌':''} ${noLabel}</button>
-      </div>${val!==null&&val!==undefined?subsHtml:''}`;
+      const editMode = customListEditModes[sec.id] || false;
+
+      if(editMode){
+        // ── DÜZENLEME MODU ──
+        const renderSubEdit = (subArr, side) => {
+          return subArr.map((sub,si) => {
+            const itemsHtml = [...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map((item,ii)=>
+              `<div class="fq-item" style="cursor:default;border-color:var(--red);color:var(--text);background:var(--b4)">` +
+              `<span style="display:inline;color:var(--red);font-weight:700;font-size:14px;cursor:pointer;margin-right:4px" onclick="removeYesnoSubItem('${sec.id}','${side}',${si},${ii})">✕</span>` +
+              `<span onclick="renameYesnoSubItem('${sec.id}','${side}',${si},${ii})">${item}</span>` +
+              `<span style="font-size:11px;opacity:0.5;cursor:pointer;margin-left:3px" onclick="renameYesnoSubItem('${sec.id}','${side}',${si},${ii})">✏️</span>` +
+              `</div>`
+            ).join('');
+            return `<div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--b4)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:12px;font-weight:600;color:var(--accent)">${sub.name}</span>
+                <span style="display:flex;gap:4px">
+                  <button class="edit-btn" style="font-size:10px" onclick="renameYesnoSubSection('${sec.id}','${side}',${si})">✏️ Ad</button>
+                  <button class="edit-btn" style="font-size:10px;color:var(--red);border-color:var(--red)" onclick="removeYesnoSubSection('${sec.id}','${side}',${si})">🗑️</button>
+                </span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${itemsHtml}</div>
+              <div style="display:flex;gap:6px">
+                <input type="text" id="ynsub-new-${sec.id}-${side}-${si}" placeholder="Yeni öğe..." style="flex:1;font-size:14px" onkeydown="if(event.key==='Enter')addYesnoSubItem('${sec.id}','${side}',${si})">
+                <button class="btn btn-ghost btn-sm" onclick="addYesnoSubItem('${sec.id}','${side}',${si})">+ Ekle</button>
+              </div>
+            </div>`;
+          }).join('');
+        };
+
+        bodyHtml = `
+          <div style="margin-bottom:8px">
+            <div style="display:flex;gap:8px;margin-bottom:4px;align-items:center">
+              <input type="text" id="ynsub-yes-label-${sec.id}" value="${yesLabel}" style="flex:1;font-size:14px" placeholder="Evet yazısı">
+              <input type="text" id="ynsub-no-label-${sec.id}" value="${noLabel}" style="flex:1;font-size:14px" placeholder="Hayır yazısı">
+            </div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin:10px 0 6px">✅ ${yesLabel} deyince:</div>
+          ${renderSubEdit(sec.yesSubs||[], 'yes')}
+          <button class="btn btn-ghost btn-sm" id="addsub-btn-${sec.id}-yes" style="width:100%;margin-bottom:12px" onclick="addYesnoSubSection('${sec.id}','yes')">+ Alt Bölüm Ekle (${yesLabel})</button>
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin:4px 0 6px">❌ ${noLabel} deyince:</div>
+          ${renderSubEdit(sec.noSubs||[], 'no')}
+          <button class="btn btn-ghost btn-sm" id="addsub-btn-${sec.id}-no" style="width:100%;margin-bottom:4px" onclick="addYesnoSubSection('${sec.id}','no')">+ Alt Bölüm Ekle (${noLabel})</button>`;
+      } else {
+        // ── NORMAL MOD ──
+        const subs = val === true ? (sec.yesSubs||[]) : val === false ? (sec.noSubs||[]) : [];
+        const subVals = customValues[sec.id+'__subs'] || {};
+        let subsHtml = subs.map((sub,si) => {
+          const sv = subVals[si] || [];
+          return `<div style="margin-top:10px">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')">  ${item}</span>`).join('')}</div>
+          </div>`;
+        }).join('');
+        bodyHtml = `<div class="yn-group">
+          <button class="yn-btn${val===true?' yes':''}" onclick="setCustomVal('${sec.id}',true)">${val===true?'✅':''} ${yesLabel}</button>
+          <button class="yn-btn${val===false?' no':''}" onclick="setCustomVal('${sec.id}',false)">${val===false?'❌':''} ${noLabel}</button>
+        </div>${val!==null&&val!==undefined?subsHtml:''}`;
+      }
     } else if(sec.type === 'text'){
       const val = customValues[sec.id] || '';
       bodyHtml = `<textarea onchange="customValues['${sec.id}']=this.value" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 12px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;min-height:68px;resize:vertical" placeholder="${sec.placeholder||'Buraya yaz...'}">${val}</textarea>`;
     }
 
-    // Liste türü için düzenle butonu, diğerleri için düzenle (modal) butonu
+    // Liste ve yesno_sub: inline düzenleme; diğerleri: modal
     let editBtn = '';
-    if(sec.type === 'list'){
+    if(sec.type === 'list' || sec.type === 'yesno_sub'){
       const eMode = customListEditModes[sec.id] || false;
       editBtn = `<button class="edit-btn${eMode?' active':''}" onclick="toggleCustomListEdit('${sec.id}')">${eMode?'✅ Bitti':'✏️ Düzenle'}</button>`;
     } else {
@@ -1356,8 +1402,110 @@ function toggleCustomList(id, item){
 
 // Liste bölümü öğe yönetimi
 function toggleCustomListEdit(id){
+  // yesno_sub: bitti basılınca label değişikliklerini kaydet
+  const sec = customSections.find(s=>s.id===id);
+  if(sec && sec.type === 'yesno_sub' && customListEditModes[id]){
+    const ylEl = document.getElementById('ynsub-yes-label-'+id);
+    const nlEl = document.getElementById('ynsub-no-label-'+id);
+    if(ylEl) sec.yesLabel = ylEl.value.trim() || 'Evet';
+    if(nlEl) sec.noLabel = nlEl.value.trim() || 'Hayır';
+    // geçmişe başlık yansıt
+    logs.forEach(log=>{ if(log.customData&&log.customData[id]) log.customData[id].title=sec.title; });
+    save();
+    saveCustomSections();
+  }
   customListEditModes[id] = !customListEditModes[id];
   renderCustomSections();
+}
+
+// ── yesno_sub inline düzenleme fonksiyonları ──
+function _saveYesnoSub(id){ saveCustomSections(); renderCustomSections(); }
+
+function addYesnoSubSection(id, side){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  // Inline input göster
+  const btnId = 'addsub-btn-'+id+'-'+side;
+  const areaId = 'addsub-area-'+id+'-'+side;
+  const btn = document.getElementById(btnId);
+  const existing = document.getElementById(areaId);
+  if(existing){ existing.remove(); if(btn) btn.style.display=''; return; }
+  const div = document.createElement('div');
+  div.id = areaId;
+  div.style = 'display:flex;gap:6px;margin-bottom:8px';
+  div.innerHTML = `<input type="text" id="addsub-inp-${id}-${side}" placeholder="Alt bölüm adı..." style="flex:1;font-size:14px" onkeydown="if(event.key==='Enter')confirmAddYesnoSubSection('${id}','${side}')">` +
+    `<button class="btn btn-ghost btn-sm" onclick="confirmAddYesnoSubSection('${id}','${side}')">+ Ekle</button>` +
+    `<button class="btn btn-ghost btn-sm" onclick="document.getElementById('${areaId}').remove();document.getElementById('${btnId}').style.display=''">✕</button>`;
+  if(btn){ btn.style.display='none'; btn.parentNode.insertBefore(div, btn); }
+  setTimeout(()=>{ const inp=document.getElementById('addsub-inp-'+id+'-'+side); if(inp) inp.focus(); },50);
+}
+function confirmAddYesnoSubSection(id, side){
+  const inp = document.getElementById('addsub-inp-'+id+'-'+side);
+  if(!inp) return;
+  const name = inp.value.trim();
+  if(!name) return;
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  if(side==='yes'){ if(!sec.yesSubs) sec.yesSubs=[]; sec.yesSubs.push({name,items:[]}); }
+  else             { if(!sec.noSubs)  sec.noSubs=[];  sec.noSubs.push({name,items:[]});  }
+  _saveYesnoSub(id);
+}
+function removeYesnoSubSection(id, side, si){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  if(side==='yes') sec.yesSubs.splice(si,1);
+  else             sec.noSubs.splice(si,1);
+  _saveYesnoSub(id);
+}
+function renameYesnoSubSection(id, side, si){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  const arr = side==='yes' ? sec.yesSubs : sec.noSubs;
+  const n = window.prompt('Yeni ad:', arr[si].name);
+  if(n&&n.trim()&&n.trim()!==arr[si].name){ arr[si].name=n.trim(); _saveYesnoSub(id); }
+}
+function addYesnoSubItem(id, side, si){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  const arr = side==='yes' ? sec.yesSubs : sec.noSubs;
+  const inp = document.getElementById('ynsub-new-'+id+'-'+side+'-'+si);
+  if(!inp) return;
+  const v = inp.value.trim(); if(!v) return;
+  if(!arr[si].items) arr[si].items=[];
+  if(!arr[si].items.includes(v)){
+    arr[si].items.push(v);
+    arr[si].items.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+    _saveYesnoSub(id);
+  } else { inp.value=''; }
+}
+function removeYesnoSubItem(id, side, si, ii){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  const arr = side==='yes' ? sec.yesSubs : sec.noSubs;
+  const removed = arr[si].items[ii];
+  arr[si].items.splice(ii,1);
+  // Seçili değerlerden de çıkar
+  const key = id+'__subs';
+  if(customValues[key]&&customValues[key][si])
+    customValues[key][si] = customValues[key][si].filter(x=>x!==removed);
+  _saveYesnoSub(id);
+}
+function renameYesnoSubItem(id, side, si, ii){
+  const sec = customSections.find(s=>s.id===id); if(!sec) return;
+  const arr = side==='yes' ? sec.yesSubs : sec.noSubs;
+  const oldName = arr[si].items[ii];
+  const n = window.prompt('Yeni isim:', oldName);
+  if(!n||!n.trim()||n.trim()===oldName) return;
+  const newName = n.trim();
+  // Seçili değerlerde güncelle
+  const key = id+'__subs';
+  if(customValues[key]&&customValues[key][si])
+    customValues[key][si] = customValues[key][si].map(x=>x===oldName?newName:x);
+  // Geçmiş kayıtlarda güncelle
+  logs.forEach(log=>{
+    if(log.customData&&log.customData[id]&&log.customData[id].subValues){
+      const sv = log.customData[id].subValues[si];
+      if(Array.isArray(sv)) log.customData[id].subValues[si]=sv.map(x=>x===oldName?newName:x);
+    }
+  });
+  save();
+  arr[si].items[ii]=newName;
+  arr[si].items.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+  _saveYesnoSub(id);
 }
 function addCustomListItem(id){
   const inp = document.getElementById('clist-new-'+id);
@@ -1435,8 +1583,8 @@ function showAddSectionModal(editId=null){
   if(editId){
     const sec = customSections.find(s=>s.id===editId);
     if(sec){
-      // Liste türü için modal gösterme, inline düzenlemeye yönlendir
-      if(sec.type === 'list'){
+      // Liste ve yesno_sub türü için modal gösterme, inline düzenlemeye yönlendir
+      if(sec.type === 'list' || sec.type === 'yesno_sub'){
         customListEditModes[sec.id] = true;
         renderCustomSections();
         return; // modal açma
@@ -1448,7 +1596,14 @@ function showAddSectionModal(editId=null){
       document.getElementById('sec-no-label').value = sec.noLabel || '';
       document.getElementById('sec-text-placeholder').value = sec.placeholder || '';
       currentSecType = sec.type || 'yesno';
-      // yesno_sub ise alt bölümleri yükle
+      // Düzenleme modunda tür seçimini gizle
+      if(typeArea) typeArea.style.display = 'none';
+      document.querySelectorAll('.sec-type-btn').forEach(b=>{
+        b.classList.toggle('active',b.dataset.type===currentSecType);
+        b.disabled = true;
+      });
+      showSecTypeOptions(currentSecType);
+      // yesno_sub ise alt bölümleri yükle (showSecTypeOptions'tan SONRA çalışmalı)
       if(sec.type === 'yesno_sub'){
         document.getElementById('sec-yes-label2').value = sec.yesLabel || '';
         document.getElementById('sec-no-label2').value = sec.noLabel || '';
@@ -1459,13 +1614,6 @@ function showAddSectionModal(editId=null){
           addNoSubField(sub.name, [...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).join('\n'));
         });
       }
-      // Düzenleme modunda tür seçimini gizle
-      if(typeArea) typeArea.style.display = 'none';
-      document.querySelectorAll('.sec-type-btn').forEach(b=>{
-        b.classList.toggle('active',b.dataset.type===currentSecType);
-        b.disabled = true;
-      });
-      showSecTypeOptions(currentSecType);
     }
   } else {
     titleEl.textContent = 'Yeni Bölüm';
@@ -1591,6 +1739,26 @@ function saveSectionModal(){
         }
       });
       save();
+    } else if(sec.type === 'yesno_sub'){
+      sec.yesLabel = document.getElementById('sec-yes-label2').value.trim() || 'Evet';
+      sec.noLabel = document.getElementById('sec-no-label2').value.trim() || 'Hayır';
+      sec.yesSubs = getSubFields('yes-sub-name','yes-sub-items');
+      sec.noSubs = getSubFields('no-sub-name','no-sub-items');
+      // Geçmiş kayıtlarda başlık güncelle
+      logs.forEach(log => {
+        if(log.customData && log.customData[sec.id]){
+          log.customData[sec.id].title = title;
+        }
+      });
+      save();
+    } else if(sec.type === 'stars'){
+      // Geçmiş kayıtlarda başlık güncelle
+      logs.forEach(log => {
+        if(log.customData && log.customData[sec.id]){
+          log.customData[sec.id].title = title;
+        }
+      });
+      save();
     }
     saveCustomSections();
     closeSectionModal();
@@ -1624,7 +1792,15 @@ function saveSectionModal(){
   closeSectionModal();
   renderCustomSections();
 }
-function editSection(id){ showAddSectionModal(id); }
+function editSection(id){
+  const sec = customSections.find(s=>s.id===id);
+  if(sec && (sec.type === 'list' || sec.type === 'yesno_sub')){
+    customListEditModes[id] = true;
+    renderCustomSections();
+  } else {
+    showAddSectionModal(id);
+  }
+}
 function deleteSection(id){
   if(!confirm('Bu bölümü silmek istiyor musun?')) return;
   customSections = customSections.filter(s=>s.id!==id);
@@ -1986,10 +2162,16 @@ Ağır" style="min-height:100px"></textarea>
     <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:6px">Kaydı Düzenle</div>
     <div id="edit-log-date-label" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
 
-    <lbl>📅 Tarih</lbl>
-    <input type="date" id="edit-inp-date" style="margin-bottom:8px">
-    <lbl>🕐 Saat</lbl>
-    <input type="time" id="edit-inp-time" style="margin-bottom:12px">
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1;min-width:0">
+        <lbl>📅 Tarih</lbl>
+        <input type="date" id="edit-inp-date" style="width:100%;box-sizing:border-box">
+      </div>
+      <div style="flex:0 0 auto">
+        <lbl>🕐 Saat</lbl>
+        <input type="time" id="edit-inp-time" style="width:120px;box-sizing:border-box">
+      </div>
+    </div>
 
     <lbl>🍽️ Yenilen Gıdalar (virgülle ayır)</lbl>
     <input type="text" id="edit-inp-foods" placeholder="Et, Ekmek, Süt..." style="margin-bottom:12px">
