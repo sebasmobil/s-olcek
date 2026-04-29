@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.13
+  Alerji Takip Defteri - Pro 1.0.14
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.13</span>
+  <span>Pro 1.0.14</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -908,7 +908,26 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
-      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true||cd.value===false?(()=>{const lbl=cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır');const allItems=[];if(cd.subValues&&typeof cd.subValues==='object'){Object.entries(cd.subValues).forEach(([k,arr])=>{if(Array.isArray(arr)&&arr.length){allItems.push(...arr.filter(x=>x&&x.trim()));}});}return (cd.value===true?'✅':'❌')+' '+lbl+(allItems.length?' → '+allItems.join(', '):'');})():'—'):cd.value}</span>`).join('')}</div>`:''}
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>{
+        let display='';
+        if(cd.type==='yesno_sub'){
+          if(cd.value===true||cd.value===false){
+            const lbl=cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır');
+            const allItems=[];
+            if(cd.subValues&&typeof cd.subValues==='object'){
+              Object.values(cd.subValues).forEach(arr=>{if(Array.isArray(arr))allItems.push(...arr.filter(x=>x&&x.trim()));});
+            }
+            display=(cd.value===true?'✅':'❌')+' '+lbl+(allItems.length?' ('+allItems.join(', ')+')':'');
+          } else { display='—'; }
+        } else if(Array.isArray(cd.value)){ display=cd.value.join(', ');
+        } else if(cd.value===true){ display='✅ Evet';
+        } else if(cd.value===false){ display='❌ Hayır';
+        } else if(cd.type==='percent'){ display=cd.value+'%';
+        } else if(cd.type==='scale'){ display=cd.value+'/10';
+        } else if(cd.type==='stars'){ display='⭐'.repeat(cd.value||0);
+        } else { display=cd.value; }
+        return `<span>📌 ${cd.title}: ${display}</span>`;
+      }).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
