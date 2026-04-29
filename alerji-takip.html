@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.05
+  Alerji Takip Defteri - Pro 1.0.07
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -169,6 +169,24 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   .scale-btns{display:flex;gap:8px;flex-wrap:wrap;}
   .scale-btn{width:52px;height:52px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:18px;font-weight:700;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;}
   .scale-btn.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+
+
+  /* YILDIZ RATING */
+  .star-row{display:flex;gap:6px;justify-content:center;padding:6px 0;}
+  .star-btn{font-size:32px;cursor:pointer;transition:transform .15s,filter .15s;filter:grayscale(1);opacity:0.35;background:none;border:none;padding:0;}
+  .star-btn.lit{filter:none;opacity:1;}
+  .star-btn:hover,.star-btn:active{transform:scale(1.2);}
+  .star-val-lbl{text-align:center;font-size:13px;color:var(--muted);margin-top:2px;min-height:18px;}
+
+  /* SÜRGÜ (Range Slider) */
+  .custom-slider-wrap{padding:4px 0 8px;}
+  .custom-slider-val{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:8px;line-height:1;}
+  .custom-slider-val span{font-size:14px;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:2px;}
+  .custom-slider-track{position:relative;height:36px;display:flex;align-items:center;}
+  input[type=range].custom-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
+  input[type=range].custom-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+  input[type=range].custom-range::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+  .slider-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px;}
   .custom-list-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;display:inline-block;margin:3px;}
   .custom-list-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
 </style>
@@ -184,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.05</span>
+  <span>Pro 1.0.07</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -827,7 +845,7 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
-      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.value}</span>`).join('')}</div>`:''}
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true?'✅ '+(cd.subValues?Object.values(cd.subValues).flat().join(', '):''):cd.value===false?'❌ '+(cd.subValues?Object.values(cd.subValues).flat().join(', '):''):'—'):cd.value}</span>`).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
@@ -1220,10 +1238,54 @@ function renderCustomSections(){
           `</div>`;
       }
     } else if(sec.type === 'scale'){
+      const val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
+      const displayVal = val !== null ? val : '—';
+      bodyHtml = `<div class="custom-slider-wrap">
+        <div class="custom-slider-val" id="scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+        <div class="custom-slider-track">
+          <input type="range" class="custom-range" min="1" max="10" step="1"
+            value="${val !== null ? val : 5}"
+            oninput="setSliderVal('${sec.id}','scale',this.value)"
+            ${val === null ? 'style="opacity:0.5"' : ''}>
+        </div>
+        <div class="slider-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+      </div>`;
+    } else if(sec.type === 'percent'){
+      const val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
+      const displayVal = val !== null ? val : '—';
+      bodyHtml = `<div class="custom-slider-wrap">
+        <div class="custom-slider-val" id="pct-disp-${sec.id}">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+        <div class="custom-slider-track">
+          <input type="range" class="custom-range" min="0" max="100" step="1"
+            value="${val !== null ? val : 50}"
+            oninput="setSliderVal('${sec.id}','percent',this.value)"
+            ${val === null ? 'style="opacity:0.5"' : ''}>
+        </div>
+        <div class="slider-labels"><span>%0</span><span>%25</span><span>%50</span><span>%75</span><span>%100</span></div>
+      </div>`;
+    } else if(sec.type === 'stars'){
+      const val = customValues[sec.id] || 0;
+      const labels = ['','😞 Kötü','😕 Fena değil','😐 Orta','😊 İyi','🤩 Mükemmel'];
+      bodyHtml = `<div class="star-row">` +
+        [1,2,3,4,5].map(n=>`<button class="star-btn${val>=n?' lit':''}" onclick="setStarVal('${sec.id}',${n})">⭐</button>`).join('') +
+        `</div><div class="star-val-lbl">${val>0?labels[val]:''}</div>`;
+    } else if(sec.type === 'yesno_sub'){
       const val = customValues[sec.id];
-      bodyHtml = '<div class="scale-btns">' +
-        [1,2,3,4,5].map(n => `<button class="scale-btn${val===n?' sel':''}" onclick="setCustomVal('${sec.id}',${n})">${n}</button>`).join('') +
-        '</div>';
+      const yesLabel = sec.yesLabel || 'Evet';
+      const noLabel = sec.noLabel || 'Hayır';
+      const subs = val === true ? (sec.yesSubs||[]) : val === false ? (sec.noSubs||[]) : [];
+      const subVals = customValues[sec.id+'__subs'] || {};
+      let subsHtml = subs.map((sub,si) => {
+        const sv = subVals[si] || [];
+        return `<div style="margin-top:10px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')">  ${item}</span>`).join('')}</div>
+        </div>`;
+      }).join('');
+      bodyHtml = `<div class="yn-group">
+        <button class="yn-btn${val===true?' yes':''}" onclick="setCustomVal('${sec.id}',true)">${val===true?'✅':''} ${yesLabel}</button>
+        <button class="yn-btn${val===false?' no':''}" onclick="setCustomVal('${sec.id}',false)">${val===false?'❌':''} ${noLabel}</button>
+      </div>${val!==null&&val!==undefined?subsHtml:''}`;
     } else if(sec.type === 'text'){
       const val = customValues[sec.id] || '';
       bodyHtml = `<textarea onchange="customValues['${sec.id}']=this.value" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 12px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;min-height:68px;resize:vertical" placeholder="${sec.placeholder||'Buraya yaz...'}">${val}</textarea>`;
@@ -1253,6 +1315,33 @@ function renderCustomSections(){
 
 function setCustomVal(id, val){
   customValues[id] = val;
+  renderCustomSections();
+}
+function setSliderVal(id, type, val){
+  const v = type === 'percent' ? parseInt(val) : parseInt(val);
+  customValues[id] = v;
+  // Sadece gösterge metni güncelle (rerender olmadan - akıcı sürgü için)
+  const prefix = type === 'percent' ? 'pct-disp-' : 'scale-disp-';
+  const suffix = type === 'percent' ? '%' : '/10';
+  const el = document.getElementById(prefix + id);
+  if(el) el.innerHTML = v + `<span>${suffix}</span>`;
+  // Sürgü opaklığını kaldır (ilk kez değer seçildiğinde)
+  const inp = el ? el.closest('.custom-slider-wrap').querySelector('input[type=range]') : null;
+  if(inp) inp.style.opacity = '';
+}
+function setStarVal(id, n){
+  // Aynı yıldıza tekrar basılırsa sıfırla
+  if(customValues[id] === n) customValues[id] = 0;
+  else customValues[id] = n;
+  renderCustomSections();
+}
+function toggleYesnoSub(id, subIdx, item){
+  const key = id+'__subs';
+  if(!customValues[key]) customValues[key] = {};
+  if(!customValues[key][subIdx]) customValues[key][subIdx] = [];
+  const arr = customValues[key][subIdx];
+  if(arr.includes(item)) customValues[key][subIdx] = arr.filter(x=>x!==item);
+  else customValues[key][subIdx].push(item);
   renderCustomSections();
 }
 function toggleCustomList(id, item){
@@ -1331,6 +1420,12 @@ function showAddSectionModal(editId=null){
   document.getElementById('sec-no-label').value = '';
   document.getElementById('sec-list-items').value = '';
   document.getElementById('sec-text-placeholder').value = '';
+  // Reset yesno_sub sub-fields
+  const ysa = document.getElementById('yes-subs-area');
+  const nsa = document.getElementById('no-subs-area');
+  if(ysa) ysa.innerHTML='';
+  if(nsa) nsa.innerHTML='';
+  yesSubCount=0; noSubCount=0;
   currentSecType = 'yesno';
   document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='yesno'));
   showSecTypeOptions('yesno');
@@ -1353,6 +1448,17 @@ function showAddSectionModal(editId=null){
       document.getElementById('sec-no-label').value = sec.noLabel || '';
       document.getElementById('sec-text-placeholder').value = sec.placeholder || '';
       currentSecType = sec.type || 'yesno';
+      // yesno_sub ise alt bölümleri yükle
+      if(sec.type === 'yesno_sub'){
+        document.getElementById('sec-yes-label2').value = sec.yesLabel || '';
+        document.getElementById('sec-no-label2').value = sec.noLabel || '';
+        (sec.yesSubs||[]).forEach(sub => {
+          addYesSubField(sub.name, [...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).join('\n'));
+        });
+        (sec.noSubs||[]).forEach(sub => {
+          addNoSubField(sub.name, [...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).join('\n'));
+        });
+      }
       // Düzenleme modunda tür seçimini gizle
       if(typeArea) typeArea.style.display = 'none';
       document.querySelectorAll('.sec-type-btn').forEach(b=>{
@@ -1394,7 +1500,53 @@ function showSecTypeOptions(type){
   document.getElementById('yesno-options').style.display = type==='yesno'?'block':'none';
   document.getElementById('list-options').style.display = type==='list'?'block':'none';
   document.getElementById('scale-options').style.display = type==='scale'?'block':'none';
+  document.getElementById('percent-options').style.display = type==='percent'?'block':'none';
+  document.getElementById('stars-options').style.display = type==='stars'?'block':'none';
+  document.getElementById('yesno_sub-options').style.display = type==='yesno_sub'?'block':'none';
   document.getElementById('text-options').style.display = type==='text'?'block':'none';
+}
+
+// Alt bölüm alanları (yesno_sub modal)
+let yesSubCount = 0;
+let noSubCount = 0;
+function addYesSubField(name='', items=''){
+  yesSubCount++;
+  const id = 'yes-sub-'+yesSubCount;
+  const div = document.createElement('div');
+  div.id = id;
+  div.style = 'border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--card2)';
+  div.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:6px">
+    <input type="text" class="yes-sub-name" placeholder="Alt bölüm adı (örn: Şampuan)" value="${name}" style="flex:1;margin-right:8px">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="document.getElementById('${id}').remove()">✕</button>
+  </div>
+  <textarea class="yes-sub-items" placeholder="Öğeler (her satıra bir tane)&#10;Örn:&#10;Clear&#10;Dove" style="min-height:72px;width:100%">${items}</textarea>`;
+  document.getElementById('yes-subs-area').appendChild(div);
+}
+function addNoSubField(name='', items=''){
+  noSubCount++;
+  const id = 'no-sub-'+noSubCount;
+  const div = document.createElement('div');
+  div.id = id;
+  div.style = 'border:1px solid var(--red);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--card2)';
+  div.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:6px">
+    <input type="text" class="no-sub-name" placeholder="Alt bölüm adı" value="${name}" style="flex:1;margin-right:8px">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="document.getElementById('${id}').remove()">✕</button>
+  </div>
+  <textarea class="no-sub-items" placeholder="Öğeler (her satıra bir tane)" style="min-height:72px;width:100%">${items}</textarea>`;
+  document.getElementById('no-subs-area').appendChild(div);
+}
+function getSubFields(cls_name, cls_items){
+  const subs = [];
+  const names = document.querySelectorAll('.'+cls_name);
+  const items = document.querySelectorAll('.'+cls_items);
+  names.forEach((n,i)=>{
+    const nm = n.value.trim();
+    if(!nm) return;
+    const itArr = items[i].value.split('\n').map(s=>s.trim()).filter(Boolean);
+    itArr.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+    subs.push({ name: nm, items: itArr });
+  });
+  return subs;
 }
 function saveSectionModal(){
   const title = document.getElementById('sec-title').value.trim();
@@ -1454,11 +1606,15 @@ function saveSectionModal(){
     title,
     icon: document.getElementById('sec-icon').value.trim(),
     type: currentSecType,
-    yesLabel: document.getElementById('sec-yes-label').value.trim() || 'Evet',
-    noLabel: document.getElementById('sec-no-label').value.trim() || 'Hayır',
+    yesLabel: (currentSecType==='yesno'?document.getElementById('sec-yes-label'):document.getElementById('sec-yes-label2')).value.trim() || 'Evet',
+    noLabel: (currentSecType==='yesno'?document.getElementById('sec-no-label'):document.getElementById('sec-no-label2')).value.trim() || 'Hayır',
     listItems: document.getElementById('sec-list-items').value.split('\n').map(s=>s.trim()).filter(Boolean),
     placeholder: document.getElementById('sec-text-placeholder').value.trim() || 'Buraya yaz...'
   };
+  if(currentSecType === 'yesno_sub'){
+    sec.yesSubs = getSubFields('yes-sub-name','yes-sub-items');
+    sec.noSubs = getSubFields('no-sub-name','no-sub-items');
+  }
   // Liste türüyse alfabetik sırala
   if(sec.type==='list' && sec.listItems){
     sec.listItems.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
@@ -1482,7 +1638,12 @@ function deleteSection(id){
 function getCustomValuesForLog(){
   const result = {};
   customSections.forEach(sec=>{
-    result[sec.id] = {title: sec.title, type: sec.type, value: customValues[sec.id]||null};
+    let val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
+    const entry = {title: sec.title, type: sec.type, value: val};
+    if(sec.type === 'yesno_sub'){
+      entry.subValues = customValues[sec.id+'__subs'] || {};
+    }
+    result[sec.id] = entry;
   });
   return result;
 }
@@ -1499,6 +1660,8 @@ let editingLogId = null;
 let editShowerVal = null;
 let editSeyVal = null;
 let editAcneVal = null;
+
+let editCustomVals = {}; // Geçmiş düzenleme modalı için özel değerler
 
 function editLog(id){
   const log = logs.find(l=>l.id===id);
@@ -1532,7 +1695,141 @@ function editLog(id){
   document.getElementById('edit-sey-yes').className='yn-btn'+(editSeyVal===true?' yes':'');
   document.getElementById('edit-sey-no').className='yn-btn'+(editSeyVal===false?' no':'');
 
+  // Özel bölümleri yükle
+  editCustomVals = {};
+  if(log.customData){
+    Object.entries(log.customData).forEach(([sid, cd])=>{
+      editCustomVals[sid] = cd.value !== undefined ? cd.value : null;
+      if(cd.type === 'yesno_sub' && cd.subValues){
+        editCustomVals[sid+'__subs'] = cd.subValues;
+      }
+    });
+  }
+  renderEditCustomSections(log);
+
   document.getElementById('edit-log-modal').style.display='flex';
+}
+
+function renderEditCustomSections(log){
+  const area = document.getElementById('edit-custom-sections-area');
+  if(!area || customSections.length === 0){ if(area) area.innerHTML=''; return; }
+  area.innerHTML = customSections.map(sec => {
+    const icon = sec.icon ? sec.icon + ' ' : '';
+    const saved = (log && log.customData && log.customData[sec.id]) ? log.customData[sec.id].value : null;
+    const cur = editCustomVals[sec.id] !== undefined ? editCustomVals[sec.id] : saved;
+    let bodyHtml = '';
+
+    if(sec.type === 'yesno'){
+      const yesLabel = sec.yesLabel || 'Evet';
+      const noLabel = sec.noLabel || 'Hayır';
+      bodyHtml = `<div class="yn-group">
+        <button class="yn-btn${cur===true?' yes':''}" onclick="setEditCustomVal('${sec.id}',true)">${cur===true?'✅':''} ${yesLabel}</button>
+        <button class="yn-btn${cur===false?' no':''}" onclick="setEditCustomVal('${sec.id}',false)">${cur===false?'❌':''} ${noLabel}</button>
+      </div>`;
+    } else if(sec.type === 'list'){
+      const val = Array.isArray(cur) ? cur : [];
+      bodyHtml = '<div style="display:flex;flex-wrap:wrap;gap:4px">' +
+        (sec.listItems||[]).map(item => `<span class="custom-list-item${val.includes(item)?' sel':''}" onclick="toggleEditCustomList('${sec.id}','${item.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">${item}</span>`).join('') +
+        '</div>';
+    } else if(sec.type === 'scale'){
+      const val = cur !== null && cur !== undefined ? parseInt(cur) : null;
+      const displayVal = val !== null ? val : '—';
+      bodyHtml = `<div class="custom-slider-wrap">
+        <div class="custom-slider-val" id="edit-scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+        <div class="custom-slider-track">
+          <input type="range" class="custom-range" min="1" max="10" step="1"
+            value="${val !== null ? val : 5}"
+            oninput="setEditSliderVal('${sec.id}','scale',this.value)"
+            ${val === null ? 'style="opacity:0.5"' : ''}>
+        </div>
+        <div class="slider-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+      </div>`;
+    } else if(sec.type === 'percent'){
+      const val = cur !== null && cur !== undefined ? parseInt(cur) : null;
+      const displayVal = val !== null ? val : '—';
+      bodyHtml = `<div class="custom-slider-wrap">
+        <div class="custom-slider-val" id="edit-pct-disp-${sec.id}">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+        <div class="custom-slider-track">
+          <input type="range" class="custom-range" min="0" max="100" step="1"
+            value="${val !== null ? val : 50}"
+            oninput="setEditSliderVal('${sec.id}','percent',this.value)"
+            ${val === null ? 'style="opacity:0.5"' : ''}>
+        </div>
+        <div class="slider-labels"><span>%0</span><span>%25</span><span>%50</span><span>%75</span><span>%100</span></div>
+      </div>`;
+    } else if(sec.type === 'stars'){
+      const val = cur !== null && cur !== undefined ? parseInt(cur) : 0;
+      const labels = ['','😞 Kötü','😕 Fena değil','😐 Orta','😊 İyi','🤩 Mükemmel'];
+      bodyHtml = `<div class="star-row">` +
+        [1,2,3,4,5].map(n=>`<button class="star-btn${val>=n?' lit':''}" onclick="setEditStarVal('${sec.id}',${n})">⭐</button>`).join('') +
+        `</div><div class="star-val-lbl" id="edit-star-lbl-${sec.id}">${val>0?labels[val]:''}</div>`;
+    } else if(sec.type === 'yesno_sub'){
+      const yesLabel = sec.yesLabel || 'Evet';
+      const noLabel = sec.noLabel || 'Hayır';
+      const savedSubs = (log && log.customData && log.customData[sec.id]) ? (log.customData[sec.id].subValues||{}) : {};
+      const curSubs = editCustomVals[sec.id+'__subs'] !== undefined ? editCustomVals[sec.id+'__subs'] : savedSubs;
+      const subs = cur === true ? (sec.yesSubs||[]) : cur === false ? (sec.noSubs||[]) : [];
+      let subsHtml = subs.map((sub,si) => {
+        const sv = curSubs[si] || [];
+        return `<div style="margin-top:10px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleEditYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')"> ${item}</span>`).join('')}</div>
+        </div>`;
+      }).join('');
+      bodyHtml = `<div class="yn-group">
+        <button class="yn-btn${cur===true?' yes':''}" onclick="setEditCustomVal('${sec.id}',true)">${cur===true?'✅':''} ${yesLabel}</button>
+        <button class="yn-btn${cur===false?' no':''}" onclick="setEditCustomVal('${sec.id}',false)">${cur===false?'❌':''} ${noLabel}</button>
+      </div>${cur!==null&&cur!==undefined?subsHtml:''}`;
+    } else if(sec.type === 'text'){
+      const val = cur || '';
+      bodyHtml = `<textarea onchange="editCustomVals['${sec.id}']=this.value" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 12px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;min-height:68px;resize:vertical" placeholder="${sec.placeholder||'Buraya yaz...'}">${val}</textarea>`;
+    }
+
+    return `<div style="margin-bottom:14px">
+      <lbl>${icon}${sec.title}</lbl>
+      ${bodyHtml}
+    </div>`;
+  }).join('');
+}
+
+function setEditCustomVal(id, val){
+  editCustomVals[id] = val;
+  const log = logs.find(l=>l.id===editingLogId);
+  renderEditCustomSections(log);
+}
+function setEditStarVal(id, n){
+  if(editCustomVals[id] === n) editCustomVals[id] = 0;
+  else editCustomVals[id] = n;
+  const log = logs.find(l=>l.id===editingLogId);
+  renderEditCustomSections(log);
+}
+function toggleEditYesnoSub(id, subIdx, item){
+  const key = id+'__subs';
+  if(!editCustomVals[key]) editCustomVals[key] = {};
+  if(!editCustomVals[key][subIdx]) editCustomVals[key][subIdx] = [];
+  const arr = editCustomVals[key][subIdx];
+  if(arr.includes(item)) editCustomVals[key][subIdx] = arr.filter(x=>x!==item);
+  else editCustomVals[key][subIdx].push(item);
+  const log = logs.find(l=>l.id===editingLogId);
+  renderEditCustomSections(log);
+}
+function toggleEditCustomList(id, item){
+  if(!Array.isArray(editCustomVals[id])) editCustomVals[id] = [];
+  if(editCustomVals[id].includes(item)){
+    editCustomVals[id] = editCustomVals[id].filter(x=>x!==item);
+  } else {
+    editCustomVals[id].push(item);
+  }
+  const log = logs.find(l=>l.id===editingLogId);
+  renderEditCustomSections(log);
+}
+function setEditSliderVal(id, type, val){
+  const v = parseInt(val);
+  editCustomVals[id] = v;
+  const prefix = type === 'percent' ? 'edit-pct-disp-' : 'edit-scale-disp-';
+  const suffix = type === 'percent' ? '%' : '/10';
+  const el = document.getElementById(prefix + id);
+  if(el){ el.innerHTML = v + `<span>${suffix}</span>`; el.closest('.custom-slider-wrap').querySelector('input[type=range]').style.opacity=''; }
 }
 function closeEditLogModal(){
   document.getElementById('edit-log-modal').style.display='none';
@@ -1562,6 +1859,20 @@ function saveEditLog(){
   if(idx<0) return;
   const foodsRaw=document.getElementById('edit-inp-foods').value;
   const locsRaw=document.getElementById('edit-inp-locs').value;
+
+  // Özel bölüm değerlerini birleştir
+  const oldCustomData = logs[idx].customData || {};
+  const newCustomData = {};
+  customSections.forEach(sec=>{
+    const val = editCustomVals[sec.id] !== undefined ? editCustomVals[sec.id] : (oldCustomData[sec.id] ? oldCustomData[sec.id].value : null);
+    const entry = { title: sec.title, type: sec.type, value: val };
+    if(sec.type === 'yesno_sub'){
+      const savedSubs = oldCustomData[sec.id] ? (oldCustomData[sec.id].subValues||{}) : {};
+      entry.subValues = editCustomVals[sec.id+'__subs'] !== undefined ? editCustomVals[sec.id+'__subs'] : savedSubs;
+    }
+    newCustomData[sec.id] = entry;
+  });
+
   logs[idx] = {
     ...logs[idx],
     date: document.getElementById('edit-inp-date').value,
@@ -1573,7 +1884,8 @@ function saveEditLog(){
     shampoo: document.getElementById('edit-inp-shampoo').value.trim(),
     soap: document.getElementById('edit-inp-soap').value.trim(),
     sey: editSeyVal,
-    notes: document.getElementById('edit-inp-notes').value.trim()
+    notes: document.getElementById('edit-inp-notes').value.trim(),
+    customData: newCustomData
   };
   logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   save();
@@ -1601,7 +1913,10 @@ function saveEditLog(){
     <div style="display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap">
       <button class="sec-type-btn active" data-type="yesno" onclick="selectSecType(this)">✅ Evet/Hayır</button>
       <button class="sec-type-btn" data-type="list" onclick="selectSecType(this)">📋 Liste Seçim</button>
-      <button class="sec-type-btn" data-type="scale" onclick="selectSecType(this)">📊 Skala (1-5)</button>
+      <button class="sec-type-btn" data-type="scale" onclick="selectSecType(this)">📊 Skala (1-10)</button>
+      <button class="sec-type-btn" data-type="percent" onclick="selectSecType(this)">💯 Yüzde (%)</button>
+      <button class="sec-type-btn" data-type="stars" onclick="selectSecType(this)">⭐ Yıldız (1-5)</button>
+      <button class="sec-type-btn" data-type="yesno_sub" onclick="selectSecType(this)">🔀 Evet/Hayır+</button>
       <button class="sec-type-btn" data-type="text" onclick="selectSecType(this)">✏️ Metin</button>
     </div>
     </div>
@@ -1625,8 +1940,33 @@ Ağır" style="min-height:100px"></textarea>
 
     <!-- Skala & Metin - ek ayar yok -->
     <div id="scale-options" style="display:none;margin-bottom:12px">
-      <p style="font-size:12px;color:var(--muted)">1'den 5'e kadar derecelendirme. Kullanıcı bir değer seçer.</p>
+      <p style="font-size:12px;color:var(--muted)">1'den 10'a kadar sürgülü derecelendirme.</p>
     </div>
+    <div id="percent-options" style="display:none;margin-bottom:12px">
+      <p style="font-size:12px;color:var(--muted)">%0 ile %100 arasında sürgülü seçim.</p>
+    </div>
+    <div id="stars-options" style="display:none;margin-bottom:12px">
+      <p style="font-size:12px;color:var(--muted)">5 yıldız üzerinden derecelendirme. Tıklayarak seç.</p>
+    </div>
+
+    <!-- Evet/Hayır+ seçenekleri -->
+    <div id="yesno_sub-options" style="display:none;margin-bottom:12px">
+      <lbl>Evet / Doğru butonu yazısı</lbl>
+      <input type="text" id="sec-yes-label2" placeholder="Evet" style="margin-bottom:8px">
+      <lbl>Hayır / Yanlış butonu yazısı</lbl>
+      <input type="text" id="sec-no-label2" placeholder="Hayır" style="margin-bottom:12px">
+
+      <lbl style="color:var(--accent)">Evet deyince çıkacak alt bölümler</lbl>
+      <p style="font-size:11px;color:var(--muted);margin:2px 0 6px">Her satıra bir bölüm adı. Bu bölümler liste seçim olarak görünür.</p>
+      <div id="yes-subs-area"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="addYesSubField()">+ Alt Bölüm Ekle (Evet)</button>
+
+      <lbl style="color:var(--red);margin-top:14px">Hayır deyince çıkacak alt bölümler</lbl>
+      <p style="font-size:11px;color:var(--muted);margin:2px 0 6px">Her satıra bir bölüm adı. Bu bölümler liste seçim olarak görünür.</p>
+      <div id="no-subs-area"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="addNoSubField()">+ Alt Bölüm Ekle (Hayır)</button>
+    </div>
+
     <div id="text-options" style="display:none;margin-bottom:12px">
       <lbl>Placeholder yazısı</lbl>
       <input type="text" id="sec-text-placeholder" placeholder="Buraya yaz...">
@@ -1686,6 +2026,8 @@ Ağır" style="min-height:100px"></textarea>
 
     <lbl>📝 Notlar</lbl>
     <textarea id="edit-inp-notes" style="margin-bottom:16px" placeholder="Not..."></textarea>
+
+    <div id="edit-custom-sections-area"></div>
 
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" onclick="saveEditLog()" style="flex:1;justify-content:center">💾 Kaydet</button>
