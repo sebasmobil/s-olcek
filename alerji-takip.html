@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.34
+  Alerji Takip Defteri - Pro 1.0.35
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.34</span>
+  <span>Pro 1.0.35</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -921,26 +921,38 @@ function setShower(v){
 }
 
 // ===== SEY =====
+let _builtinEditKey = null;
 function editBuiltinSection(key, iconKey, titleEl, iconEl){
   const curTitle = localStorage.getItem('alerji-'+key+'-title') || titleEl;
   const curIcon  = localStorage.getItem('alerji-'+key+'-icon')  || iconEl;
-  const yeniAd   = prompt('Bölüm adı:', curTitle);
-  if(yeniAd===null) return;
-  const yeniSimge = prompt('Simge (emoji):', curIcon);
-  if(yeniSimge===null) return;
-  if(yeniAd.trim())    localStorage.setItem('alerji-'+key+'-title', yeniAd.trim());
-  if(yeniSimge.trim()) localStorage.setItem('alerji-'+key+'-icon',  yeniSimge.trim());
+  _builtinEditKey = key;
+  document.getElementById('bolum-edit-ad').value = curTitle;
+  document.getElementById('bolum-edit-simge').value = curIcon;
+  document.getElementById('bolum-edit-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('bolum-edit-ad').focus(), 100);
+}
+function bolumEditKaydet(){
+  const key = _builtinEditKey; if(!key) return;
+  const yeniAd    = document.getElementById('bolum-edit-ad').value.trim();
+  const yeniSimge = document.getElementById('bolum-edit-simge').value.trim();
+  if(yeniAd)    localStorage.setItem('alerji-'+key+'-title', yeniAd);
+  if(yeniSimge) localStorage.setItem('alerji-'+key+'-icon',  yeniSimge);
   refreshBuiltinTitles();
-  // Analiz başlıklarını güncelle
+  // Analiz başlığı
   const at=document.getElementById('diger-analysis-title');
-  if(at && key==='diger') at.textContent=yeniSimge.trim()+' '+(yeniAd.trim()||curTitle)+' Analizi';
-  // Geçmiş kayıtlarda digerTitle snapshot'ı güncelle (Diğer bölümü için)
+  if(at && key==='diger') at.textContent=yeniSimge+' '+yeniAd+' Analizi';
+  // Geçmiş snapshot (Diğer için)
   if(key==='diger'){
-    const newT=yeniAd.trim()||curTitle;
-    logs.forEach(l=>{ if(l.digerTitleSnapshot!==undefined) l.digerTitleSnapshot=newT; });
-    save();
-    renderHistory();
+    logs.forEach(l=>{ if(l.digerTitleSnapshot!==undefined) l.digerTitleSnapshot=yeniAd; });
+    save(); renderHistory();
   }
+  document.getElementById('bolum-edit-modal').style.display='none';
+  _builtinEditKey = null;
+  toast('✅ Bölüm güncellendi!');
+}
+function bolumEditIptal(){
+  document.getElementById('bolum-edit-modal').style.display='none';
+  _builtinEditKey = null;
 }
 function refreshBuiltinTitles(){
   neYedinTitle  = localStorage.getItem('alerji-neyedin-title')  || 'Ne yedin?';
@@ -3223,6 +3235,21 @@ Ağır" style="min-height:100px"></textarea>
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" onclick="saveEditLog()" style="flex:1;justify-content:center">💾 Kaydet</button>
       <button class="btn btn-ghost" onclick="closeEditLogModal()" style="flex:1;justify-content:center">İptal</button>
+    </div>
+  </div>
+</div>
+
+<!-- SABIT BÖLÜM AD/SİMGE DÜZENLE MODAL -->
+<div id="bolum-edit-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)bolumEditIptal()">
+  <div style="background:var(--card);border-radius:18px;padding:24px 20px;width:calc(100% - 40px);max-width:400px">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:16px">Bölümü Düzenle</div>
+    <lbl>Bölüm adı</lbl>
+    <input type="text" id="bolum-edit-ad" placeholder="Örn: Sivilce Durumu" style="margin-bottom:12px">
+    <lbl>Simge (emoji)</lbl>
+    <input type="text" id="bolum-edit-simge" placeholder="Örn: 🔴 🌿 🚿" style="margin-bottom:20px">
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="bolumEditKaydet()" style="flex:1;justify-content:center">💾 Kaydet</button>
+      <button class="btn btn-ghost" onclick="bolumEditIptal()" style="flex:1;justify-content:center">İptal</button>
     </div>
   </div>
 </div>
