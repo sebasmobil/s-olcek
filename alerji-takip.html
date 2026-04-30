@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.37
+  Alerji Takip Defteri - Pro 1.0.38
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.37</span>
+  <span>Pro 1.0.38</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -2430,12 +2430,22 @@ function editSection(id){
 function deleteSection(id){
   const sec = customSections.find(s=>s.id===id);
   if(!sec) return;
-  if(!confirm(sec.title + ' bolumu gizlensin mi? Ayarlardan geri ekleyebilirsin.')) return;
-  sec.hidden = true;
-  saveCustomSections();
-  renderCustomSections();
-  renderHiddenCustomSections();
-  toast('Bolum gizlendi. Ayarlar - Gizli Bolumler');
+  const isBuiltin = sec.id && sec.id.startsWith('builtin_');
+  if(isBuiltin){
+    if(!confirm(sec.title + ' bölümü gizlensin mi? Ayarlardan geri ekleyebilirsin.')) return;
+    sec.hidden = true;
+    saveCustomSections();
+    renderCustomSections();
+    renderHiddenCustomSections();
+    toast('Bölüm gizlendi. Ayarlar → Gizli Bölümler');
+  } else {
+    if(!confirm(sec.title + ' bölümü kalıcı olarak silinsin mi? Bu işlem geri alınamaz.')) return;
+    customSections = customSections.filter(s=>s.id!==id);
+    saveCustomSections();
+    renderCustomSections();
+    renderHiddenCustomSections();
+    toast('🗑️ Bölüm silindi.');
+  }
 }
 
 function restoreCustomSection(id){
