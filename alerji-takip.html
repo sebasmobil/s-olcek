@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.33
+  Alerji Takip Defteri - Pro 1.0.34
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.32</span>
+  <span>Pro 1.0.34</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -928,9 +928,19 @@ function editBuiltinSection(key, iconKey, titleEl, iconEl){
   if(yeniAd===null) return;
   const yeniSimge = prompt('Simge (emoji):', curIcon);
   if(yeniSimge===null) return;
-  if(yeniAd.trim())   localStorage.setItem('alerji-'+key+'-title', yeniAd.trim());
+  if(yeniAd.trim())    localStorage.setItem('alerji-'+key+'-title', yeniAd.trim());
   if(yeniSimge.trim()) localStorage.setItem('alerji-'+key+'-icon',  yeniSimge.trim());
   refreshBuiltinTitles();
+  // Analiz başlıklarını güncelle
+  const at=document.getElementById('diger-analysis-title');
+  if(at && key==='diger') at.textContent=yeniSimge.trim()+' '+(yeniAd.trim()||curTitle)+' Analizi';
+  // Geçmiş kayıtlarda digerTitle snapshot'ı güncelle (Diğer bölümü için)
+  if(key==='diger'){
+    const newT=yeniAd.trim()||curTitle;
+    logs.forEach(l=>{ if(l.digerTitleSnapshot!==undefined) l.digerTitleSnapshot=newT; });
+    save();
+    renderHistory();
+  }
 }
 function refreshBuiltinTitles(){
   neYedinTitle  = localStorage.getItem('alerji-neyedin-title')  || 'Ne yedin?';
@@ -954,8 +964,6 @@ function refreshBuiltinTitles(){
   set('diger-icon-text',    digerIcon);
   set('uyku-title-text',    uykuluTitle);
   set('uyku-icon-text',     uykuluIcon);
-  // Geçmişi de yenile — ikon/ad değişiklikleri yansısın
-  if(document.getElementById('history-list')) renderHistory();
 }
 function editNeYedinTitle(){ editBuiltinSection('neyedin','neyedin',neYedinTitle,neYedinIcon); }
 let uykuluValue = null;
@@ -1034,31 +1042,8 @@ function restoreUykuCard(){
 }
 
 function editBanyoTitle(){ editBuiltinSection('banyo','banyo',banyoTitle,banyoIcon); }
-function editDigerTitle(){
-  const newTitle=prompt('Bu bölümün adı ne olsun?', digerTitle);
-  if(newTitle&&newTitle.trim()){
-    const old=digerTitle;
-    digerTitle=newTitle.trim();
-    localStorage.setItem('alerji-diger-title',digerTitle);
-    const el=document.getElementById('diger-title-text');
-    if(el) el.textContent=digerTitle;
-    const at=document.getElementById('diger-analysis-title');
-    if(at) at.textContent='🌿 '+digerTitle+' Analizi';
-    // Geçmiş kayıtlara da yansıt
-    logs.forEach(l=>{ if(l.digerTitleSnapshot!==undefined) l.digerTitleSnapshot=digerTitle; });
-    save();
-    renderHistory();
-  }
-}
-function editSivilceTitle(){
-  const newTitle=prompt('Bu bölümün adı ne olsun?', sivilceTitle);
-  if(newTitle&&newTitle.trim()){
-    sivilceTitle=newTitle.trim();
-    localStorage.setItem('alerji-sivilce-title',sivilceTitle);
-    const el=document.getElementById('sivilce-title-text');
-    if(el) el.textContent=sivilceTitle;
-  }
-}
+function editDigerTitle(){ editBuiltinSection('diger','diger',digerTitle,digerIcon); }
+function editSivilceTitle(){ editBuiltinSection('sivilce','sivilce',sivilceTitle,sivilceIcon); }
 function setSey(v){
   seyVal=v;
   document.getElementById('sey-yes').className='yn-btn'+(v?' yes':'');
@@ -1142,23 +1127,19 @@ function renderHistory(){
   if(filtered.length===0){container.innerHTML='<div class="empty-state"><span>📭</span>Henüz kayıt yok. İlk kaydını ekle!</div>';return;}
   container.innerHTML=filtered.map(l=>{
     const meta=[];
-    const _bIcon=banyoIcon||'🚿'; const _bTitle=banyoTitle||'Banyo';
-    const _dIcon=digerIcon||'🌿'; const _dTitle=digerTitle||'Diğer';
-    const _sIcon=sivilceIcon||'🔴'; const _sTitle=sivilceTitle||'Sivilce Durumu';
-    const _nIcon=neYedinIcon||'🍽️'; const _nTitle=neYedinTitle||'Ne yedin?';
-    if(l.shower===true)meta.push(_bIcon+' '+_bTitle+': Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
-    else if(l.shower===false)meta.push(_bIcon+' '+_bTitle+': Hayır');
-    if(l.sey===true)meta.push('✅ '+_dIcon+' '+_dTitle+': Evet');
-    else if(l.sey===false)meta.push('❌ '+_dIcon+' '+_dTitle+': Hayır');
+    if(l.shower===true)meta.push('🚿 Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
+    else if(l.shower===false)meta.push('🚿 Banyo: Hayır');
+    if(l.sey===true)meta.push('✅ '+digerTitle+': Evet');
+    else if(l.sey===false)meta.push('❌ '+digerTitle+': Hayır');
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="badge ${badgeClass[l.acne]}" title="${_sTitle}">${_sIcon} ${acneLabels[l.acne]}</span>
+          <span class="badge ${badgeClass[l.acne]}">${acneLabels[l.acne]}</span>
           ${l.locs&&l.locs.length?`<span style="font-size:10px;color:var(--muted)">${l.locs.join(', ')}</span>`:''}
         </div>
       </div>
-      ${l.foods&&l.foods.length?`<div class="log-tags"><span class="food-tag" style="opacity:0.6">${_nIcon}</span>${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
+      ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
       ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.entries(l.customData).filter(([,cd])=>cd.value!==null&&cd.value!==undefined).map(([sid,cd])=>{
@@ -1198,10 +1179,9 @@ function renderHistory(){
         } else if(cd.type==='scale'){ display=cd.value+'/10';
         } else if(cd.type==='stars'){ display='⭐'.repeat(cd.value||0);
         } else { display=cd.value; }
-        const secDef=customSections.find(s=>s.id===sid);
-        const secIcon=(secDef&&secDef.icon)||cd.icon||'📌';
-        const secTitle=(secDef&&secDef.title)||cd.title||sid;
-        return `<span>${secIcon} ${secTitle}: ${display}</span>`;
+        const secDef2=customSections.find(s=>s.id===sid);
+        const dispIcon=cd.icon||(secDef2&&secDef2.icon)||'📌';
+        return `<span>${dispIcon} ${cd.title}: ${display}</span>`;
       }).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
@@ -2327,6 +2307,14 @@ function saveSectionModal(){
     const oldTitle = sec.title;
     sec.title = title;
     sec.icon = document.getElementById('sec-icon').value.trim();
+    // Geçmiş kayıtlarda başlık ve simgeyi güncelle (tüm türler için ortak)
+    const newIcon = sec.icon;
+    logs.forEach(log => {
+      if(log.customData && log.customData[sec.id]){
+        log.customData[sec.id].title = title;
+        log.customData[sec.id].icon  = newIcon;
+      }
+    });
     if(sec.type === 'yesno'){
       const oldYes = sec.yesLabel || 'Evet';
       const oldNo = sec.noLabel || 'Hayır';
@@ -2465,7 +2453,7 @@ function getCustomValuesForLog(){
   const result = {};
   customSections.forEach(sec=>{
     let val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
-    const entry = {title: sec.title, type: sec.type, value: val};
+    const entry = {title: sec.title, icon: sec.icon||'', type: sec.type, value: val};
     if(sec.type === 'yesno_sub'){
       // Deep copy - referans sorununu önle
       const rawSubs = customValues[sec.id+'__subs'];
@@ -2903,19 +2891,117 @@ function renderIcecekGecmis(){
   if(!el) return;
   if(!icecekGecmisData.length){ el.innerHTML='<div style="color:var(--muted);font-size:13px">Henüz geçmiş kaydı yok. Her gün otomatik kaydedilir.</div>'; return; }
   const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-  el.innerHTML = icecekGecmisData.slice(0,30).map(gun=>{
+  el.innerHTML = icecekGecmisData.slice(0,30).map((gun,gi)=>{
     const [y,m,d] = gun.tarih.split('-');
     const tarihStr = parseInt(d)+' '+months[parseInt(m)-1]+' '+y;
     const ozetParts = Object.entries(gun.ozet).map(([isim,sayi])=>isim+': '+sayi);
     const detayParts = Object.entries(gun.saatler||{}).map(([isim,arr])=>`<div style="margin-top:4px"><span style="font-size:11px;color:var(--accent)">${isim}:</span> ${arr.map(s=>`<span style="font-size:11px;color:var(--muted)">🕐${s}</span>`).join(' ')}</div>`);
     return `<div style="border-bottom:1px solid var(--border);padding:10px 0">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:13px;font-weight:500;color:var(--text)">${tarihStr}</span>
-        <span style="font-size:12px;color:var(--muted)">${ozetParts.join(' · ')}</span>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:500;color:var(--text)">${tarihStr}</span>
+            <span style="font-size:11px;color:var(--muted)">${ozetParts.join(' · ')}</span>
+          </div>
+          ${detayParts.join('')}
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;margin-top:2px">
+          <button class="btn btn-sm btn-ghost" style="font-size:11px;padding:3px 8px" onclick="icecekGecmisDuzenle(${gi})">✏️</button>
+          <button class="btn btn-sm btn-danger" style="font-size:11px;padding:3px 8px" onclick="icecekGecmisSil(${gi})">🗑️</button>
+        </div>
       </div>
-      ${detayParts.join('')}
     </div>`;
   }).join('');
+}
+
+function icecekGecmisSil(gi){
+  const gun = icecekGecmisData[gi];
+  if(!gun) return;
+  const [y,m,d] = gun.tarih.split('-');
+  const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const tarihStr = parseInt(d)+' '+months[parseInt(m)-1]+' '+y;
+  if(!confirm(tarihStr + ' tarihli içecek kaydı silinsin mi?')) return;
+  icecekGecmisData.splice(gi,1);
+  localStorage.setItem('icecek-gecmis', JSON.stringify(icecekGecmisData));
+  renderIcecekGecmis();
+  toast('🗑️ Kayıt silindi');
+}
+
+let icecekDuzenleIdx = null;
+
+function icecekGecmisDuzenle(gi){
+  const gun = icecekGecmisData[gi];
+  if(!gun) return;
+  icecekDuzenleIdx = gi;
+  const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const [y,mo,d] = gun.tarih.split('-');
+  document.getElementById('icecek-duzenle-tarih').textContent = parseInt(d)+' '+months[parseInt(mo)-1]+' '+y;
+  // İçerikleri doldur
+  const area = document.getElementById('icecek-duzenle-area');
+  area.innerHTML = icecekList.map(isim=>{
+    const saatler = (gun.saatler&&gun.saatler[isim]) ? [...gun.saatler[isim]] : [];
+    const id = 'iduz-'+isim.replace(/[^a-z0-9]/gi,'_');
+    return `<div style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:5px">💧 ${isim}</div>
+      <div id="${id}-list" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px">${saatler.map((s,si)=>`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;color:var(--muted)">🕐${s}<span onclick="icecekSaatSil('${isim}',${si})" style="cursor:pointer;color:var(--red);font-weight:700;margin-left:2px">✕</span></span>`).join('')}</div>
+      <div style="display:flex;gap:6px">
+        <input type="time" id="${id}-inp" style="flex:1;font-size:14px">
+        <button class="btn btn-ghost btn-sm" onclick="icecekSaatEkle('${isim}')">+ Ekle</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('icecek-duzenle-modal').style.display='flex';
+}
+
+function icecekSaatSil(isim, si){
+  const gun = icecekGecmisData[icecekDuzenleIdx];
+  if(!gun||!gun.saatler||!gun.saatler[isim]) return;
+  gun.saatler[isim].splice(si,1);
+  if(!gun.saatler[isim].length){ delete gun.saatler[isim]; delete gun.ozet[isim]; }
+  else { gun.ozet[isim] = gun.saatler[isim].length; }
+  icecekGecmisDuzenleYenile(icecekDuzenleIdx);
+}
+
+function icecekSaatEkle(isim){
+  const id = 'iduz-'+isim.replace(/[^a-z0-9]/gi,'_');
+  const inp = document.getElementById(id+'-inp');
+  if(!inp||!inp.value) return;
+  const saat = inp.value;
+  const gun = icecekGecmisData[icecekDuzenleIdx];
+  if(!gun.saatler) gun.saatler={};
+  if(!gun.saatler[isim]) gun.saatler[isim]=[];
+  gun.saatler[isim].push(saat);
+  gun.saatler[isim].sort();
+  gun.ozet[isim] = gun.saatler[isim].length;
+  inp.value='';
+  icecekGecmisDuzenleYenile(icecekDuzenleIdx);
+}
+
+function icecekGecmisDuzenleYenile(gi){
+  // Modalı yeniden çiz (liste güncelle)
+  const gun = icecekGecmisData[gi];
+  icecekList.forEach(isim=>{
+    const id = 'iduz-'+isim.replace(/[^a-z0-9]/gi,'_');
+    const listEl = document.getElementById(id+'-list');
+    if(!listEl) return;
+    const saatler = (gun.saatler&&gun.saatler[isim]) ? gun.saatler[isim] : [];
+    listEl.innerHTML = saatler.map((s,si)=>`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;color:var(--muted)">🕐${s}<span onclick="icecekSaatSil('${isim}',${si})" style="cursor:pointer;color:var(--red);font-weight:700;margin-left:2px">✕</span></span>`).join('');
+  });
+}
+
+function icecekDuzenleKaydet(){
+  // Boş günleri temizle
+  const gun = icecekGecmisData[icecekDuzenleIdx];
+  if(gun && (!gun.saatler || !Object.keys(gun.saatler).length)){
+    if(confirm('Bu günde hiç içecek kaydı kalmadı. Kaydı tamamen silmek ister misin?')){
+      icecekGecmisData.splice(icecekDuzenleIdx,1);
+    }
+  }
+  localStorage.setItem('icecek-gecmis', JSON.stringify(icecekGecmisData));
+  document.getElementById('icecek-duzenle-modal').style.display='none';
+  icecekDuzenleIdx=null;
+  renderIcecekGecmis();
+  toast('✅ Kayıt güncellendi!');
 }
 
 function renderIcecekListEdit(){
@@ -3137,6 +3223,19 @@ Ağır" style="min-height:100px"></textarea>
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" onclick="saveEditLog()" style="flex:1;justify-content:center">💾 Kaydet</button>
       <button class="btn btn-ghost" onclick="closeEditLogModal()" style="flex:1;justify-content:center">İptal</button>
+    </div>
+  </div>
+</div>
+
+<!-- İÇECEK GEÇMİŞ DÜZENLE MODAL -->
+<div id="icecek-duzenle-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)document.getElementById('icecek-duzenle-modal').style.display='none'">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px;max-height:88vh;overflow-y:auto">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:3px">İçecek Kaydını Düzenle</div>
+    <div id="icecek-duzenle-tarih" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
+    <div id="icecek-duzenle-area"></div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-primary" onclick="icecekDuzenleKaydet()" style="flex:1;justify-content:center">💾 Kaydet</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('icecek-duzenle-modal').style.display='none'" style="flex:1;justify-content:center">İptal</button>
     </div>
   </div>
 </div>
