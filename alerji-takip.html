@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.35
+  Alerji Takip Defteri - Pro 1.0.37
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.35</span>
+  <span>Pro 1.0.37</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -1139,10 +1139,10 @@ function renderHistory(){
   if(filtered.length===0){container.innerHTML='<div class="empty-state"><span>📭</span>Henüz kayıt yok. İlk kaydını ekle!</div>';return;}
   container.innerHTML=filtered.map(l=>{
     const meta=[];
-    if(l.shower===true)meta.push('🚿 Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
-    else if(l.shower===false)meta.push('🚿 Banyo: Hayır');
-    if(l.sey===true)meta.push('✅ '+digerTitle+': Evet');
-    else if(l.sey===false)meta.push('❌ '+digerTitle+': Hayır');
+    if(l.shower===true)meta.push(banyoIcon+' Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
+    else if(l.shower===false)meta.push(banyoIcon+' Banyo: Hayır');
+    if(l.sey===true)meta.push(digerIcon+' '+digerTitle+': Evet');
+    else if(l.sey===false)meta.push(digerIcon+' '+digerTitle+': Hayır');
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
@@ -1733,8 +1733,8 @@ function copyAllLogs(){
     lines.push('🔴 '+sivilceTitle+': '+acneLabels[l.acne||0]);
     if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.locs&&l.locs.length) lines.push('📍 Konum: '+l.locs.join(', '));
-    lines.push('🚿 Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
-    lines.push('🌿 '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
+    lines.push(banyoIcon+' Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
+    lines.push(digerIcon+' '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
     if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.customData){Object.entries(l.customData).forEach(([sid,cd])=>{
       if(cd.value===null||cd.value===undefined) return;
@@ -1790,7 +1790,14 @@ if(customSections === null){
   ];
   localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
 }
-// Her oturum için değerler (kayıt sırasında dolar, kayıt sonrası sıfırlanır)
+// Sabit bölümlerle çakışan özel bölümleri temizle (örn: Uyku)
+const builtinTitles = ['uyku','Uyku','sleep','Sleep'];
+const builtinIds = ['builtin_uyku','uyku'];
+const hadDuplicate = customSections.some(s => builtinIds.includes(s.id) || builtinTitles.includes(s.title));
+if(hadDuplicate){
+  customSections = customSections.filter(s => !builtinIds.includes(s.id) && !builtinTitles.includes(s.title));
+  localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
+}
 let customValues = {}; // {sectionId: value}
 let customListEditModes = {}; // {sectionId: bool} - liste bölümleri için düzenleme modu
 let editingSectionId = null;
