@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.24
+  Alerji Takip Defteri - Pro 1.0.27
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.24</span>
+  <span>Pro 1.0.27</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -505,16 +505,6 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     <div id="restore-status" style="font-size:13px;margin-top:10px;text-align:center"></div>
   </div>
 
-  <div class="card">
-    <div class="card-title">🥗 Gıda Listesi</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Hızlı seçimde çıkan gıdaları buradan düzenle.</p>
-    <div id="food-list-edit" style="margin-bottom:10px"></div>
-    <div style="display:flex;gap:7px">
-      <input type="text" id="new-food-settings" placeholder="Yeni gıda ekle..." onkeydown="if(event.key==='Enter')addFoodToList()" style="flex:1">
-      <button class="btn btn-ghost btn-sm" onclick="addFoodToList()">+ Ekle</button>
-    </div>
-  </div>
-
   <div class="card" style="border-color:var(--red)">
     <div class="card-title" style="color:var(--red)">⚠️ Veri Sıfırla</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Tüm kayıtları sil. Bu işlem geri alınamaz.</p>
@@ -778,7 +768,7 @@ function addLocItem(){
   if(!locList.includes(v)){locList.push(v);locList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-locs',JSON.stringify(locList));renderLocs();}
   inp.value='';
 }
-function removeLocItem(i){
+function removeLocItem(i){if(!confirm('"'+locList[i]+'" silinsin mi?'))return;
   const v=locList[i];
   selectedLocs=selectedLocs.filter(x=>x!==v);
   locList.splice(i,1);locList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-locs',JSON.stringify(locList));renderLocs();
@@ -820,7 +810,7 @@ function addShampooItem(){
   if(!shampooList.includes(v)){shampooList.push(v);shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}
   inp.value='';
 }
-function removeShampoo(i){if(selectedShampoo===shampooList[i])selectedShampoo=null;shampooList.splice(i,1);shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}
+function removeShampoo(i){if(!confirm('"'+shampooList[i]+'" silinsin mi?'))return;if(selectedShampoo===shampooList[i])selectedShampoo=null;shampooList.splice(i,1);shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}
 function renameShampoo(i){const o=shampooList[i];const n=prompt('Yeni isim:',o);if(n&&n.trim()&&n.trim()!==o){if(selectedShampoo===o)selectedShampoo=n.trim();shampooList[i]=n.trim();shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}}
 
 function renderSoapList(){
@@ -842,7 +832,7 @@ function toggleSoapEdit(){
   renderSoapList();
 }
 function addSoapItem(){const inp=document.getElementById('soap-new');const v=inp.value.trim();if(!v)return;if(!soapList.includes(v)){soapList.push(v);soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}inp.value='';}
-function removeSoap(i){if(selectedSoap===soapList[i])selectedSoap=null;soapList.splice(i,1);soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}
+function removeSoap(i){if(!confirm('"'+soapList[i]+'" silinsin mi?'))return;if(selectedSoap===soapList[i])selectedSoap=null;soapList.splice(i,1);soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}
 function renameSoap(i){const o=soapList[i];const n=prompt('Yeni isim:',o);if(n&&n.trim()&&n.trim()!==o){if(selectedSoap===o)selectedSoap=n.trim();soapList[i]=n.trim();soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}}
 
 function setShower(v){
@@ -1302,7 +1292,7 @@ function renderFoodListEdit(){
   wrap.innerHTML=foodList.map((f,i)=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:13px">${f}</span><button class="btn btn-sm btn-danger" onclick="removeFoodItem(${i})">✕</button></div>`).join('');
 }
 
-function removeFoodItem(i){foodList.splice(i,1);saveFL();renderFoodListEdit();renderFoodQuick();}
+function removeFoodItem(i){if(!confirm('"'+foodList[i]+'" listeden silinsin mi?'))return;foodList.splice(i,1);saveFL();renderFoodListEdit();renderFoodQuick();}
 
 function addFoodToList(){
   const inp=document.getElementById('new-food-settings');
@@ -2668,6 +2658,7 @@ function renderIcecekListEdit(){
   if(!el) return;
   el.innerHTML = icecekList.map((isim,i)=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)">
     <span style="flex:1;font-size:13px">${isim}</span>
+    <button class="btn btn-sm btn-ghost" style="font-size:12px" onclick="renameIcecek(${i})">✏️</button>
     <button class="btn btn-sm btn-danger" onclick="removeIcecek(${i})">✕</button>
   </div>`).join('');
 }
@@ -2695,12 +2686,18 @@ function addIcecek(){
   inp.value = '';
 }
 
-function removeIcecek(i){
-  icecekList.splice(i,1);
-  localStorage.setItem('icecek-list', JSON.stringify(icecekList));
+function renameIcecek(i){
+  const yeni = prompt('Yeni isim:', icecekList[i]);
+  if(!yeni||!yeni.trim()||yeni.trim()===icecekList[i]) return;
+  const v = yeni.trim();
+  if(icecekList.includes(v)){alert('Bu isim zaten listede var.');return;}
+  icecekList[i]=v;
+  icecekList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+  localStorage.setItem('icecek-list',JSON.stringify(icecekList));
   renderIcecekGrid();
   renderIcecekListEdit();
 }
+function removeIcecek(i){if(!confirm('"'+icecekList[i]+'" listeden silinsin mi?'))return;icecekList.splice(i,1);localStorage.setItem('icecek-list',JSON.stringify(icecekList));renderIcecekGrid();renderIcecekListEdit();}
 
 // İçecek verilerini YZ kopyasına ekle
 function icecekKopyaMetni(){
@@ -2880,13 +2877,13 @@ Ağır" style="min-height:100px"></textarea>
 </div>
 
 <nav class="bottom-nav">
-  <button class="bnav-btn active" id="bnav-kayit" onclick="showTab('kayit',this)">
-    <span class="bnav-icon">✏️</span>
-    <span class="bnav-label">Kayıt Ekle</span>
-  </button>
   <button class="bnav-btn" id="bnav-icecek" onclick="showTab('icecek',this)">
     <span class="bnav-icon">💧</span>
     <span class="bnav-label">İçecek</span>
+  </button>
+  <button class="bnav-btn active" id="bnav-kayit" onclick="showTab('kayit',this)">
+    <span class="bnav-icon">✏️</span>
+    <span class="bnav-label">Kayıt Ekle</span>
   </button>
   <button class="bnav-btn" id="bnav-gecmis" onclick="showTab('gecmis',this)">
     <span class="bnav-icon">📋</span>
