@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.40
+  Alerji Takip Defteri - Pro 1.0.44
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -62,9 +62,9 @@ textarea{resize:vertical;min-height:60px;}
 
 /* FOOD QUICK LIST */
 .food-quick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
-.fq-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;user-select:none;display:flex;align-items:center;gap:5px;}
+.fq-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;user-select:none;display:inline-flex;align-items:center;gap:0;}
 .fq-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
-.fq-item .del-x{display:none;color:var(--red);font-weight:700;font-size:14px;line-height:1;margin-left:2px;}
+.fq-item .del-x{display:none;color:var(--red);font-weight:700;font-size:14px;line-height:1;margin-right:6px;}
 .edit-mode .fq-item .del-x{display:inline;}
 .edit-mode .fq-item{border-color:var(--red);color:var(--text);background:var(--b4);cursor:default;}
 .edit-mode .fq-item.sel{border-color:var(--red);}
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.40</span>
+  <span>Pro 1.0.44</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -264,6 +264,11 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px">
       <section-label style="margin:0">Hızlı seçim</section-label>
       <button class="edit-btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Düzenle</button>
+    </div>
+    <div style="position:relative;margin-bottom:8px" id="food-search-wrap">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:0.5">🔍</span>
+      <input type="text" id="food-search-input" placeholder="Gıda ara... (örn: tavuk, tam kelime, içerik)" oninput="filterFoodQuick()" onclick="this.select()" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13px;font-family:DM Sans,sans-serif">
+      <button id="food-search-clear" onclick="clearFoodSearch()" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--muted);line-height:1">✕</button>
     </div>
     <div class="food-quick" id="food-quick"></div>
     <div id="fq-add-area" style="display:none;margin:6px 0 4px">
@@ -728,18 +733,82 @@ function showTab(t,btn){
 
 // ===== FOOD QUICK =====
 let editMode = false;
+let foodSearchQuery = '';
+
+function filterFoodQuick(){
+  const inp = document.getElementById('food-search-input');
+  const clearBtn = document.getElementById('food-search-clear');
+  foodSearchQuery = inp ? inp.value.trim() : '';
+  if(clearBtn) clearBtn.style.display = foodSearchQuery ? 'block' : 'none';
+  renderFoodQuick();
+}
+
+function clearFoodSearch(){
+  const inp = document.getElementById('food-search-input');
+  if(inp) inp.value = '';
+  foodSearchQuery = '';
+  const clearBtn = document.getElementById('food-search-clear');
+  if(clearBtn) clearBtn.style.display = 'none';
+  renderFoodQuick();
+  inp && inp.focus();
+}
+
+function matchFoodSearch(name, query){
+  if(!query) return true;
+  const n = name.toLowerCase();
+  const q = query.toLowerCase();
+  // Tam kelime eşleşmesi önce, sonra içeren
+  const words = n.split(/[\s,\/\-]+/);
+  if(words.some(w => w === q)) return { score: 3, match: true };
+  if(words.some(w => w.startsWith(q))) return { score: 2, match: true };
+  if(n.includes(q)) return { score: 1, match: true };
+  return { score: 0, match: false };
+}
+
 function renderFoodQuick(){
   const wrap=document.getElementById('food-quick');
+  const q = foodSearchQuery;
+  // Edit modda arama gösterme
   if(editMode){
+    const searchWrap = document.getElementById('food-search-wrap');
+    if(searchWrap) searchWrap.style.display = 'none';
     wrap.innerHTML=foodList.map((f,i)=>`
       <div class="fq-item" style="cursor:default">
         <span class="del-x" onclick="removeFoodQuick(${i})">✕</span>
         <span onclick="renameFoodQuick(${i})">${f}</span>
         <span style="font-size:11px;opacity:0.5;cursor:pointer" onclick="renameFoodQuick(${i})">✏️</span>
       </div>`).join('');
-  } else {
-    wrap.innerHTML=foodList.map(f=>`<div class="fq-item${selectedFoods.includes(f)?' sel':''}" onclick="toggleFood('${f.replace(/'/g,"\\'")}',this)">${f}</div>`).join('');
+    return;
   }
+  const searchWrap = document.getElementById('food-search-wrap');
+  if(searchWrap) searchWrap.style.display = 'block';
+  if(!q){
+    wrap.innerHTML=foodList.map(f=>`<div class="fq-item${selectedFoods.includes(f)?' sel':''}" onclick="toggleFood('${f.replace(/'/g,"\\'")}',this)">${f}</div>`).join('');
+    return;
+  }
+  // Filtrele ve skorla
+  const results = foodList.map((f,i)=>({ f, i, r: matchFoodSearch(f, q) }))
+    .filter(x => x.r.match)
+    .sort((a,b) => b.r.score - a.r.score);
+  if(!results.length){
+    wrap.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:6px 2px">🔍 "<strong>${q}</strong>" ile eşleşen gıda bulunamadı.</div>`;
+    return;
+  }
+  // Eşleşen kısmı vurgula
+  wrap.innerHTML = results.map(({f})=>{
+    const sel = selectedFoods.includes(f);
+    const esc = f.replace(/'/g,"\\'");
+    const qLow = q.toLowerCase();
+    const idx = f.toLowerCase().indexOf(qLow);
+    let label = f;
+    if(idx !== -1){
+      const before = f.slice(0,idx);
+      const match  = f.slice(idx, idx+q.length);
+      const after  = f.slice(idx+q.length);
+      label = before + '<span style="display:inline;text-decoration:underline dotted;text-underline-offset:2px;vertical-align:baseline">' + match + '</span>' + after;
+    }
+    return `<div class="fq-item${sel?' sel':''}" onclick="toggleFood('${esc}',this)">${label}</div>`;
+  }).join('');
 }
 function renameFoodQuick(i){
   const oldName = foodList[i];
@@ -759,6 +828,7 @@ function toggleEditMode(){
   btn.classList.toggle('active',editMode);
   btn.textContent=editMode?'✅ Bitti':'✏️ Düzenle';
   addArea.style.display=editMode?'block':'none';
+  if(!editMode){ clearFoodSearch(); }
   renderFoodQuick();
 }
 function removeFoodQuick(i){
@@ -914,11 +984,12 @@ function removeSoap(i){if(!confirm('"'+soapList[i]+'" silinsin mi?'))return;if(s
 function renameSoap(i){const o=soapList[i];const n=prompt('Yeni isim:',o);if(n&&n.trim()&&n.trim()!==o){if(selectedSoap===o)selectedSoap=n.trim();soapList[i]=n.trim();soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}}
 
 function setShower(v){
-  showerVal=v;
-  document.getElementById('shower-yes').className='yn-btn'+(v?' yes':'');
-  document.getElementById('shower-no').className='yn-btn'+(!v&&v!==null?' no':'');
-  document.getElementById('shower-details').style.display=v?'block':'none';
-  if(v){renderShampooList();renderSoapList();}
+  if(showerVal===v){ showerVal=null; }
+  else { showerVal=v; }
+  document.getElementById('shower-yes').className='yn-btn'+(showerVal===true?' yes':'');
+  document.getElementById('shower-no').className='yn-btn'+(showerVal===false?' no':'');
+  document.getElementById('shower-details').style.display=showerVal===true?'block':'none';
+  if(showerVal===true){renderShampooList();renderSoapList();}
 }
 
 // ===== SEY =====
@@ -1058,9 +1129,10 @@ function editBanyoTitle(){ editBuiltinSection('banyo','banyo',banyoTitle,banyoIc
 function editDigerTitle(){ editBuiltinSection('diger','diger',digerTitle,digerIcon); }
 function editSivilceTitle(){ editBuiltinSection('sivilce','sivilce',sivilceTitle,sivilceIcon); }
 function setSey(v){
-  seyVal=v;
-  document.getElementById('sey-yes').className='yn-btn'+(v?' yes':'');
-  document.getElementById('sey-no').className='yn-btn'+(!v&&v!==null?' no':'');
+  if(seyVal===v) seyVal=null;
+  else seyVal=v;
+  document.getElementById('sey-yes').className='yn-btn'+(seyVal===true?' yes':'');
+  document.getElementById('sey-no').className='yn-btn'+(seyVal===false?' no':'');
 }
 
 // ===== SAVE =====
@@ -1209,6 +1281,15 @@ function formatDate(d){
   const dayNames=['Paz','Pts','Sal','Çar','Per','Cum','Cmt'];
   const dt=new Date(d+'T12:00:00');
   return dayNames[dt.getDay()]+', '+parseInt(day)+' '+months[parseInt(m)-1]+' '+y;
+}
+
+function updateEditDayLabel(){
+  const inp = document.getElementById('edit-inp-date');
+  const lbl = document.getElementById('edit-day-label');
+  if(!inp || !lbl || !inp.value) return;
+  const dayNames=['Paz','Pts','Sal','Çar','Per','Cum','Cmt'];
+  const dt = new Date(inp.value+'T12:00:00');
+  lbl.textContent = dayNames[dt.getDay()];
 }
 
 function addDays(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
@@ -1866,7 +1947,10 @@ function renderCustomSections(){
       const val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
       const displayVal = val !== null ? val : '—';
       bodyHtml = `<div class="custom-slider-wrap">
-        <div class="custom-slider-val" id="scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px">
+          <div class="custom-slider-val" id="scale-disp-${sec.id}" style="margin-bottom:0">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+          ${val !== null ? `<button onclick="resetSliderVal('${sec.id}')" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer">✕ Sıfırla</button>` : ''}
+        </div>
         <div class="custom-slider-track">
           <input type="range" class="custom-range" min="0" max="10" step="1"
             value="${val !== null ? val : 5}"
@@ -1879,7 +1963,10 @@ function renderCustomSections(){
       const val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
       const displayVal = val !== null ? val : '—';
       bodyHtml = `<div class="custom-slider-wrap">
-        <div class="custom-slider-val" id="pct-disp-${sec.id}">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px">
+          <div class="custom-slider-val" id="pct-disp-${sec.id}" style="margin-bottom:0">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+          ${val !== null ? `<button onclick="resetSliderVal('${sec.id}')" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer">✕ Sıfırla</button>` : ''}
+        </div>
         <div class="custom-slider-track">
           <input type="range" class="custom-range" min="0" max="100" step="1"
             value="${val !== null ? val : 50}"
@@ -1986,7 +2073,16 @@ function renderCustomSections(){
 
 function setCustomVal(id, val){
   const sec = customSections.find(s=>s.id===id);
-  // yesno_sub: sadece taraf DEĞİŞİNCE sıfırla (aynı değere tekrar basılırsa sıfırlama)
+  // Aynı değere tekrar basılırsa seçimi iptal et
+  if(customValues[id] === val){
+    customValues[id] = null;
+    if(sec && (sec.type === 'yesno' || sec.type === 'yesno_sub')){
+      customValues[id+'__subs'] = {};
+    }
+    renderCustomSections();
+    return;
+  }
+  // yesno_sub: taraf değişince alt seçimleri sıfırla
   if(sec && sec.type === 'yesno_sub'){
     if(customValues[id] !== val){
       customValues[id+'__subs'] = {};
@@ -2006,6 +2102,19 @@ function setSliderVal(id, type, val){
   // Sürgü opaklığını kaldır (ilk kez değer seçildiğinde)
   const inp = el ? el.closest('.custom-slider-wrap').querySelector('input[type=range]') : null;
   if(inp) inp.style.opacity = '';
+  // Sıfırla butonunu göster (yoksa ekle)
+  const wrap2 = el ? el.parentElement : null;
+  if(wrap2 && !wrap2.querySelector('button')){
+    const btn = document.createElement('button');
+    btn.textContent = '✕ Sıfırla';
+    btn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer';
+    btn.onclick = () => resetSliderVal(id);
+    wrap2.appendChild(btn);
+  }
+}
+function resetSliderVal(id){
+  delete customValues[id];
+  renderCustomSections();
 }
 function setStarVal(id, n){
   // Aynı yıldıza tekrar basılırsa sıfırla
@@ -2546,9 +2655,24 @@ let editSelectedSoap = null;
 function renderEditFoods(){
   const wrap = document.getElementById('edit-food-quick');
   if(!wrap) return;
-  wrap.innerHTML = foodList.map(f =>
-    `<span class="fq-item${editSelectedFoods.includes(f)?' sel':''}" style="cursor:pointer" onclick="toggleEditFood('${f.replace(/'/g,"\\'")}')">  ${f}</span>`
-  ).join('');
+  const searchInp = document.getElementById('edit-food-search');
+  const q = searchInp ? searchInp.value.trim().toLowerCase() : '';
+  const liste = q ? foodList.filter(f => f.toLowerCase().includes(q)) : foodList;
+  if(q && !liste.length){
+    wrap.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:4px 2px">🔍 "${searchInp.value.trim()}" ile eşleşen gıda bulunamadı.</div>`;
+    return;
+  }
+  wrap.innerHTML = liste.map(f => {
+    const sel = editSelectedFoods.includes(f);
+    const esc = f.replace(/'/g,"\\'");
+    const qLow = q;
+    const idx = qLow ? f.toLowerCase().indexOf(qLow) : -1;
+    let label = f;
+    if(idx !== -1){
+      label = f.slice(0,idx) + '<span style="display:inline;text-decoration:underline dotted;text-underline-offset:2px;vertical-align:baseline">' + f.slice(idx, idx+q.length) + '</span>' + f.slice(idx+q.length);
+    }
+    return `<span class="fq-item${sel?' sel':''}" style="cursor:pointer" onclick="toggleEditFood('${esc}')">${label}</span>`;
+  }).join('');
 }
 function toggleEditFood(f){
   if(editSelectedFoods.includes(f)) editSelectedFoods = editSelectedFoods.filter(x=>x!==f);
@@ -2613,6 +2737,7 @@ function editLog(id){
   document.getElementById('edit-log-date-label').textContent = formatDate(log.date) + ' — ' + log.time;
   document.getElementById('edit-inp-date').value = log.date;
   document.getElementById('edit-inp-time').value = log.time;
+  updateEditDayLabel();
   // Gıda quick-pick render
   editSelectedFoods = [...(log.foods||[])];
   renderEditFoods();
@@ -2654,6 +2779,10 @@ function editLog(id){
   }
   renderEditCustomSections(log);
 
+  // Gıda arama kutusunu sıfırla
+  const editFoodSearch = document.getElementById('edit-food-search');
+  if(editFoodSearch) editFoodSearch.value = '';
+
   document.getElementById('edit-log-modal').style.display='flex';
 }
 
@@ -2682,7 +2811,10 @@ function renderEditCustomSections(log){
       const val = cur !== null && cur !== undefined ? parseInt(cur) : null;
       const displayVal = val !== null ? val : '—';
       bodyHtml = `<div class="custom-slider-wrap">
-        <div class="custom-slider-val" id="edit-scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px">
+          <div class="custom-slider-val" id="edit-scale-disp-${sec.id}" style="margin-bottom:0">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
+          ${val !== null ? `<button onclick="resetEditSliderVal('${sec.id}')" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer">✕ Sıfırla</button>` : ''}
+        </div>
         <div class="custom-slider-track">
           <input type="range" class="custom-range" min="0" max="10" step="1"
             value="${val !== null ? val : 5}"
@@ -2695,7 +2827,10 @@ function renderEditCustomSections(log){
       const val = cur !== null && cur !== undefined ? parseInt(cur) : null;
       const displayVal = val !== null ? val : '—';
       bodyHtml = `<div class="custom-slider-wrap">
-        <div class="custom-slider-val" id="edit-pct-disp-${sec.id}">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px">
+          <div class="custom-slider-val" id="edit-pct-disp-${sec.id}" style="margin-bottom:0">${displayVal}<span>${val !== null ? '%' : ''}</span></div>
+          ${val !== null ? `<button onclick="resetEditSliderVal('${sec.id}')" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer">✕ Sıfırla</button>` : ''}
+        </div>
         <div class="custom-slider-track">
           <input type="range" class="custom-range" min="0" max="100" step="1"
             value="${val !== null ? val : 50}"
@@ -2740,7 +2875,11 @@ function renderEditCustomSections(log){
 }
 
 function setEditCustomVal(id, val){
-  editCustomVals[id] = val;
+  if(editCustomVals[id] === val){
+    editCustomVals[id] = null;
+  } else {
+    editCustomVals[id] = val;
+  }
   const log = logs.find(l=>l.id===editingLogId);
   renderEditCustomSections(log);
 }
@@ -2777,7 +2916,24 @@ function setEditSliderVal(id, type, val){
   const prefix = type === 'percent' ? 'edit-pct-disp-' : 'edit-scale-disp-';
   const suffix = type === 'percent' ? '%' : '/10';
   const el = document.getElementById(prefix + id);
-  if(el){ el.innerHTML = v + `<span>${suffix}</span>`; el.closest('.custom-slider-wrap').querySelector('input[type=range]').style.opacity=''; }
+  if(el){
+    el.innerHTML = v + `<span>${suffix}</span>`;
+    el.closest('.custom-slider-wrap').querySelector('input[type=range]').style.opacity='';
+    // Sıfırla butonunu göster
+    const wrap = el.parentElement;
+    if(wrap && !wrap.querySelector('button')){
+      const btn = document.createElement('button');
+      btn.textContent = '✕ Sıfırla';
+      btn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer';
+      btn.onclick = () => resetEditSliderVal(id);
+      wrap.appendChild(btn);
+    }
+  }
+}
+function resetEditSliderVal(id){
+  editCustomVals[id] = null;
+  const log = logs.find(l=>l.id===editingLogId);
+  renderEditCustomSections(log);
 }
 function closeEditLogModal(){
   document.getElementById('edit-log-modal').style.display='none';
@@ -2791,16 +2947,18 @@ function setEditAcne(v){
   });
 }
 function setEditShower(v){
-  editShowerVal=v;
-  document.getElementById('edit-shower-yes').className='yn-btn'+(v?' yes':'');
-  document.getElementById('edit-shower-no').className='yn-btn'+(!v&&v!==null?' no':'');
-  document.getElementById('edit-shower-details').style.display=v?'block':'none';
+  if(editShowerVal===v){ editShowerVal=null; }
+  else { editShowerVal=v; }
+  document.getElementById('edit-shower-yes').className='yn-btn'+(editShowerVal===true?' yes':'');
+  document.getElementById('edit-shower-no').className='yn-btn'+(editShowerVal===false?' no':'');
+  document.getElementById('edit-shower-details').style.display=editShowerVal===true?'block':'none';
   if(v){ renderEditShampoo(); renderEditSoap(); }
 }
 function setEditSey(v){
-  editSeyVal=v;
-  document.getElementById('edit-sey-yes').className='yn-btn'+(v?' yes':'');
-  document.getElementById('edit-sey-no').className='yn-btn'+(!v&&v!==null?' no':'');
+  if(editSeyVal===v) editSeyVal=null;
+  else editSeyVal=v;
+  document.getElementById('edit-sey-yes').className='yn-btn'+(editSeyVal===true?' yes':'');
+  document.getElementById('edit-sey-no').className='yn-btn'+(editSeyVal===false?' no':'');
 }
 function saveEditLog(){
   if(editAcneVal===null){alert('Sivilce durumunu seç!');return;}
@@ -2902,6 +3060,9 @@ function icecekEkle(isim){
 function icecekCikar(isim){
   const k = isim.toLowerCase();
   if(icecekGun[k] && icecekGun[k].length > 0){
+    const son = icecekGun[k][icecekGun[k].length-1];
+    const saatBilgi = son && son.saat ? ' (\uD83D\uDD50 '+son.saat+')' : '';
+    if(!confirm('"'+isim+'"'+saatBilgi+' kayd\u0131 silinsin mi?')) return;
     icecekGun[k].pop();
     localStorage.setItem(ICECEK_GUN_KEY, JSON.stringify(icecekGun));
     renderIcecekGrid();
@@ -2987,9 +3148,24 @@ function icecekGecmisDuzenle(gi){
   const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
   const [y,mo,d] = gun.tarih.split('-');
   document.getElementById('icecek-duzenle-tarih').textContent = parseInt(d)+' '+months[parseInt(mo)-1]+' '+y;
-  // İçerikleri doldur
+  const searchInp = document.getElementById('icecek-duzenle-search');
+  if(searchInp) searchInp.value = '';
+  renderIcecekDuzenleArea();
+  document.getElementById('icecek-duzenle-modal').style.display='flex';
+}
+
+function renderIcecekDuzenleArea(){
+  const gun = icecekGecmisData[icecekDuzenleIdx];
+  if(!gun) return;
   const area = document.getElementById('icecek-duzenle-area');
-  area.innerHTML = icecekList.map(isim=>{
+  const searchInp = document.getElementById('icecek-duzenle-search');
+  const q = searchInp ? searchInp.value.trim().toLowerCase() : '';
+  const liste = q ? icecekList.filter(isim => isim.toLowerCase().includes(q)) : icecekList;
+  if(!liste.length){
+    area.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:8px 0">🔍 "${q}" ile eşleşen içecek bulunamadı.</div>`;
+    return;
+  }
+  area.innerHTML = liste.map(isim=>{
     const saatler = (gun.saatler&&gun.saatler[isim]) ? [...gun.saatler[isim]] : [];
     const id = 'iduz-'+isim.replace(/[^a-z0-9]/gi,'_');
     return `<div style="margin-bottom:12px">
@@ -3001,7 +3177,6 @@ function icecekGecmisDuzenle(gi){
       </div>
     </div>`;
   }).join('');
-  document.getElementById('icecek-duzenle-modal').style.display='flex';
 }
 
 function icecekSaatSil(isim, si){
@@ -3029,15 +3204,7 @@ function icecekSaatEkle(isim){
 }
 
 function icecekGecmisDuzenleYenile(gi){
-  // Modalı yeniden çiz (liste güncelle)
-  const gun = icecekGecmisData[gi];
-  icecekList.forEach(isim=>{
-    const id = 'iduz-'+isim.replace(/[^a-z0-9]/gi,'_');
-    const listEl = document.getElementById(id+'-list');
-    if(!listEl) return;
-    const saatler = (gun.saatler&&gun.saatler[isim]) ? gun.saatler[isim] : [];
-    listEl.innerHTML = saatler.map((s,si)=>`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;color:var(--muted)">🕐${s}<span onclick="icecekSaatSil('${isim}',${si})" style="cursor:pointer;color:var(--red);font-weight:700;margin-left:2px">✕</span></span>`).join('');
-  });
+  renderIcecekDuzenleArea();
 }
 
 function icecekDuzenleKaydet(){
@@ -3214,19 +3381,27 @@ Ağır" style="min-height:100px"></textarea>
     <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:6px">Kaydı Düzenle</div>
     <div id="edit-log-date-label" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
 
-    <div style="display:flex;gap:10px;margin-bottom:12px">
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px">
       <div style="flex:1;min-width:0">
-        <lbl>📅 Tarih</lbl>
-        <input type="date" id="edit-inp-date" style="width:100%;box-sizing:border-box">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Tarih</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="edit-day-label" style="font-size:13px;color:var(--accent);font-weight:600;min-width:28px;flex-shrink:0"></span>
+          <input type="date" id="edit-inp-date" oninput="updateEditDayLabel()" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text);flex:1;min-width:0">
+        </div>
       </div>
+      <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
       <div style="flex:0 0 auto">
-        <lbl>🕐 Saat</lbl>
-        <input type="time" id="edit-inp-time" style="width:120px;box-sizing:border-box">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Saat</div>
+        <input type="time" id="edit-inp-time" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text)">
       </div>
     </div>
 
     <lbl>🍽️ Yenilen Gıdalar</lbl>
-    <div id="edit-food-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px"></div>
+    <div style="position:relative;margin:4px 0 6px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;opacity:0.5">🔍</span>
+      <input type="text" id="edit-food-search" placeholder="Gıda ara..." oninput="renderEditFoods()" onclick="this.select()" style="width:100%;box-sizing:border-box;padding:7px 10px 7px 30px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13px;font-family:DM Sans,sans-serif">
+    </div>
+    <div id="edit-food-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px"></div>
     <div style="display:flex;gap:6px;margin-bottom:12px">
       <input type="text" id="edit-inp-foods-new" placeholder="Yeni gıda ekle..." style="flex:1">
       <button class="btn btn-ghost btn-sm" onclick="editAddFood()">+ Ekle</button>
@@ -3297,7 +3472,11 @@ Ağır" style="min-height:100px"></textarea>
 <div id="icecek-duzenle-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)document.getElementById('icecek-duzenle-modal').style.display='none'">
   <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px;max-height:88vh;overflow-y:auto">
     <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:3px">İçecek Kaydını Düzenle</div>
-    <div id="icecek-duzenle-tarih" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
+    <div id="icecek-duzenle-tarih" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
+    <div style="position:relative;margin-bottom:12px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;opacity:0.5">🔍</span>
+      <input type="text" id="icecek-duzenle-search" placeholder="İçecek ara..." oninput="renderIcecekDuzenleArea()" onclick="this.select()" style="width:100%;box-sizing:border-box;padding:8px 10px 8px 30px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13px;font-family:DM Sans,sans-serif">
+    </div>
     <div id="icecek-duzenle-area"></div>
     <div style="display:flex;gap:10px;margin-top:10px">
       <button class="btn btn-primary" onclick="icecekDuzenleKaydet()" style="flex:1;justify-content:center">💾 Kaydet</button>
