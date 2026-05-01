@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.61</span>
+  <span>Pro 1.0.62</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -1389,6 +1389,14 @@ function renderHistory(){
   const filtered=filter===''?logs:logs.filter(l=>l.acne==filter);
   if(filtered.length===0){container.innerHTML='<div class="empty-state"><span>📭</span>Henüz kayıt yok. İlk kaydını ekle!</div>';return;}
 
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const acneShort=['😊','😐','😕','😣','😤'];
+
+  // Bugünün ay-yıl'ı
+  const todayFull = new Date().toISOString().split('T')[0];
+  const [ty,tm] = todayFull.split('-');
+  const thisMonthKey = ty+'-'+tm;
+
   // Günlere göre grupla
   const groups = {};
   filtered.forEach(l=>{
@@ -1397,14 +1405,22 @@ function renderHistory(){
   });
   const sortedDates = Object.keys(groups).sort((a,b)=>b.localeCompare(a));
 
-  container.innerHTML = sortedDates.map(date=>{
+  // Aylara göre grupla
+  const monthGroups = {}; // {'2025-04': ['2025-04-15', ...]}
+  sortedDates.forEach(date=>{
+    const [y,m] = date.split('-');
+    const mk = y+'-'+m;
+    if(!monthGroups[mk]) monthGroups[mk]=[];
+    monthGroups[mk].push(date);
+  });
+  const sortedMonths = Object.keys(monthGroups).sort((a,b)=>b.localeCompare(a));
+
+  function buildDayHtml(date){
     const dayLogs = groups[date];
     const open = isDayOpen(date);
     const dayLabel = formatDate(date);
-    // Özet: kaç kayıt, en kötü sivilce
     const count = dayLogs.length;
     const worstAcne = Math.max(...dayLogs.map(l=>l.acne||0));
-    const acneShort=['😊','😐','😕','😣','😤'];
 
     const logsHtml = dayLogs.map(l=>{
       const meta=[];
@@ -1456,8 +1472,8 @@ function renderHistory(){
       </div>`;
     }).join('');
 
-    return `<div style="margin-bottom:10px;border-radius:16px;border:1px solid var(--border);overflow:hidden">
-      <div onclick="toggleHistoryDay('${date}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card2);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent">
+    return `<div style="margin-bottom:6px;border-radius:13px;border:1px solid var(--border);overflow:hidden">
+      <div onclick="toggleHistoryDay('${date}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--card2);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent">
         <div style="display:flex;align-items:center;gap:8px">
           <span id="hday-arrow-${date}" style="font-size:12px;color:var(--muted);transition:transform .2s;transform:${open?'rotate(90deg)':'rotate(0deg)'};display:inline-block">▶</span>
           <span style="font-weight:600;font-size:14px;color:var(--text)">${dayLabel}</span>
@@ -1471,7 +1487,63 @@ function renderHistory(){
         ${logsHtml}
       </div>
     </div>`;
+  }
+
+  container.innerHTML = sortedMonths.map(mk=>{
+    const [y,m] = mk.split('-');
+    const monthName = months[parseInt(m)-1]+' '+y;
+    const datesInMonth = monthGroups[mk];
+    const isCurrentMonth = mk === thisMonthKey;
+    const monthOpen = isMonthOpen(mk);
+
+    if(isCurrentMonth){
+      // Mevcut ay: sadece günler, klasör yok
+      return `<div style="margin-bottom:4px">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;padding:6px 2px 8px">${monthName}</div>
+        ${datesInMonth.map(date=>buildDayHtml(date)).join('')}
+      </div>`;
+    } else {
+      // Geçmiş aylar: tıklanabilir ay klasörü
+      const totalLogs = datesInMonth.reduce((s,d)=>s+groups[d].length,0);
+      const worstOverall = Math.max(...datesInMonth.map(d=>Math.max(...groups[d].map(l=>l.acne||0))));
+      return `<div style="margin-bottom:8px;border-radius:16px;border:1px solid var(--border);overflow:hidden">
+        <div onclick="toggleHistoryMonth('${mk}')" style="display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:var(--card);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="hmonth-arrow-${mk}" style="font-size:13px;color:var(--accent);transition:transform .2s;transform:${monthOpen?'rotate(90deg)':'rotate(0deg)'};display:inline-block">📁</span>
+            <span style="font-weight:700;font-size:15px;color:var(--accent)">${monthName}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px">${acneShort[worstOverall]}</span>
+            <span style="font-size:12px;color:var(--muted)">${datesInMonth.length} gün · ${totalLogs} kayıt</span>
+            <span style="font-size:11px;color:var(--muted);margin-left:2px">${monthOpen?'▲':'▼'}</span>
+          </div>
+        </div>
+        <div id="hmonth-body-${mk}" style="display:${monthOpen?'block':'none'};padding:8px 8px 4px;background:var(--card2)">
+          ${datesInMonth.map(date=>buildDayHtml(date)).join('')}
+        </div>
+      </div>`;
+    }
   }).join('');
+}
+
+let historyOpenMonths = JSON.parse(localStorage.getItem('alerji-history-open-months') || '{}');
+
+function toggleHistoryMonth(mk){
+  historyOpenMonths[mk] = !historyOpenMonths[mk];
+  localStorage.setItem('alerji-history-open-months', JSON.stringify(historyOpenMonths));
+  const body = document.getElementById('hmonth-body-'+mk);
+  const arrow = document.getElementById('hmonth-arrow-'+mk);
+  const open = historyOpenMonths[mk];
+  if(body) body.style.display = open ? 'block' : 'none';
+  if(arrow){
+    arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+    // update the ▲▼ indicator via re-render is simpler; just re-render
+    renderHistory();
+  }
+}
+
+function isMonthOpen(mk){
+  return !!historyOpenMonths[mk];
 }
 
 function deleteLog(id){if(!confirm('Silinsin mi?'))return;logs=logs.filter(l=>l.id!==id);save();renderHistory();renderAnalysis();}
@@ -3240,7 +3312,6 @@ function icecekCheckReset(){
     });
     if(Object.keys(ozet).length){
       icecekGecmisData.unshift({tarih: kayitliTarih, ozet, saatler});
-      if(icecekGecmisData.length > 60) icecekGecmisData = icecekGecmisData.slice(0,60);
       localStorage.setItem('icecek-gecmis', JSON.stringify(icecekGecmisData));
     }
     // Sıfırla
@@ -3311,6 +3382,14 @@ function clearIcecekGecmisSearch(){
   renderIcecekGecmis();
 }
 
+let icecekOpenMonths = JSON.parse(localStorage.getItem('icecek-open-months') || '{}');
+
+function toggleIcecekMonth(mk){
+  icecekOpenMonths[mk] = !icecekOpenMonths[mk];
+  localStorage.setItem('icecek-open-months', JSON.stringify(icecekOpenMonths));
+  renderIcecekGecmis();
+}
+
 function renderIcecekGecmis(){
   const el = document.getElementById('icecek-gecmis');
   if(!el) return;
@@ -3321,24 +3400,38 @@ function renderIcecekGecmis(){
 
   if(!icecekGecmisData.length){ el.innerHTML='<div style="color:var(--muted);font-size:13px">Henüz geçmiş kaydı yok. Her gün otomatik kaydedilir.</div>'; return; }
 
-  const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const monthsLong=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const monthsShort=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
 
-  // Arama filtresi: eşleşen günleri bul (orijinal index'i koru)
-  const filtered = icecekGecmisData.slice(0,30).map((gun,gi)=>({gun,gi})).filter(({gun})=>{
+  // Bugünün ay-yıl'ı
+  const todayFull = new Date().toISOString().split('T')[0];
+  const [ty,tm] = todayFull.split('-');
+  const thisMonthKey = ty+'-'+tm;
+
+  // Tüm geçmişi index'le birlikte al, ara filtresi uygula
+  const allIndexed = icecekGecmisData.map((gun,gi)=>({gun,gi})).filter(({gun})=>{
     if(!q) return true;
-    // İçecek isimlerinde ara
     return Object.keys(gun.ozet||{}).some(isim => isim.toLowerCase().includes(q));
   });
 
-  if(!filtered.length){
-    el.innerHTML = `<div style="color:var(--muted);font-size:13px">🔍 "${searchInp.value.trim()}" ile eşleşen kayıt bulunamadı.</div>`;
+  if(!allIndexed.length){
+    el.innerHTML = `<div style="color:var(--muted);font-size:13px">🔍 "${q}" ile eşleşen kayıt bulunamadı.</div>`;
     return;
   }
 
-  el.innerHTML = filtered.map(({gun,gi})=>{
+  // Aylara grupla
+  const monthGroups = {}; // mk -> [{gun,gi}]
+  allIndexed.forEach(item=>{
+    const [y,m] = item.gun.tarih.split('-');
+    const mk = y+'-'+m;
+    if(!monthGroups[mk]) monthGroups[mk]=[];
+    monthGroups[mk].push(item);
+  });
+  const sortedMonths = Object.keys(monthGroups).sort((a,b)=>b.localeCompare(a));
+
+  function buildDayRow(gun, gi){
     const [y,m,d] = gun.tarih.split('-');
-    const tarihStr = parseInt(d)+' '+months[parseInt(m)-1]+' '+y;
-    // Arama varsa sadece eşleşen içecekleri göster
+    const tarihStr = parseInt(d)+' '+monthsShort[parseInt(m)-1]+' '+y;
     const ozet = gun.ozet || {};
     const saatler = gun.saatler || {};
     const filteredOzet = q ? Object.fromEntries(Object.entries(ozet).filter(([isim])=>isim.toLowerCase().includes(q))) : ozet;
@@ -3359,7 +3452,7 @@ function renderIcecekGecmis(){
       }
       return `<div style="margin-top:4px"><span style="font-size:11px;color:var(--accent)">${label}:</span> ${arr.map(s=>`<span style="font-size:11px;color:var(--muted)">🕐${s}</span>`).join(' ')}</div>`;
     });
-    return `<div style="border-bottom:1px solid var(--border);padding:10px 0">
+    return `<div style="border-bottom:1px solid var(--border);padding:9px 0">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -3374,6 +3467,38 @@ function renderIcecekGecmis(){
         </div>
       </div>
     </div>`;
+  }
+
+  el.innerHTML = sortedMonths.map(mk=>{
+    const [y,m] = mk.split('-');
+    const monthName = monthsLong[parseInt(m)-1]+' '+y;
+    const items = monthGroups[mk];
+    const isCurrentMonth = mk === thisMonthKey;
+
+    if(isCurrentMonth || q){
+      // Mevcut ay veya arama modunda: klasörsüz, düz liste
+      const label = isCurrentMonth ? `<div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;padding:4px 0 8px">${monthName}</div>` : '';
+      return label + items.map(({gun,gi})=>buildDayRow(gun,gi)).join('');
+    } else {
+      // Geçmiş aylar: tıklanabilir klasör
+      const open = !!icecekOpenMonths[mk];
+      const totalSay = items.reduce((s,{gun})=>s+Object.values(gun.ozet||{}).reduce((a,b)=>a+b,0), 0);
+      return `<div style="margin-bottom:8px;border-radius:14px;border:1px solid var(--border);overflow:hidden">
+        <div onclick="toggleIcecekMonth('${mk}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;color:var(--accent);transition:transform .2s;transform:${open?'rotate(90deg)':'rotate(0deg)'};display:inline-block">📁</span>
+            <span style="font-weight:700;font-size:14px;color:var(--accent)">${monthName}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--muted)">${items.length} gün · ${totalSay} içecek</span>
+            <span style="font-size:11px;color:var(--muted)">${open?'▲':'▼'}</span>
+          </div>
+        </div>
+        <div style="display:${open?'block':'none'};padding:6px 10px 2px;background:var(--card2)">
+          ${items.map(({gun,gi})=>buildDayRow(gun,gi)).join('')}
+        </div>
+      </div>`;
+    }
   }).join('');
 }
 
