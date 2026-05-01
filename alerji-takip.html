@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.51
+  Alerji Takip Defteri - Pro 1.0.58
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 <title>Alerji Takip Defteri</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{--bg:#000000;--card:#2e2e34;--card2:#46464f;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#46464f;--topbar-bg:#1a1a20;--topbar-text:#888890;}
-[data-theme="light"]{--bg:#f5f0e8;--card:#fff;--card2:#f0ebe0;--accent:#7a4a10;--accent2:#9a4020;--red:#c0392b;--green:#1e8449;--yellow:#a06800;--text:#1a1510;--muted:#7a6a55;--border:#ddd5c5;--hbg:rgba(245,240,232,0.95);--b0:#d4f4e2;--b1:#e0f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d4f4e2;--a1:#e0f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#f0ebe0;--topbar-bg:#e8e0d0;--topbar-text:#9a8a70;}
+[data-theme="dark"]{--bg:#000000;--card:#2e2e34;--card2:#46464f;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#46464f;--topbar-bg:#1a1a20;--topbar-text:#888890;--btn-bg:#3a3a42;--btn-border:#5a5a68;--sel-bg:rgba(255,224,102,0.18);}
+[data-theme="light"]{--bg:#f5f0e8;--card:#fff;--card2:#f0ebe0;--accent:#7a4a10;--accent2:#9a4020;--red:#c0392b;--green:#1e8449;--yellow:#a06800;--text:#1a1510;--muted:#7a6a55;--border:#ddd5c5;--hbg:rgba(245,240,232,0.95);--b0:#d4f4e2;--b1:#e0f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d4f4e2;--a1:#e0f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#f0ebe0;--topbar-bg:#e8e0d0;--topbar-text:#9a8a70;--btn-bg:#e8e2d8;--btn-border:#ccc5b5;--sel-bg:rgba(122,74,16,0.12);}
 [data-theme="ocean"]{display:none}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;min-height:100vh;transition:background .3s,color .3s;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 68px);}
@@ -64,36 +64,36 @@ textarea{resize:vertical;min-height:60px;}
 
 /* FOOD QUICK LIST */
 .food-quick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
-.fq-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;user-select:none;display:inline-flex;align-items:center;gap:0;}
-.fq-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+.fq-item{padding:7px 14px;border-radius:18px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;user-select:none;display:inline-flex;align-items:center;gap:0;}
+.fq-item.sel{border-color:var(--accent);color:var(--accent);background:var(--sel-bg);font-weight:600;box-shadow:0 0 0 1px var(--accent);}
 .fq-item .del-x{display:none;color:var(--red);font-weight:700;font-size:14px;line-height:1;margin-right:6px;}
 .edit-mode .fq-item .del-x{display:inline;}
 .edit-mode .fq-item{border-color:var(--red);color:var(--text);background:var(--b4);cursor:default;}
-.edit-mode .fq-item.sel{border-color:var(--red);}
-.edit-btn{padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.edit-mode .fq-item.sel{border-color:var(--red);box-shadow:none;}
+.edit-btn{padding:4px 10px;border-radius:14px;border:1px solid var(--btn-border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .edit-btn.active{border-color:var(--red);color:var(--red);background:var(--b4);}
 .fq-add-row{display:flex;gap:7px;margin-top:6px;}
 .fq-add-row input{flex:1;}
 
 /* ACNE */
 .acne-rating{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
-.acne-btn{padding:8px 15px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
-.acne-btn.sel-0{border-color:var(--green);color:var(--green);background:var(--a0);}
-.acne-btn.sel-1{border-color:#7cb518;color:#7cb518;background:var(--a1);}
-.acne-btn.sel-2{border-color:var(--yellow);color:var(--yellow);background:var(--a2);}
-.acne-btn.sel-3{border-color:var(--accent2);color:var(--accent2);background:var(--a3);}
-.acne-btn.sel-4{border-color:var(--red);color:var(--red);background:var(--a4);}
+.acne-btn{padding:8px 15px;border-radius:20px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.acne-btn.sel-0{border-color:var(--green);color:var(--green);background:var(--a0);font-weight:600;box-shadow:0 0 0 1px var(--green);}
+.acne-btn.sel-1{border-color:#7cb518;color:#7cb518;background:var(--a1);font-weight:600;box-shadow:0 0 0 1px #7cb518;}
+.acne-btn.sel-2{border-color:var(--yellow);color:var(--yellow);background:var(--a2);font-weight:600;box-shadow:0 0 0 1px var(--yellow);}
+.acne-btn.sel-3{border-color:var(--accent2);color:var(--accent2);background:var(--a3);font-weight:600;box-shadow:0 0 0 1px var(--accent2);}
+.acne-btn.sel-4{border-color:var(--red);color:var(--red);background:var(--a4);font-weight:600;box-shadow:0 0 0 1px var(--red);}
 
 /* LOC */
 .loc-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
-.loc-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
-.loc-btn.active{border-color:#9b72db;color:#9b72db;background:var(--loc);}
+.loc-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.loc-btn.active{border-color:var(--accent);color:var(--accent);background:var(--sel-bg);font-weight:600;box-shadow:0 0 0 1px var(--accent);}
 
 /* YES/NO toggle */
 .yn-group{display:flex;gap:8px;margin-top:5px;}
-.yn-btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:15px;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
-.yn-btn.yes{border-color:var(--green);color:var(--green);background:var(--a0);}
-.yn-btn.no{border-color:var(--red);color:var(--red);background:var(--b4);}
+.yn-btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:15px;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.yn-btn.yes{border-color:var(--green);color:var(--green);background:var(--a0);font-weight:600;box-shadow:0 0 0 1px var(--green);}
+.yn-btn.no{border-color:var(--red);color:var(--red);background:var(--b4);font-weight:600;box-shadow:0 0 0 1px var(--red);}
 
 /* SHOWER extra */
 .shampoo-row{display:flex;gap:7px;margin-top:7px;align-items:flex-end;}
@@ -139,8 +139,8 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   input, select, textarea { font-size: 16px !important; }
   input[type=text], input[type=date], input[type=time] { font-size: 16px !important; }
 
-  .delay-opt{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;}
-  .delay-opt.active{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+  .delay-opt{padding:7px 14px;border-radius:20px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .delay-opt.active{border-color:var(--accent);color:var(--accent);background:var(--sel-bg);font-weight:600;box-shadow:0 0 0 1px var(--accent);}
 
   .counter-box{border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden;transition:all .3s;}
   .counter-box.clean{background:linear-gradient(135deg,#0a3020,#0d4028);border-color:#2a7a50;}
@@ -196,8 +196,8 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   input[type=range].custom-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
   input[type=range].custom-range::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
   .slider-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px;}
-  .custom-list-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;display:inline-block;margin:3px;}
-  .custom-list-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
+  .custom-list-item{padding:7px 14px;border-radius:18px;border:1px solid var(--btn-border);background:var(--btn-bg);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;display:inline-block;margin:3px;}
+  .custom-list-item.sel{border-color:var(--accent);color:var(--accent);background:var(--sel-bg);font-weight:600;box-shadow:0 0 0 1px var(--accent);}
 </style>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.51</span>
+  <span>Pro 1.0.58</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -246,7 +246,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
           <input type="date" id="inp-date" oninput="updateDayLabel()" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text);width:100%">
         </div>
       </div>
-      <div style="width:1px;height:36px;background:var(--border)"></div>
+      <div style="width:1px;height:36px;background:var(--accent);opacity:0.5"></div>
       <div style="flex:0 0 auto">
         <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Saat</div>
         <input type="time" id="inp-time" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text)">
@@ -299,7 +299,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     </div>
     <div id="loc-section" style="margin-top:10px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-        <lbl style="margin:0">📍 Konum</lbl>
+        <lbl style="margin:0" id="loc-title-lbl" onclick="editLocTitle()" title="Düzenlemek için tıkla" style="cursor:pointer"></lbl>
         <button class="edit-btn" id="loc-edit-btn" onclick="toggleLocEdit()">✏️ Düzenle</button>
       </div>
       <div class="loc-group" id="loc-group"></div>
@@ -663,6 +663,8 @@ let sivilceTitle  = localStorage.getItem('alerji-sivilce-title')  || 'Sivilce Du
 let sivilceIcon   = localStorage.getItem('alerji-sivilce-icon')   || '🔴';
 let uykuluTitle   = localStorage.getItem('alerji-uyku-title')     || 'Uyku';
 let uykuluIcon    = localStorage.getItem('alerji-uyku-icon')      || '😴';
+let locTitle      = localStorage.getItem('alerji-loc-title')      || 'Konum';
+let locIcon       = localStorage.getItem('alerji-loc-icon')       || '📍';
 let uykuluHidden  = localStorage.getItem('alerji-uyku-hidden')==='1';
 let zamanHidden   = localStorage.getItem('alerji-zaman-hidden')==='1';
 let neyedinHidden = localStorage.getItem('alerji-neyedin-hidden')==='1';
@@ -672,14 +674,31 @@ let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
 const COLOR_PALETTES = [
-  { id:'altin',   label:'Altın',   dark:['#ffe066','#ffaa55'], light:['#7a4a10','#9a4020'] },
-  { id:'turkuaz', label:'Turkuaz', dark:['#5ee7d0','#48b8e0'], light:['#0a7a6a','#0a5a8a'] },
-  { id:'mor',     label:'Mor',     dark:['#c084fc','#a855f7'], light:['#6d28d9','#9333ea'] },
-  { id:'pembe',   label:'Pembe',   dark:['#f472b6','#e879f9'], light:['#be185d','#a21caf'] },
-  { id:'yesil',   label:'Yeşil',   dark:['#4ade80','#22d3ee'], light:['#166534','#0e7490'] },
-  { id:'turuncu', label:'Turuncu', dark:['#fb923c','#f87171'], light:['#9a3412','#991b1b'] },
-  { id:'kirmizi', label:'Kırmızı', dark:['#f87171','#fb7185'], light:['#991b1b','#9f1239'] },
-  { id:'mavi',    label:'Mavi',    dark:['#60a5fa','#818cf8'], light:['#1d4ed8','#4338ca'] },
+  {
+    id:'altin', label:'Altın', icon:'🌕',
+    dark:  { accent:'#ffe066', accent2:'#ffaa55', tint:'rgba(255,224,102,0.06)' },
+    light: { accent:'#8a5a00', accent2:'#b06010', tint:'rgba(138,90,0,0.05)' },
+  },
+  {
+    id:'mavi', label:'Okyanus', icon:'🌊',
+    dark:  { accent:'#60c8ff', accent2:'#4aa0e8', tint:'rgba(96,200,255,0.06)' },
+    light: { accent:'#1558a0', accent2:'#0e3f7a', tint:'rgba(21,88,160,0.05)' },
+  },
+  {
+    id:'mor', label:'Lavanta', icon:'💜',
+    dark:  { accent:'#c084fc', accent2:'#a78bfa', tint:'rgba(192,132,252,0.06)' },
+    light: { accent:'#6d28d9', accent2:'#5b21b6', tint:'rgba(109,40,217,0.05)' },
+  },
+  {
+    id:'yesil', label:'Orman', icon:'🌿',
+    dark:  { accent:'#4ade80', accent2:'#34d399', tint:'rgba(74,222,128,0.06)' },
+    light: { accent:'#166534', accent2:'#14532d', tint:'rgba(22,101,52,0.05)' },
+  },
+  {
+    id:'gul', label:'Gül', icon:'🌸',
+    dark:  { accent:'#f9a8d4', accent2:'#f472b6', tint:'rgba(249,168,212,0.06)' },
+    light: { accent:'#9d174d', accent2:'#831843', tint:'rgba(157,23,77,0.05)' },
+  },
 ];
 
 function hexToRgb(hex){
@@ -695,24 +714,45 @@ function applyAccentColor(id){
   const pal = COLOR_PALETTES.find(p=>p.id===id);
   if(!pal) return;
   const t = theme;
-  const [a1hex, a2hex] = pal[t] || pal['dark'];
+  const colors = pal[t] || pal['dark'];
   const el = document.documentElement;
-  el.style.setProperty('--accent', a1hex);
-  el.style.setProperty('--accent2', a2hex);
-  // Arka plan tonları: accent renginin alfa varyantları
+  el.style.setProperty('--accent', colors.accent);
+  el.style.setProperty('--accent2', colors.accent2);
+  const [r,g,b] = hexToRgb(colors.accent);
   const isDark = t === 'dark';
-  const [r,g,b] = hexToRgb(a1hex);
-  // a0-a4: sivilce durum buton arka planları (soluktan koyuya)
-  el.style.setProperty('--a0', isDark ? `rgba(${r},${g},${b},0.12)` : `rgba(${r},${g},${b},0.15)`);
-  el.style.setProperty('--a1', isDark ? `rgba(${r},${g},${b},0.18)` : `rgba(${r},${g},${b},0.20)`);
-  el.style.setProperty('--a2', isDark ? `rgba(${r},${g},${b},0.14)` : `rgba(${r},${g},${b},0.18)`);
-  el.style.setProperty('--a3', isDark ? `rgba(${r},${g},${b},0.10)` : `rgba(${r},${g},${b},0.14)`);
-  el.style.setProperty('--a4', isDark ? `rgba(${r},${g},${b},0.08)` : `rgba(${r},${g},${b},0.10)`);
-  // loc: konum etiketi arka planı
-  el.style.setProperty('--loc', isDark ? `rgba(${r},${g},${b},0.20)` : `rgba(${r},${g},${b},0.18)`);
-  // bnav aktif pill rengi
-  el.style.setProperty('--bnav-active-bg', `rgba(${r},${g},${b},0.13)`);
-  el.style.setProperty('--bnav-active-border', `rgba(${r},${g},${b},0.30)`);
+
+  // Kart arka planları — hafif renk tonu
+  if(isDark){
+    el.style.setProperty('--bg',    `#000000`);
+    el.style.setProperty('--card',  `#2e2e34`);
+    el.style.setProperty('--card2', `#46464f`);
+    el.style.setProperty('--border',`rgba(${r},${g},${b},0.30)`);
+    el.style.setProperty('--hbg',   `rgba(0,0,0,0.98)`);
+    el.style.setProperty('--btn-bg',    `#3a3a42`);
+    el.style.setProperty('--btn-border',`#5a5a68`);
+    el.style.setProperty('--sel-bg',    `rgba(${r},${g},${b},0.22)`);
+  } else {
+    el.style.setProperty('--bg',    `#f5f0e8`);
+    el.style.setProperty('--card',  `rgba(255,255,255,0.95)`);
+    el.style.setProperty('--card2', `rgba(${r},${g},${b},0.06)`);
+    el.style.setProperty('--border',`rgba(${r},${g},${b},0.18)`);
+    el.style.setProperty('--hbg',  `rgba(245,240,232,0.95)`);
+    el.style.setProperty('--btn-bg',    `#e8e2d8`);
+    el.style.setProperty('--btn-border',`#ccc5b5`);
+    el.style.setProperty('--sel-bg',    `rgba(${r},${g},${b},0.15)`);
+  }
+
+  // Seçim arka planları
+  const base = isDark ? 0.12 : 0.10;
+  el.style.setProperty('--a0', `rgba(${r},${g},${b},${base})`);
+  el.style.setProperty('--a1', `rgba(${r},${g},${b},${base+0.06})`);
+  el.style.setProperty('--a2', `rgba(${r},${g},${b},${base+0.02})`);
+  el.style.setProperty('--a3', `rgba(${r},${g},${b},${base-0.04})`);
+  el.style.setProperty('--a4', `rgba(${r},${g},${b},${base-0.06})`);
+  el.style.setProperty('--loc', `rgba(${r},${g},${b},${isDark?0.22:0.12})`);
+  el.style.setProperty('--ftag',`rgba(${r},${g},${b},${isDark?0.13:0.08})`);
+  el.style.setProperty('--bnav-active-bg', `rgba(${r},${g},${b},${isDark?0.15:0.10})`);
+  el.style.setProperty('--bnav-active-border', `rgba(${r},${g},${b},${isDark?0.35:0.25})`);
   renderColorPalette();
 }
 
@@ -720,12 +760,11 @@ function renderColorPalette(){
   const wrap = document.getElementById('color-palette');
   if(!wrap) return;
   wrap.innerHTML = COLOR_PALETTES.map(p=>{
-    const t = theme;
-    const [a1] = p[t] || p['dark'];
+    const colors = p[theme] || p['dark'];
     const isActive = accentColor === p.id;
-    return `<button onclick="applyAccentColor('${p.id}')" style="display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:4px">
-      <div style="width:40px;height:40px;border-radius:12px;background:${a1};border:3px solid ${isActive ? 'var(--text)' : 'transparent'};box-shadow:${isActive ? '0 0 0 2px '+a1 : '0 1px 4px rgba(0,0,0,0.2)'};transition:all .2s"></div>
-      <span style="font-size:10px;color:${isActive ? 'var(--text)' : 'var(--muted)'};font-family:DM Sans,sans-serif;font-weight:${isActive ? '600' : '400'}">${p.label}</span>
+    return `<button onclick="applyAccentColor('${p.id}')" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:6px;flex:1">
+      <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,${colors.accent},${colors.accent2});border:3px solid ${isActive ? 'var(--text)' : 'transparent'};box-shadow:${isActive ? '0 0 0 2px '+colors.accent+',0 4px 12px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.2)'};transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:20px">${p.icon}</div>
+      <span style="font-size:11px;color:${isActive ? colors.accent : 'var(--muted)'};font-family:DM Sans,sans-serif;font-weight:${isActive ? '700' : '400'};transition:color .2s">${p.label}</span>
     </button>`;
   }).join('');
 }
@@ -1126,6 +1165,8 @@ function refreshBuiltinTitles(){
   sivilceIcon   = localStorage.getItem('alerji-sivilce-icon')   || '🔴';
   uykuluTitle   = localStorage.getItem('alerji-uyku-title')     || 'Uyku';
   uykuluIcon    = localStorage.getItem('alerji-uyku-icon')      || '😴';
+  locTitle      = localStorage.getItem('alerji-loc-title')      || 'Konum';
+  locIcon       = localStorage.getItem('alerji-loc-icon')       || '📍';
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   set('neyedin-title-text', neYedinTitle);
   set('neyedin-icon-text',  neYedinIcon);
@@ -1137,6 +1178,23 @@ function refreshBuiltinTitles(){
   set('diger-icon-text',    digerIcon);
   set('uyku-title-text',    uykuluTitle);
   set('uyku-icon-text',     uykuluIcon);
+  // Konum başlığını güncelle
+  const locLbl = document.getElementById('loc-title-lbl');
+  if(locLbl) locLbl.textContent = locIcon + ' ' + locTitle;
+  const editLocLbl = document.getElementById('edit-loc-title-lbl');
+  if(editLocLbl) editLocLbl.textContent = locIcon + ' ' + locTitle;
+}
+function editLocTitle(){
+  const curTitle = locTitle;
+  const curIcon  = locIcon;
+  const newTitle = prompt('Bölüm adı:', curTitle);
+  if(!newTitle || !newTitle.trim()) return;
+  const newIcon  = prompt('Simge (emoji):', curIcon);
+  locTitle = newTitle.trim();
+  locIcon  = (newIcon && newIcon.trim()) ? newIcon.trim() : curIcon;
+  localStorage.setItem('alerji-loc-title', locTitle);
+  localStorage.setItem('alerji-loc-icon',  locIcon);
+  refreshBuiltinTitles();
 }
 function editNeYedinTitle(){ editBuiltinSection('neyedin','neyedin',neYedinTitle,neYedinIcon); }
 let uykuluValue = null;
@@ -1305,6 +1363,10 @@ function renderHistory(){
     else if(l.shower===false)meta.push(banyoIcon+' Banyo: Hayır');
     if(l.sey===true)meta.push(digerIcon+' '+digerTitle+': Evet');
     else if(l.sey===false)meta.push(digerIcon+' '+digerTitle+': Hayır');
+    if(l.uykuValue!==null&&l.uykuValue!==undefined){
+      const uykuluLbls=['Çok Kötü','Kötü','Orta','İyi','Mükemmel'];
+      meta.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' '+uykuluLbls[l.uykuValue-1]);
+    }
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
@@ -1686,6 +1748,8 @@ function backupData(){
     sivilceIcon: sivilceIcon,
     uykuluTitle: uykuluTitle,
     uykuluIcon: uykuluIcon,
+    locTitle: locTitle,
+    locIcon: locIcon,
     uykuluHidden: uykuluHidden,
     zamanHidden: zamanHidden,
     neyedinHidden: neyedinHidden,
@@ -1743,6 +1807,9 @@ function restoreData(event){
       if(backup.digerIcon) digerIcon = backup.digerIcon;
       if(backup.sivilceIcon) sivilceIcon = backup.sivilceIcon;
       if(backup.uykuluTitle) uykuluTitle = backup.uykuluTitle;
+      if(backup.uykuluIcon)  uykuluIcon  = backup.uykuluIcon;
+      if(backup.locTitle) { locTitle = backup.locTitle; localStorage.setItem('alerji-loc-title', locTitle); }
+      if(backup.locIcon)  { locIcon  = backup.locIcon;  localStorage.setItem('alerji-loc-icon',  locIcon); }
       if(backup.uykuluIcon) uykuluIcon = backup.uykuluIcon;
       if(backup.uykuluHidden!==undefined){ uykuluHidden=backup.uykuluHidden; if(uykuluHidden) localStorage.setItem('alerji-uyku-hidden','1'); else localStorage.removeItem('alerji-uyku-hidden'); }
       ['zaman','neyedin','sivilce','notlar'].forEach(k=>{
@@ -1924,10 +1991,9 @@ function copyAllLogs(){
     if(l.foods&&l.foods.length) lines.push('🍽️ Yenilen: '+l.foods.join(', '));
     lines.push('🔴 '+sivilceTitle+': '+acneLabels[l.acne||0]);
     if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
-    if(l.locs&&l.locs.length) lines.push('📍 Konum: '+l.locs.join(', '));
+    if(l.locs&&l.locs.length) lines.push(locIcon+' '+locTitle+': '+l.locs.join(', '));
     lines.push(banyoIcon+' Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
     lines.push(digerIcon+' '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
-    if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.customData){Object.entries(l.customData).forEach(([sid,cd])=>{
       if(cd.value===null||cd.value===undefined) return;
       let v='';
@@ -3524,7 +3590,7 @@ Ağır" style="min-height:100px"></textarea>
           <input type="date" id="edit-inp-date" oninput="updateEditDayLabel()" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text);flex:1;min-width:0">
         </div>
       </div>
-      <div style="width:1px;height:36px;background:var(--border);flex-shrink:0"></div>
+      <div style="width:1px;height:36px;background:var(--accent);opacity:0.5;flex-shrink:0"></div>
       <div style="flex:0 0 auto">
         <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Saat</div>
         <input type="time" id="edit-inp-time" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text)">
@@ -3551,7 +3617,7 @@ Ağır" style="min-height:100px"></textarea>
       <button class="acne-btn" data-v="4" onclick="setEditAcne(4)">😤 Çok Kötü</button>
     </div>
 
-    <lbl>📍 Konum</lbl>
+    <lbl id="edit-loc-title-lbl"></lbl>
     <div id="edit-loc-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px"></div>
 
     <div id="edit-banyo-group">
