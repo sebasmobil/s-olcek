@@ -23,8 +23,8 @@
 <title>Alerji Takip Defteri</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{--bg:#000000;--card:#0d0d0d;--card2:#1a1a1a;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#1a1a1a;--topbar-bg:#0d0d0d;--topbar-text:#888890;--btn-bg:#1a1a22;--btn-border:#2a2a38;--sel-bg:rgba(255,224,102,0.18);}
-[data-theme="light"]{--bg:#ffffff;--card:#f2f2f7;--card2:#e5e5ea;--accent:#1c1c1e;--accent2:#3a3a3c;--red:#ff3b30;--green:#34c759;--yellow:#ff9500;--text:#000000;--muted:#6e6e73;--border:#c7c7cc;--hbg:rgba(255,255,255,0.98);--b0:#d1f4e0;--b1:#d4f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d1f4e0;--a1:#d4f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#e5e5ea;--topbar-bg:#f2f2f7;--topbar-text:#8e8e93;--btn-bg:#e5e5ea;--btn-border:#c7c7cc;--sel-bg:rgba(28,28,30,0.08);}
+[data-theme="dark"]{--bg:#000000;--card:#0d0d0d;--card2:#1a1a1a;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#1a1a1a;--topbar-bg:#0d0d0d;--topbar-text:#888890;--btn-bg:#1a1a22;--btn-border:#2a2a38;--sel-bg:rgba(255,224,102,0.18);--modal-overlay:rgba(0,0,0,0.75);--modal-bg:#111114;}
+[data-theme="light"]{--bg:#ffffff;--card:#f2f2f7;--card2:#e5e5ea;--accent:#1c1c1e;--accent2:#3a3a3c;--red:#ff3b30;--green:#34c759;--yellow:#ff9500;--text:#000000;--muted:#6e6e73;--border:#c7c7cc;--hbg:rgba(255,255,255,0.98);--b0:#d1f4e0;--b1:#d4f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d1f4e0;--a1:#d4f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#e5e5ea;--topbar-bg:#f2f2f7;--topbar-text:#8e8e93;--btn-bg:#e5e5ea;--btn-border:#c7c7cc;--sel-bg:rgba(28,28,30,0.08);--modal-overlay:rgba(0,0,0,0.35);--modal-bg:#ffffff;}
 [data-theme="ocean"]{display:none}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;min-height:100vh;transition:background .3s,color .3s;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 68px);}
@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.71</span>
+  <span>Pro 1.0.73</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -749,6 +749,7 @@ function applyAccentColor(id){
     el.style.setProperty('--btn-bg',    `rgba(${r},${g},${b},0.14)`);
     el.style.setProperty('--btn-border',`rgba(${r},${g},${b},0.35)`);
     el.style.setProperty('--sel-bg',    `rgba(${r},${g},${b},0.22)`);
+    el.style.setProperty('--modal-bg',  `rgb(${Math.round(r*0.08)},${Math.round(g*0.08)},${Math.round(b*0.08)})`);
   } else {
     el.style.setProperty('--bg',    `rgba(${r},${g},${b},0.04)`);
     el.style.setProperty('--card',  `rgba(${r},${g},${b},0.07)`);
@@ -758,6 +759,7 @@ function applyAccentColor(id){
     el.style.setProperty('--btn-bg',    `rgba(${r},${g},${b},0.09)`);
     el.style.setProperty('--btn-border',`rgba(${r},${g},${b},0.22)`);
     el.style.setProperty('--sel-bg',    `rgba(${r},${g},${b},0.12)`);
+    el.style.setProperty('--modal-bg',  `#ffffff`);
   }
 
   // Seçim arka planları
@@ -3747,8 +3749,8 @@ function icecekKopyaMetni(){
 </script>
 
 <!-- ÖZEL BÖLÜM MODAL -->
-<div id="section-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeSectionModal()">
-  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px;max-height:85vh;overflow-y:auto">
+<div id="section-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--modal-overlay);backdrop-filter:blur(2px)" onclick="if(event.target===this)closeSectionModal()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--modal-bg);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px;max-height:85vh;overflow-y:auto">
     <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:20px" id="modal-title">Yeni Bölüm</div>
 
     <lbl>Bölüm Başlığı</lbl>
@@ -3829,8 +3831,8 @@ Ağır" style="min-height:100px"></textarea>
 
 
 <!-- GEÇMİŞ KAYIT DÜZENLE MODAL -->
-<div id="edit-log-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeEditLogModal()">
-  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px;max-height:90vh;overflow-y:auto">
+<div id="edit-log-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--modal-overlay);backdrop-filter:blur(2px)" onclick="if(event.target===this)closeEditLogModal()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--modal-bg);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px;max-height:90vh;overflow-y:auto">
     <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--accent);margin-bottom:6px">Kaydı Düzenle</div>
     <div id="edit-log-date-label" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
 
@@ -3907,8 +3909,8 @@ Ağır" style="min-height:100px"></textarea>
 </div>
 
 <!-- SABIT BÖLÜM AD/SİMGE DÜZENLE MODAL -->
-<div id="bolum-edit-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)bolumEditIptal()">
-  <div style="background:var(--card);border-radius:18px;padding:24px 20px;width:calc(100% - 40px);max-width:400px">
+<div id="bolum-edit-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--modal-overlay);backdrop-filter:blur(2px);align-items:center;justify-content:center" onclick="if(event.target===this)bolumEditIptal()">
+  <div style="background:var(--modal-bg);border:1px solid var(--border);border-radius:18px;padding:24px 20px;width:calc(100% - 40px);max-width:400px">
     <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:16px">Bölümü Düzenle</div>
     <lbl>Bölüm adı</lbl>
     <input type="text" id="bolum-edit-ad" placeholder="Örn: Sivilce Durumu" style="margin-bottom:12px">
@@ -3922,8 +3924,8 @@ Ağır" style="min-height:100px"></textarea>
 </div>
 
 <!-- İÇECEK GEÇMİŞ DÜZENLE MODAL -->
-<div id="icecek-duzenle-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)" onclick="if(event.target===this)document.getElementById('icecek-duzenle-modal').style.display='none'">
-  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:22px 20px;max-height:88vh;overflow-y:auto">
+<div id="icecek-duzenle-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--modal-overlay);backdrop-filter:blur(2px)" onclick="if(event.target===this)document.getElementById('icecek-duzenle-modal').style.display='none'">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--modal-bg);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:22px 20px;max-height:88vh;overflow-y:auto">
     <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:3px">İçecek Kaydını Düzenle</div>
     <div id="icecek-duzenle-tarih" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
     <div style="position:relative;margin-bottom:12px">
