@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.07
+  Version: Pro 1.0.11
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -592,23 +592,58 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   width: 100%; max-width: 430px;
   background: var(--bg2);
   border-radius: 28px 28px 0 0;
-  padding: 20px 20px 40px;
+  padding: 0;
   animation: slideUp 0.4s cubic-bezier(0.4,0,0.2,1);
-  max-height: 90vh;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Standart modal içeriği (food modal dışı) */
+.modal > .modal-handle,
+.modal > .modal-title,
+.modal > .input-group,
+.modal > .settings-title,
+.modal > .btn,
+.modal > p {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.modal-scrollable {
   overflow-y: auto;
+  padding: 0 20px 40px;
+  flex: 1;
 }
 .modal-handle {
   width: 40px; height: 4px;
   background: var(--border);
   border-radius: 2px;
-  margin: 0 auto 20px;
+  margin: 16px auto 12px;
+  flex-shrink: 0;
 }
 .modal-title {
   font-family: var(--font-head);
   font-size: 1.3rem;
   font-weight: 800;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-align: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+/* İki panel food modal */
+.food-modal-top {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 8px;
+  min-height: 0;
+}
+.food-modal-bottom {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 10px 20px 36px;
+  max-height: 55vh;
+  overflow-y: auto;
 }
 
 /* FOOD SEARCH */
@@ -658,32 +693,83 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 .cat-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
 .food-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   overflow-y: auto;
   scrollbar-width: none;
+  border-top: 1px solid var(--border);
 }
 .food-grid::-webkit-scrollbar { display: none; }
 
 .food-option {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
+  background: var(--bg2);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: all var(--transition);
-  display: flex; flex-direction: column; gap: 4px;
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
-.food-option:hover, .food-option.selected {
-  border-color: var(--accent);
-  background: rgba(0,229,160,0.05);
-  transform: scale(1.02);
+.food-option:last-child { border-bottom: none; }
+.food-option:active { background: var(--card); }
+.food-option.selected { background: rgba(0,229,160,0.07); }
+.food-option-emoji { font-size: 1.3rem; flex-shrink: 0; width: 26px; text-align: center; }
+.food-option-name { font-size: 0.82rem; font-weight: 600; flex: 1; }
+.food-option-kcal { font-size: 0.7rem; color: var(--text3); flex-shrink: 0; }
+.food-option-check {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 800; transition: all 0.15s;
 }
-.food-option-emoji { font-size: 1.5rem; margin-bottom: 4px; }
-.food-option-name { font-size: 0.8rem; font-weight: 600; }
-.food-option-kcal { font-size: 0.7rem; color: var(--text3); }
+.food-option.selected .food-option-check {
+  background: var(--accent); border-color: var(--accent); color: #000;
+}
+/* Inline expand paneli */
+.food-expand {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 14px 10px;
+  animation: expandIn 0.18s ease;
+}
+@keyframes expandIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.expand-macros {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 4px; text-align: center;
+  background: var(--card2); border-radius: 8px;
+  padding: 6px 4px; margin-bottom: 7px;
+}
+.expand-macros span { display:flex; flex-direction:column; gap:1px; }
+.expand-macros b { font-family: var(--font-head); font-weight: 800; font-size: 0.82rem; }
+.expand-macros small { font-size: 0.58rem; color: var(--text3); text-transform: uppercase; }
+.expand-portion {
+  display: flex; align-items: center; gap: 8px;
+}
+.expand-portion-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--card2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1.1rem; color: var(--text); flex-shrink:0;
+  user-select: none;
+}
+.expand-portion-input {
+  flex:1; text-align: center; background: var(--card2);
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: 5px 4px; color: var(--text);
+  font-family: var(--font-head); font-weight: 700; font-size: 0.9rem;
+}
+.expand-unit { color: var(--text3); font-size: 0.8rem; flex-shrink:0; }
+.expand-add-btn {
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--accent); color: #000;
+  font-weight: 800; font-size: 0.75rem; border: none;
+  cursor: pointer; flex-shrink: 0; font-family: var(--font-head);
+}
 
 .portion-input {
   display: flex; align-items: center; gap: 12px; margin: 16px 0;
@@ -1104,9 +1190,9 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   display: flex; gap: 6px; align-items: center;
 }
 .add-bar .btn-add-all {
-  flex: 1; padding: 10px; border-radius: 14px;
+  flex: 1; padding: 8px; border-radius: 12px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #000; font-weight: 800; font-size: 0.85rem;
+  color: #000; font-weight: 800; font-size: 0.8rem;
   border: none; cursor: pointer; font-family: var(--font-head);
 }
 .add-bar .btn-clear {
@@ -1123,7 +1209,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.07</span>
+    <span>Pro 1.0.11</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1753,43 +1839,43 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
 <!-- Add Food Modal -->
 <div class="modal-overlay" id="modal-addFood">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">🍽️ Yemek Ekle</div>
-
-    <div class="settings-title" style="margin-bottom:8px">Öğün Seçin</div>
-    <div class="timing-grid" id="meal-select" style="margin-bottom:14px">
-      <div class="timing-chip selected" data-meal="kahvalti" onclick="selectMeal(this)">🌅 Kahvaltı</div>
-      <div class="timing-chip" data-meal="ogle" onclick="selectMeal(this)">☀️ Öğle</div>
-      <div class="timing-chip" data-meal="aksam" onclick="selectMeal(this)">🌙 Akşam</div>
-      <div class="timing-chip" data-meal="atistirma" onclick="selectMeal(this)">🍎 Atıştırma</div>
-      <div class="timing-chip" data-meal="icecek" onclick="selectMeal(this)">☕ İçecek</div>
+  <div class="modal" style="max-height:88vh;overflow-y:auto;padding:0">
+    <div style="padding:8px 14px 0">
+      <div class="modal-handle" style="margin-top:0;margin-bottom:8px"></div>
+      <!-- Başlık + kapat tek satır -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-family:var(--font-head);font-size:1rem;font-weight:800">🍽️ Yemek Ekle</span>
+        <button onclick="closeModal('addFood')" style="background:none;border:none;color:var(--text3);font-size:1.1rem;cursor:pointer;padding:2px 6px">✕</button>
+      </div>
+      <!-- Öğün chip'leri — daha küçük -->
+      <div style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:6px;padding-bottom:2px" id="meal-select">
+        <div class="timing-chip selected" data-meal="kahvalti" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🌅 Kahvaltı</div>
+        <div class="timing-chip" data-meal="ogle" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">☀️ Öğle</div>
+        <div class="timing-chip" data-meal="aksam" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🌙 Akşam</div>
+        <div class="timing-chip" data-meal="atistirma" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🍎 Atıştırma</div>
+        <div class="timing-chip" data-meal="icecek" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">☕ İçecek</div>
+      </div>
+      <!-- Arama — daha ince -->
+      <div style="display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 10px;gap:6px;margin-bottom:5px">
+        <span style="font-size:0.9rem">🔍</span>
+        <input type="text" id="food-search" placeholder="Yemek ara..." oninput="filterFoods(this.value)"
+          style="border:none;background:none;color:var(--text);font-size:0.82rem;flex:1;outline:none;font-family:var(--font-body)">
+      </div>
+      <!-- Kategoriler — ince scroll -->
+      <div class="food-categories" id="food-cats" style="margin-bottom:0"></div>
     </div>
 
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="food-search" placeholder="Yemek ara..." oninput="filterFoods(this.value)">
-    </div>
+    <!-- Gıda listesi: inline expand -->
+    <div class="food-grid" id="food-grid" style="max-height:none;border-radius:0;border-left:none;border-right:none;border-top:none"></div>
 
-    <div class="food-categories" id="food-cats"></div>
-
-    <!-- food grid: tıklayınca sepete ekler, tekrar tıklayınca kaldırır -->
-    <div class="food-grid" id="food-grid"></div>
-
-    <!-- Kompakt seçim barı -->
-    <div class="multi-cart" id="multi-cart" style="display:none">
-      <!-- seçilen chip'ler -->
-      <div class="cart-chips" id="cart-items"></div>
-      <!-- inline porsiyon satırları -->
-      <div id="portion-rows"></div>
-      <!-- makro strip -->
-      <div class="macro-strip">
+    <!-- Alt buton çubuğu: sadece seçili varsa -->
+    <div id="multi-cart" style="display:none;padding:7px 14px 24px;border-top:1px solid var(--border);background:var(--bg2);position:sticky;bottom:0">
+      <div class="macro-strip" style="margin-bottom:6px">
         <span><b id="cn-cal" style="color:var(--accent)">0</b><span style="color:var(--text3);font-size:0.6rem">kal</span></span>
         <span><b id="cn-prot" style="color:#FF6B6B">0g</b><span style="color:var(--text3);font-size:0.6rem">protein</span></span>
         <span><b id="cn-carb" style="color:#FFD93D">0g</b><span style="color:var(--text3);font-size:0.6rem">karb</span></span>
         <span><b id="cn-fat" style="color:#6BCB77">0g</b><span style="color:var(--text3);font-size:0.6rem">yağ</span></span>
       </div>
-      <!-- ekle + temizle -->
       <div class="add-bar">
         <button class="btn-add-all" onclick="addMultiFood()">✅ Ekle · <span id="cart-count">0</span> ürün · <span id="cart-total-cal">0</span> kal</button>
         <div class="btn-clear" onclick="clearCart()" title="Temizle">🗑️</div>
@@ -1804,11 +1890,10 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <div id="prev-fat" style="display:none">0g</div>
     <div id="portion-amount" style="display:none">100</div>
     <div id="portion-editor" style="display:none"></div>
-
-    <div id="cart-empty-hint" style="text-align:center;padding:8px 0 2px;color:var(--text3);font-size:0.72rem">
-      👆 Birden fazla yemek seçebilirsin
-    </div>
-    <button class="btn btn-secondary" onclick="closeModal('addFood')" style="margin-top:6px">İptal</button>
+    <div id="cart-items" style="display:none"></div>
+    <div id="portion-rows" style="display:none"></div>
+    <div id="cart-count2" style="display:none"></div>
+    <div id="cart-empty-hint" style="display:none"></div>
   </div>
 </div>
 
@@ -1816,6 +1901,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div class="modal-overlay" id="modal-addWeight">
   <div class="modal">
     <div class="modal-handle"></div>
+    <div class="modal-scrollable">
     <div class="modal-title">⚖️ Kilo Ekle</div>
     <div class="input-group">
       <label class="input-label">Kilo (kg)</label>
@@ -1832,12 +1918,14 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <button class="btn btn-primary" onclick="saveWeight()">💾 Kaydet</button>
     <button class="btn btn-secondary" onclick="closeModal('addWeight')">İptal</button>
   </div>
+    </div>
 </div>
 
 <!-- Add Exercise Modal -->
 <div class="modal-overlay" id="modal-addExercise">
   <div class="modal">
     <div class="modal-handle"></div>
+    <div class="modal-scrollable">
     <div class="modal-title">🏃 Egzersiz Ekle</div>
     <div class="food-grid" id="exercise-grid" style="max-height:250px"></div>
     <div class="input-group" style="margin-top:16px">
@@ -1851,6 +1939,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <button class="btn btn-primary" onclick="addExercise()">✅ Ekle</button>
     <button class="btn btn-secondary" onclick="closeModal('addExercise')">İptal</button>
   </div>
+    </div>
 </div>
 
 <!-- Notification Modal -->
@@ -2286,18 +2375,124 @@ function buildFoodGrid() {
   renderFoodGrid(FOOD_DB);
 }
 
+let expandedFoodId = null;
+
 function renderFoodGrid(foods) {
   const grid = document.getElementById('food-grid');
   if(!grid) return;
-  grid.innerHTML = foods.map(f => {
+  if(foods.length===0) {
+    grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.82rem">Sonuç bulunamadı</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  foods.forEach(f => {
     const inCart = foodCart.some(c=>c.food.id===f.id);
-    return `<div class="food-option${inCart?' selected':''}" id="fo-${f.id}" onclick="selectFood(${f.id})" style="position:relative">
-      <span class="fo-badge" style="${inCart?'display:flex':'display:none'}">✓</span>
+    const cartItem = foodCart.find(c=>c.food.id===f.id);
+    const amount = cartItem ? cartItem.amount : 100;
+    const isExpanded = expandedFoodId === f.id;
+
+    // Ana satır
+    const row = document.createElement('div');
+    row.className = 'food-option' + (inCart?' selected':'');
+    row.id = 'fo-'+f.id;
+    row.innerHTML = `
       <div class="food-option-emoji">${f.emoji}</div>
       <div class="food-option-name">${f.name}</div>
       <div class="food-option-kcal">${f.cal} kal/100g</div>
-    </div>`;
-  }).join('');
+      <div class="food-option-check">${inCart?'✓':''}</div>`;
+    row.onclick = () => toggleExpand(f.id);
+    grid.appendChild(row);
+
+    // Expand paneli
+    if(isExpanded) {
+      const exp = document.createElement('div');
+      exp.className = 'food-expand';
+      exp.id = 'exp-'+f.id;
+      const r = amount/100;
+      exp.innerHTML = `
+        <div class="expand-macros">
+          <span><b style="color:var(--accent)">${Math.round(f.cal*r)}</b><small>kal</small></span>
+          <span><b style="color:#FF6B6B">${(f.p*r).toFixed(1)}g</b><small>protein</small></span>
+          <span><b style="color:#FFD93D">${(f.c*r).toFixed(1)}g</b><small>karb</small></span>
+          <span><b style="color:#6BCB77">${(f.f*r).toFixed(1)}g</b><small>yağ</small></span>
+        </div>
+        <div class="expand-portion">
+          <div class="expand-portion-btn" onclick="expandChange(${f.id},-25)">−</div>
+          <input class="expand-portion-input" type="number" id="epinput-${f.id}" value="${amount}" min="10" step="25"
+            oninput="expandUpdate(${f.id},this.value)" onchange="expandUpdate(${f.id},this.value)">
+          <span class="expand-unit">g</span>
+          <button class="expand-add-btn" onclick="expandAddToCart(${f.id})">${inCart?'✓ Güncelle':'+ Ekle'}</button>
+          <div class="expand-portion-btn" onclick="expandChange(${f.id},25)">+</div>
+        </div>`;
+      grid.appendChild(exp);
+    }
+  });
+}
+
+function toggleExpand(id) {
+  if(expandedFoodId === id) {
+    expandedFoodId = null;
+  } else {
+    expandedFoodId = id;
+  }
+  const q = document.getElementById('food-search')?.value || '';
+  filterFoods(q);
+}
+
+function expandChange(id, delta) {
+  const inp = document.getElementById('epinput-'+id);
+  if(!inp) return;
+  const newVal = Math.max(10, (+inp.value||100)+delta);
+  inp.value = newVal;
+  expandUpdate(id, newVal);
+}
+
+function expandUpdate(id, val) {
+  const food = FOOD_DB.find(f=>f.id===id);
+  if(!food) return;
+  const amount = Math.max(10, +val||100);
+  const r = amount/100;
+  const exp = document.getElementById('exp-'+id);
+  if(!exp) return;
+  const bs = exp.querySelectorAll('.expand-macros b');
+  if(bs[0]) bs[0].textContent = Math.round(food.cal*r);
+  if(bs[1]) bs[1].textContent = (food.p*r).toFixed(1)+'g';
+  if(bs[2]) bs[2].textContent = (food.c*r).toFixed(1)+'g';
+  if(bs[3]) bs[3].textContent = (food.f*r).toFixed(1)+'g';
+  // Sepetteyse miktarını güncelle
+  const idx = foodCart.findIndex(c=>c.food.id===id);
+  if(idx>=0) { foodCart[idx].amount = amount; renderCartBar(); }
+}
+
+function expandAddToCart(id) {
+  const food = FOOD_DB.find(f=>f.id===id);
+  if(!food) return;
+  const inp = document.getElementById('epinput-'+id);
+  const amount = Math.max(10, +(inp?.value)||100);
+  const idx = foodCart.findIndex(c=>c.food.id===id);
+  if(idx>=0) {
+    foodCart[idx].amount = amount;
+  } else {
+    foodCart.push({food, amount});
+  }
+  // expand kapat, listeyi yenile
+  expandedFoodId = null;
+  const q = document.getElementById('food-search')?.value || '';
+  filterFoods(q);
+  renderCartBar();
+}
+
+function renderCartBar() {
+  const bar = document.getElementById('multi-cart');
+  if(!bar) return;
+  if(foodCart.length===0) { bar.style.display='none'; return; }
+  bar.style.display='block';
+  let totCal=0,totP=0,totC=0,totF=0;
+  foodCart.forEach(({food,amount})=>{const r=amount/100;totCal+=food.cal*r;totP+=food.p*r;totC+=food.c*r;totF+=food.f*r;});
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('cn-cal',Math.round(totCal)); s('cn-prot',totP.toFixed(1)+'g');
+  s('cn-carb',totC.toFixed(1)+'g'); s('cn-fat',totF.toFixed(1)+'g');
+  s('cart-total-cal',Math.round(totCal)); s('cart-count',foodCart.length);
 }
 
 function filterCat(cat, el) {
@@ -2306,13 +2501,13 @@ function filterCat(cat, el) {
   el.classList.add('active');
   filteredFoods = cat==='Tümü' ? FOOD_DB : FOOD_DB.filter(f=>f.cat===cat);
   const q = document.getElementById('food-search')?.value || '';
-  if(q) filteredFoods = filteredFoods.filter(f=>f.name.toLowerCase().includes(q.toLowerCase()));
+  if(q) { const trQ2=q.toLocaleLowerCase('tr-TR'); filteredFoods=filteredFoods.filter(f=>f.name.toLocaleLowerCase('tr-TR').includes(trQ2)); }
   renderFoodGrid(filteredFoods);
 }
 
 function filterFoods(q) {
   const base = selectedCat==='Tümü' ? FOOD_DB : FOOD_DB.filter(f=>f.cat===selectedCat);
-  filteredFoods = q ? base.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())) : base;
+  const trQ = q.toLocaleLowerCase('tr-TR'); filteredFoods = q ? base.filter(f=>f.name.toLocaleLowerCase('tr-TR').includes(trQ)) : base;
   renderFoodGrid(filteredFoods);
 }
 
@@ -2327,61 +2522,19 @@ function selectFood(id) {
     // zaten var → kaldır
     foodCart.splice(idx,1);
     document.getElementById('fo-'+id)?.classList.remove('selected');
-    const badge = document.getElementById('fo-'+id)?.querySelector('.fo-badge');
-    if(badge) badge.textContent = '';
+    const chk = document.getElementById('fo-'+id)?.querySelector('.food-option-check');
+    if(chk) chk.textContent = '';
   } else {
-    // ekle
     foodCart.push({food, amount:100});
     document.getElementById('fo-'+id)?.classList.add('selected');
-    const badge = document.getElementById('fo-'+id)?.querySelector('.fo-badge');
-    if(badge) badge.textContent = '✓';
+    const chk = document.getElementById('fo-'+id)?.querySelector('.food-option-check');
+    if(chk) chk.textContent = '✓';
   }
   renderCart();
 }
 
-function renderCart() {
-  const cart = document.getElementById('multi-cart');
-  const hint = document.getElementById('cart-empty-hint');
-  if(!cart) return;
+function renderCart() { renderCartBar(); }
 
-  if(foodCart.length===0) {
-    cart.style.display='none';
-    if(hint) hint.style.display='block';
-    return;
-  }
-  cart.style.display='block';
-  if(hint) hint.style.display='none';
-
-  // chip satırı
-  const itemsEl = document.getElementById('cart-items');
-  if(itemsEl) itemsEl.innerHTML = foodCart.map(({food},i)=>
-    `<div class="cart-chip" onclick="removeFromCart(${i})">
-      ${food.emoji} ${food.name} <span class="cc-x">✕</span>
-    </div>`
-  ).join('');
-
-  // inline porsiyon satırları (kompakt)
-  const rowsEl = document.getElementById('portion-rows');
-  if(rowsEl) rowsEl.innerHTML = foodCart.map(({food,amount},i)=>
-    `<div class="ipr">
-      <span style="font-size:1rem">${food.emoji}</span>
-      <span class="ipr-name">${food.name}</span>
-      <div class="ipr-btn" onclick="cartChangePortion(${i},-25)">−</div>
-      <input class="ipr-input" type="number" value="${amount}" min="10" step="25"
-        onchange="cartSetPortion(${i},this.value)" oninput="cartSetPortion(${i},this.value)">
-      <span class="ipr-g">g</span>
-      <div class="ipr-btn" onclick="cartChangePortion(${i},25)">+</div>
-    </div>`
-  ).join('');
-
-  // makro toplamları
-  let totCal=0,totP=0,totC=0,totF=0;
-  foodCart.forEach(({food,amount})=>{const r=amount/100;totCal+=food.cal*r;totP+=food.p*r;totC+=food.c*r;totF+=food.f*r;});
-  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  s('cn-cal',Math.round(totCal)); s('cn-prot',totP.toFixed(1)+'g');
-  s('cn-carb',totC.toFixed(1)+'g'); s('cn-fat',totF.toFixed(1)+'g');
-  s('cart-total-cal',Math.round(totCal)); s('cart-count',foodCart.length);
-}
 
 function removeFromCart(idx) {
   const food = foodCart[idx]?.food;
@@ -2391,9 +2544,11 @@ function removeFromCart(idx) {
 }
 
 function clearCart() {
-  foodCart.forEach(({food})=>document.getElementById('fo-'+food.id)?.classList.remove('selected'));
   foodCart=[];
-  renderCart();
+  expandedFoodId=null;
+  const q=document.getElementById('food-search')?.value||'';
+  filterFoods(q);
+  renderCartBar();
 }
 
 function cartChangePortion(idx,delta) {
@@ -3134,7 +3289,8 @@ function openModal(id) {
     if(id==='addFood') {
       // Sepeti sıfırla
       foodCart = [];
-      renderCart();
+      expandedFoodId = null;
+      renderCartBar();
       const hint = document.getElementById('cart-empty-hint');
       if(hint) hint.style.display='block';
       // search ve kategori sıfırla
