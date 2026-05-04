@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.33
+  Version: Pro 1.0.34
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1232,7 +1232,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.33</span>
+    <span>Pro 1.0.34</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1504,6 +1504,27 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
       </div>
       <div id="exercise-log">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Henüz egzersiz kaydedilmedi</div>
+      </div>
+    </div>
+
+    <!-- Geçmiş Gün Su Kaydı (sadece geçmiş tarih seçilince) -->
+    <div id="history-water-section" style="display:none;margin-top:8px">
+      <div class="log-header">
+        <div class="section-title">💧 Su Kaydı</div>
+        <div class="section-action" onclick="addHistoryWater()">+ Ekle</div>
+      </div>
+      <div id="history-water-content" style="background:var(--card2);border-radius:14px;padding:14px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="font-size:2rem">💧</div>
+          <div>
+            <div style="font-family:var(--font-head);font-weight:800;font-size:1.4rem;color:var(--accent)" id="hw-amount">0 ml</div>
+            <div style="font-size:0.72rem;color:var(--text3)" id="hw-goal-pct">Hedefin %0'ı</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button onclick="editHistoryWater()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.78rem;color:var(--text);font-weight:600">✏️ Düzenle</button>
+            <button onclick="deleteHistoryWater()" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.78rem;color:#FF6B6B;font-weight:600">🗑️ Sil</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1846,13 +1867,22 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
     <div class="settings-section">
       <div class="settings-title">⚙️ Uygulama</div>
-      <div class="settings-row" onclick="exportData()" style="cursor:pointer">
+
+      <div class="settings-row" onclick="createBackup()" style="cursor:pointer">
         <div style="display:flex;align-items:center">
-          <span class="settings-row-icon">📤</span>
-          <span class="settings-row-label">Verileri Dışa Aktar</span>
+          <span class="settings-row-icon">⬇️</span>
+          <span class="settings-row-label">Yedek Al (JSON)</span>
         </div>
         <span style="color:var(--text3)">›</span>
       </div>
+      <label class="settings-row" style="cursor:pointer">
+        <div style="display:flex;align-items:center">
+          <span class="settings-row-icon">⬆️</span>
+          <span class="settings-row-label">Yedeği Geri Yükle</span>
+        </div>
+        <input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none">
+        <span style="color:var(--text3)">›</span>
+      </label>
       <div class="settings-row" onclick="clearData()" style="cursor:pointer">
         <div style="display:flex;align-items:center">
           <span class="settings-row-icon">🗑️</span>
@@ -2929,7 +2959,7 @@ function toggleSettings() {
 // =================== YEDEK & GERİ YÜKLE ===================
 function createBackup() {
   const backup = {
-    version: 'S-Diyet Pro 1.0.33',
+    version: 'S-Diyet Pro 1.0.34',
     date: new Date().toISOString(),
     appData: appData
   };
@@ -3001,6 +3031,52 @@ function updateBackupInfo() {
   }
 }
 
+
+function showCenterAlert(msg) {
+  let el = document.getElementById('center-alert');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = 'center-alert';
+    el.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:var(--card);border:2px solid var(--accent2);border-radius:18px;
+      padding:20px 28px;z-index:9999;text-align:center;
+      font-family:var(--font-head);font-weight:700;font-size:1rem;
+      color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      max-width:80vw;animation:popIn 0.2s ease`;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  // Öğün chiplerini titret
+  const mealSel = document.getElementById('meal-select');
+  if(mealSel) {
+    mealSel.style.animation = 'shake 0.4s ease';
+    setTimeout(()=>mealSel.style.animation='', 400);
+  }
+  setTimeout(() => { if(el) el.style.display='none'; }, 2000);
+}
+
+
+// =================== GECE YARISI SU SIFIRLAMA ===================
+function scheduleMidnightReset() {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 500); // 00:00:00.5
+  const msUntilMidnight = tomorrow - now;
+  setTimeout(() => {
+    // Bugünün su kaydını sıfırla (yeni gün başladı)
+    const todayKey = getTodayKey();
+    if(!appData.logs[todayKey]) appData.logs[todayKey] = {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
+    appData.logs[todayKey].water = 0;
+    saveData();
+    updateHomeStats();
+    buildWaterCups();
+    showToast('🌙 Gece yarısı! Su takibi sıfırlandı.', 'success');
+    scheduleMidnightReset(); // Sonraki gün için yeniden planla
+  }, msUntilMidnight);
+}
+
 function initApp() {
   safeRun(applyTheme);
   safeRun(updateGreeting);
@@ -3013,6 +3089,7 @@ function initApp() {
   safeRun(updateHomeStats);
   safeRun(generateNotifs);
   safeRun(updateBackupInfo);
+  safeRun(scheduleMidnightReset);
   safeRun(updateProfileView);
   safeRun(updateWeightHistory);
   safeRun(updateSettings);
@@ -3242,7 +3319,7 @@ function updateHomeStats() {
 const CUP_ML = 200; // Her bardak 200ml sabit
 
 function buildWaterCups() {
-  const log = getActiveLog();
+  const log = getTodayLog(); // Ana sayfa: her zaman bugün
   const wg = appData.settings.waterGoal || 2500;
   const cups = Math.ceil(wg / CUP_ML);
   const container = document.getElementById('water-cups');
@@ -3276,12 +3353,7 @@ function addWater(ml) {
 }
 
 function toggleCup(idx) {
-  const isToday = !currentLogDate || currentLogDate === getTodayKey();
-  if(!isToday) {
-    showToast('⚠️ Geçmiş günün su kaydı değiştirilemez', 'error');
-    return;
-  }
-  const log = getActiveLog();
+  const log = getTodayLog(); // Su takibi her zaman bugüne
   const current = Math.floor((log.water||0) / CUP_ML);
   if(idx < current) {
     log.water = idx * CUP_ML;
@@ -3506,7 +3578,7 @@ function cartSetPortion(idx,val) {
 }
 
 function addMultiFood() {
-  if(!selectedMeal) { showToast('⚠️ Lütfen önce bir öğün seçin!','error'); return; }
+  if(!selectedMeal) { showCenterAlert('⚠️ Lütfen önce bir öğün seçin!'); return; }
   if(foodCart.length===0) { showToast('⚠️ Lütfen en az bir yemek seçin!','error'); return; }
   // Yemek her zaman seçili güne eklenir
   const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
@@ -3584,6 +3656,57 @@ function addFood() {
 }
 
 // =================== MEAL LOG RENDER ===================
+
+// =================== GEÇMİŞ SU KAYDI ===================
+function renderHistoryWater(dateKey) {
+  const log = appData.logs[dateKey] || {};
+  const water = log.water || 0;
+  const wg = appData.settings.waterGoal || 2500;
+  const pct = Math.round(water / wg * 100);
+  const amountEl = document.getElementById('hw-amount');
+  const pctEl = document.getElementById('hw-goal-pct');
+  if(amountEl) amountEl.textContent = water >= 1000 ? (water/1000).toFixed(1)+' L' : water+' ml';
+  if(pctEl) pctEl.textContent = `Hedefin %${pct}'i (${wg}ml)`;
+}
+
+function addHistoryWater() {
+  const dateKey = currentLogDate;
+  const current = appData.logs[dateKey]?.water || 0;
+  const input = prompt(`Su miktarı ekle (ml):
+Mevcut: ${current}ml`, '200');
+  if(input === null) return;
+  const ml = parseInt(input);
+  if(isNaN(ml) || ml <= 0) { showToast('❌ Geçersiz miktar', 'error'); return; }
+  if(!appData.logs[dateKey]) appData.logs[dateKey] = {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
+  appData.logs[dateKey].water = (appData.logs[dateKey].water || 0) + ml;
+  saveData();
+  renderHistoryWater(dateKey);
+  showToast(`💧 ${ml}ml eklendi`, 'success');
+}
+
+function editHistoryWater() {
+  const dateKey = currentLogDate;
+  const current = appData.logs[dateKey]?.water || 0;
+  const input = prompt(`Su miktarını düzenle (ml):`, current);
+  if(input === null) return;
+  const ml = parseInt(input);
+  if(isNaN(ml) || ml < 0) { showToast('❌ Geçersiz miktar', 'error'); return; }
+  if(!appData.logs[dateKey]) appData.logs[dateKey] = {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
+  appData.logs[dateKey].water = ml;
+  saveData();
+  renderHistoryWater(dateKey);
+  showToast(`💧 Su kaydı güncellendi: ${ml}ml`, 'success');
+}
+
+function deleteHistoryWater() {
+  if(!confirm('Bu günün su kaydını silmek istiyor musunuz?')) return;
+  const dateKey = currentLogDate;
+  if(appData.logs[dateKey]) appData.logs[dateKey].water = 0;
+  saveData();
+  renderHistoryWater(dateKey);
+  showToast('🗑️ Su kaydı silindi', 'success');
+}
+
 function renderMealLogs() {
   const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
   // Seçili tarihe log yoksa boş obje kullan — bugünü kirletme
@@ -3616,8 +3739,8 @@ function renderMealLogs() {
     ).join('');
   });
 
-  // Exercise log
-  const exs = getTodayExercises();
+  // Exercise log — seçili tarih
+  const exs = (appData.exercises[dateKey] || []);
   const exContainer = document.getElementById('exercise-log');
   if(exContainer) {
     if(exs.length===0) {
@@ -3636,11 +3759,26 @@ function renderMealLogs() {
       ).join('');
     }
   }
+
+  // Geçmiş gün su bölümü
+  const hwSection = document.getElementById('history-water-section');
+  const isToday = dateKey === getTodayKey();
+  if(hwSection) {
+    if(!isToday) {
+      hwSection.style.display = 'block';
+      renderHistoryWater(dateKey);
+    } else {
+      hwSection.style.display = 'none';
+    }
+  }
 }
 
 function deleteFood(meal, id) {
-  const log = getTodayLog();
-  log[meal] = log[meal].filter(i=>i.id!==id);
+  if(!confirm('Bu kaydı silmek istiyor musunuz?')) return;
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  const log = appData.logs[dateKey];
+  if(!log) return;
+  log[meal] = (log[meal]||[]).filter(i=>i.id!==id);
   saveData();
   renderMealLogs();
   updateHomeStats();
@@ -3701,8 +3839,9 @@ function addExercise() {
 }
 
 function deleteExercise(id) {
-  const k = getTodayKey();
-  appData.exercises[k] = (appData.exercises[k]||[]).filter(e=>e.id!==id);
+  if(!confirm('Bu egzersiz kaydını silmek istiyor musunuz?')) return;
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  appData.exercises[dateKey] = (appData.exercises[dateKey]||[]).filter(e=>e.id!==id);
   saveData();
   renderMealLogs();
   updateHomeStats();
@@ -4262,7 +4401,7 @@ function renderCalendarGrid() {
   startDow = startDow === 0 ? 6 : startDow - 1;
 
   const daysInMonth = new Date(year, month+1, 0).getDate();
-  const todayDate = new Date(); todayDate.setHours(23,59,59,999);
+  const todayDate = new Date(); todayDate.setHours(0,0,0,0);
 
   for(let i=0; i<startDow; i++) {
     grid.appendChild(Object.assign(document.createElement('div'), {innerHTML:'&nbsp;'}));
@@ -4271,7 +4410,7 @@ function renderCalendarGrid() {
   for(let d=1; d<=daysInMonth; d++) {
     const dateObj = new Date(year, month, d);
     const dateKey = dateObj.toISOString().split('T')[0];
-    const isToday = dateKey === today;
+    const isToday = dateKey === getTodayKey();
     const isSelected = dateKey === currentLogDate;
     const isFuture = dateObj > todayDate;
     const hasLog = appData.logs[dateKey] &&
@@ -4458,7 +4597,7 @@ function exportData() {
 }
 
 function clearData() {
-  if(confirm('Tüm verileri silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+  if(confirm('⚠️ DİKKAT!\n\nTüm yemek kayıtları, kilo geçmişi, egzersizler ve ayarlar kalıcı olarak silinecek.\n\nBu işlem GERİ ALINAMAZ!\n\nDevam etmek istiyor musunuz?')) {
     try { localStorage.removeItem('s_diyet_v2'); } catch(e) {}
     location.reload();
   }
