@@ -1752,6 +1752,13 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
         <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:800" id="recommended-cal">-</div>
         <div style="font-size:0.75rem;color:var(--text2);margin-top:4px" id="cal-advice"></div>
       </div>
+      <div id="macro-advice" style="display:none;margin-top:10px;padding:10px 12px;background:var(--card2);border-radius:12px;font-size:0.78rem;color:var(--text2);line-height:1.7">
+        <span style="font-weight:700;color:var(--text)">📊 Önerilen Makrolar</span><br>
+        🥩 Protein: <span id="rec-protein-val" style="color:var(--accent);font-weight:700">-</span> g &nbsp;|&nbsp;
+        🌾 Karb: <span id="rec-carb-val" style="color:#FFD93D;font-weight:700">-</span> g &nbsp;|&nbsp;
+        🥑 Yağ: <span id="rec-fat-val" style="color:#6BCB77;font-weight:700">-</span> g<br>
+        <span style="font-size:0.7rem;color:var(--text3)">⬇️ Aşağıdaki hedef alanları otomatik dolduruldu. İstersen değiştirebilirsin.</span>
+      </div>
     </div>
 
     <!-- Günlük Hedefler -->
@@ -4025,10 +4032,39 @@ function saveProfile() {
 
   appData.settings.calGoal = recCal;
 
+  // Makro hedefleri otomatik hesapla (yalnızca kullanıcı manuel değiştirmediyse değil — her zaman öner, input'a yaz)
+  // Protein: vücut ağırlığı x 1.6g (orta), Yağ: kalorilerin %25'i, Karb: geri kalan
+  const recProtein = Math.round(p.weight * 1.6);
+  const recFat     = Math.round((recCal * 0.25) / 9);
+  const recCarb    = Math.round((recCal - recProtein * 4 - recFat * 9) / 4);
+
+  appData.settings.proteinGoal = recProtein;
+  appData.settings.carbGoal    = Math.max(recCarb, 50);
+  appData.settings.fatGoal     = recFat;
+
+  // Günlük Hedefler input alanlarını güncelle (kullanıcı isterse üzerine yazabilir)
+  const calEl     = document.getElementById('set-cal-goal');
+  const proteinEl = document.getElementById('set-protein-goal');
+  const carbEl    = document.getElementById('set-carb-goal');
+  const fatEl     = document.getElementById('set-fat-goal');
+  if(calEl)     calEl.value     = recCal;
+  if(proteinEl) proteinEl.value = recProtein;
+  if(carbEl)    carbEl.value    = Math.max(recCarb, 50);
+  if(fatEl)     fatEl.value     = recFat;
+
+  // Güncelleme olduğunu belirten görsel ipucu
+  ['set-cal-goal','set-protein-goal','set-carb-goal','set-fat-goal'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.transition = 'box-shadow 0.3s';
+    el.style.boxShadow = '0 0 0 2px var(--accent)';
+    setTimeout(() => { el.style.boxShadow = ''; }, 1500);
+  });
+
   saveData();
   updateProfileView();
   updateHomeStats();
-  showToast('✅ Profil kaydedildi!', 'success');
+  showToast('✅ Profil kaydedildi! Hedefler güncellendi 🎯', 'success');
 
   // Show TDEE card
   document.getElementById('bmr-val').textContent = Math.round(bmr);
@@ -4037,6 +4073,21 @@ function saveProfile() {
   const adviceTexts = {lose:'Kalori açığı ile yağ yakımı modu 🔥',maintain:'Kilo koruma modu ⚖️',gain:'Kalori fazlası ile kas kazanım modu 💪'};
   document.getElementById('cal-advice').textContent = adviceTexts[p.dietGoal] || '';
   document.getElementById('tdee-card').style.display = 'block';
+
+  // Makro özet panelini göster
+  const macroPanel = document.getElementById('macro-advice');
+  if(macroPanel) {
+    macroPanel.style.display = 'block';
+    document.getElementById('rec-protein-val').textContent = recProtein;
+    document.getElementById('rec-carb-val').textContent    = Math.max(recCarb, 50);
+    document.getElementById('rec-fat-val').textContent     = recFat;
+  }
+
+  // Hedefler kartına scroll
+  setTimeout(() => {
+    const goalsCard = document.getElementById('set-cal-goal');
+    if(goalsCard) goalsCard.closest('.card')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 400);
 }
 
 function updateProfileView() {
