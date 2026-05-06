@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.44
+  Version: Pro 1.0.45
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1232,7 +1232,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.44</span>
+    <span>Pro 1.0.45</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -2028,6 +2028,38 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <button class="btn btn-secondary" onclick="closeModal('addWeight')">İptal</button>
   </div>
     </div>
+</div>
+
+<!-- Edit Food Log Modal -->
+<div class="modal-overlay" id="modal-editFoodLog">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-scrollable">
+    <div class="modal-title">✏️ Kaydı Düzenle</div>
+    <input type="hidden" id="efl-meal">
+    <input type="hidden" id="efl-id">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;padding:12px;background:var(--card2);border-radius:12px">
+      <span id="efl-emoji" style="font-size:2rem"></span>
+      <div>
+        <div id="efl-name" style="font-weight:700;font-size:1rem"></div>
+        <div id="efl-macros-orig" style="font-size:0.72rem;color:var(--text3)"></div>
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">⚖️ Miktar (g)</label>
+      <input type="number" class="input-field" id="efl-amount" placeholder="100" min="1" oninput="calcEditFoodMacros()">
+    </div>
+    <div id="efl-macro-preview" style="display:flex;gap:8px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:10px;font-size:0.78rem;text-align:center">
+      <div style="flex:1"><div style="font-weight:700;color:var(--accent)" id="efl-prev-cal">-</div><div style="color:var(--text3)">kal</div></div>
+      <div style="flex:1"><div style="font-weight:700;color:#FF6B6B" id="efl-prev-p">-</div><div style="color:var(--text3)">protein</div></div>
+      <div style="flex:1"><div style="font-weight:700;color:#FFD93D" id="efl-prev-c">-</div><div style="color:var(--text3)">karb</div></div>
+      <div style="flex:1"><div style="font-weight:700;color:#6BCB77" id="efl-prev-f">-</div><div style="color:var(--text3)">yağ</div></div>
+    </div>
+    <button class="btn btn-primary" onclick="saveEditFoodLog()">💾 Güncelle</button>
+    <button class="btn" style="background:rgba(255,107,107,0.15);color:#FF6B6B;font-weight:700;" onclick="deleteFoodFromEdit()">🗑 Kaydı Sil</button>
+    <button class="btn btn-secondary" onclick="closeModal('editFoodLog')">İptal</button>
+    </div>
+  </div>
 </div>
 
 <!-- Edit Weight Modal -->
@@ -3430,7 +3462,7 @@ function toggleSettings() {
 // =================== YEDEK & GERİ YÜKLE ===================
 function createBackup() {
   const backup = {
-    version: 'S-Diyet Pro 1.0.44',
+    version: 'S-Diyet Pro 1.0.45',
     date: new Date().toISOString(),
     appData: appData
   };
@@ -4242,8 +4274,8 @@ function renderMealLogs() {
       container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Henüz yemek eklenmedi</div>';
       return;
     }
-    container.innerHTML = items.map(item =>
-      `<div class="food-item" id="fi-${item.id}">
+    container.innerHTML = items.map((item,idx) =>
+      `<div class="food-item" id="fi-${item.id}" style="cursor:pointer" onclick="openEditFoodLog('${meal}',${item.id})">
         <div class="food-emoji">${item.emoji}</div>
         <div class="food-info">
           <div class="food-name">${item.name}</div>
@@ -4253,7 +4285,7 @@ function renderMealLogs() {
           <div class="food-kcal-num">${item.cal}</div>
           <div class="food-kcal-unit">kal</div>
         </div>
-        <button class="food-delete" onclick="deleteFood('${meal}',${item.id})">🗑️</button>
+        <span style="font-size:0.8rem;color:var(--text3);padding:4px">✏️</span>
       </div>`
     ).join('');
   });
@@ -4290,6 +4322,94 @@ function renderMealLogs() {
       hwSection.style.display = 'none';
     }
   }
+}
+
+function openEditFoodLog(meal, id) {
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  const log = appData.logs[dateKey];
+  if(!log) return;
+  const item = (log[meal]||[]).find(i=>i.id===id);
+  if(!item) return;
+
+  document.getElementById('efl-meal').value = meal;
+  document.getElementById('efl-id').value = id;
+  document.getElementById('efl-emoji').textContent = item.emoji;
+  document.getElementById('efl-name').textContent = item.name;
+  document.getElementById('efl-amount').value = item.amount;
+  // 100g başına değerleri sakla
+  document.getElementById('efl-macros-orig').textContent =
+    `100g → ${item._cal100||Math.round(item.cal/item.amount*100)} kal · P:${item._p100||Math.round(item.protein/item.amount*100)}g · K:${item._c100||Math.round(item.carb/item.amount*100)}g · Y:${item._f100||Math.round(item.fat/item.amount*100)}g`;
+  // 100g değerlerini data olarak sakla
+  document.getElementById('efl-amount').dataset.cal100 = item._cal100 || Math.round(item.cal/item.amount*100);
+  document.getElementById('efl-amount').dataset.p100   = item._p100   || Math.round(item.protein/item.amount*100);
+  document.getElementById('efl-amount').dataset.c100   = item._c100   || Math.round(item.carb/item.amount*100);
+  document.getElementById('efl-amount').dataset.f100   = item._f100   || Math.round(item.fat/item.amount*100);
+  calcEditFoodMacros();
+  openModal('editFoodLog');
+}
+
+function calcEditFoodMacros() {
+  const amountEl = document.getElementById('efl-amount');
+  const amount = +amountEl.value || 0;
+  const cal100 = +amountEl.dataset.cal100 || 0;
+  const p100   = +amountEl.dataset.p100   || 0;
+  const c100   = +amountEl.dataset.c100   || 0;
+  const f100   = +amountEl.dataset.f100   || 0;
+  document.getElementById('efl-prev-cal').textContent = Math.round(cal100 * amount / 100);
+  document.getElementById('efl-prev-p').textContent   = Math.round(p100   * amount / 100) + 'g';
+  document.getElementById('efl-prev-c').textContent   = Math.round(c100   * amount / 100) + 'g';
+  document.getElementById('efl-prev-f').textContent   = Math.round(f100   * amount / 100) + 'g';
+}
+
+function saveEditFoodLog() {
+  const meal   = document.getElementById('efl-meal').value;
+  const id     = +document.getElementById('efl-id').value;
+  const amount = +document.getElementById('efl-amount').value;
+  if(!amount || amount < 1) { showToast('⚠️ Geçerli bir miktar girin!', 'error'); return; }
+
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  const log = appData.logs[dateKey];
+  if(!log) return;
+  const idx = (log[meal]||[]).findIndex(i=>i.id===id);
+  if(idx === -1) return;
+
+  const item     = log[meal][idx];
+  const amountEl = document.getElementById('efl-amount');
+  const cal100   = +amountEl.dataset.cal100;
+  const p100     = +amountEl.dataset.p100;
+  const c100     = +amountEl.dataset.c100;
+  const f100     = +amountEl.dataset.f100;
+
+  log[meal][idx] = {
+    ...item,
+    amount,
+    cal:     Math.round(cal100 * amount / 100),
+    protein: Math.round(p100   * amount / 100),
+    carb:    Math.round(c100   * amount / 100),
+    fat:     Math.round(f100   * amount / 100),
+    _cal100: cal100, _p100: p100, _c100: c100, _f100: f100
+  };
+
+  saveData();
+  closeModal('editFoodLog');
+  renderMealLogs();
+  updateHomeStats();
+  showToast('✅ Kayıt güncellendi!', 'success');
+}
+
+function deleteFoodFromEdit() {
+  const meal = document.getElementById('efl-meal').value;
+  const id   = +document.getElementById('efl-id').value;
+  if(!confirm('Bu kaydı silmek istiyor musunuz?')) return;
+  closeModal('editFoodLog');
+  setTimeout(() => {
+    const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+    const log = appData.logs[dateKey];
+    if(!log) return;
+    log[meal] = (log[meal]||[]).filter(i=>i.id!==id);
+    saveData(); renderMealLogs(); updateHomeStats();
+    showToast('🗑️ Silindi', 'success');
+  }, 200);
 }
 
 function deleteFood(meal, id) {
