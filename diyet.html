@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.45
+  Version: Pro 1.0.48
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -573,12 +573,25 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   font-family: var(--font-body);
   font-size: 1rem;
   width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
   transition: all var(--transition);
   outline: none;
 }
 .input-field:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+}
+/* iOS Safari date/time input fix */
+input[type="date"].input-field,
+input[type="time"].input-field {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  display: block;
 }
 .input-row { display: flex; gap: 10px; }
 .input-row .input-group { flex: 1; }
@@ -1232,7 +1245,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.45</span>
+    <span>Pro 1.0.48</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -2018,7 +2031,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     </div>
     <div class="input-group">
       <label class="input-label">Tarih</label>
-      <input type="date" class="input-field" id="wt-date">
+      <input type="date" class="input-field" id="wt-date" style="width:100%;box-sizing:border-box;max-width:100%;min-width:0;-webkit-appearance:none;appearance:none">
     </div>
     <div class="input-group">
       <label class="input-label">📝 Not (opsiyonel)</label>
@@ -2045,9 +2058,15 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
         <div id="efl-macros-orig" style="font-size:0.72rem;color:var(--text3)"></div>
       </div>
     </div>
-    <div class="input-group">
-      <label class="input-label">⚖️ Miktar (g)</label>
-      <input type="number" class="input-field" id="efl-amount" placeholder="100" min="1" oninput="calcEditFoodMacros()">
+    <div style="display:flex;gap:10px">
+      <div class="input-group" style="flex:2">
+        <label class="input-label">⚖️ Miktar (g)</label>
+        <input type="number" class="input-field" id="efl-amount" placeholder="100" min="1" oninput="calcEditFoodMacros()">
+      </div>
+      <div class="input-group" style="flex:1">
+        <label class="input-label">🕐 Saat</label>
+        <input type="time" class="input-field" id="efl-time">
+      </div>
     </div>
     <div id="efl-macro-preview" style="display:flex;gap:8px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:10px;font-size:0.78rem;text-align:center">
       <div style="flex:1"><div style="font-weight:700;color:var(--accent)" id="efl-prev-cal">-</div><div style="color:var(--text3)">kal</div></div>
@@ -2075,7 +2094,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     </div>
     <div class="input-group">
       <label class="input-label">Tarih</label>
-      <input type="date" class="input-field" id="edit-wt-date">
+      <input type="date" class="input-field" id="edit-wt-date" style="width:100%;box-sizing:border-box;max-width:100%;min-width:0;-webkit-appearance:none;appearance:none">
     </div>
     <div class="input-group">
       <label class="input-label">📝 Not (opsiyonel)</label>
@@ -3462,7 +3481,7 @@ function toggleSettings() {
 // =================== YEDEK & GERİ YÜKLE ===================
 function createBackup() {
   const backup = {
-    version: 'S-Diyet Pro 1.0.45',
+    version: 'S-Diyet Pro 1.0.48',
     date: new Date().toISOString(),
     appData: appData
   };
@@ -4336,6 +4355,7 @@ function openEditFoodLog(meal, id) {
   document.getElementById('efl-emoji').textContent = item.emoji;
   document.getElementById('efl-name').textContent = item.name;
   document.getElementById('efl-amount').value = item.amount;
+  document.getElementById('efl-time').value = item.time || '';
   // 100g başına değerleri sakla
   document.getElementById('efl-macros-orig').textContent =
     `100g → ${item._cal100||Math.round(item.cal/item.amount*100)} kal · P:${item._p100||Math.round(item.protein/item.amount*100)}g · K:${item._c100||Math.round(item.carb/item.amount*100)}g · Y:${item._f100||Math.round(item.fat/item.amount*100)}g`;
@@ -4365,6 +4385,7 @@ function saveEditFoodLog() {
   const meal   = document.getElementById('efl-meal').value;
   const id     = +document.getElementById('efl-id').value;
   const amount = +document.getElementById('efl-amount').value;
+  const time   = document.getElementById('efl-time').value || item?.time || '';
   if(!amount || amount < 1) { showToast('⚠️ Geçerli bir miktar girin!', 'error'); return; }
 
   const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
@@ -4380,9 +4401,11 @@ function saveEditFoodLog() {
   const c100     = +amountEl.dataset.c100;
   const f100     = +amountEl.dataset.f100;
 
+  const timeVal = document.getElementById('efl-time').value || item.time || '';
   log[meal][idx] = {
     ...item,
     amount,
+    time:    timeVal,
     cal:     Math.round(cal100 * amount / 100),
     protein: Math.round(p100   * amount / 100),
     carb:    Math.round(c100   * amount / 100),
