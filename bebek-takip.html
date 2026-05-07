@@ -1,1736 +1,733 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="light" data-gender="girl">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bebek Gelişim Takibi</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<title>Bebek Takip Uygulaması</title>
 <style>
-/* ===== CSS VARIABLES ===== */
-:root {
-  --ff-display: 'Fredoka One', cursive;
-  --ff-body: 'Nunito', sans-serif;
-  --radius: 20px;
-  --radius-sm: 12px;
-  --radius-xs: 8px;
-  --transition: 0.25s ease;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f6fa;--bg2:#fff;--bg3:#eef0f5;--text:#1a1a2e;--text2:#444;--text3:#888;
+  --border:#e0e4ef;--accent:#7C6FDE;--accent2:#5CB8B2;--accent3:#F4845F;--accent4:#E8A838;
+  --card:#fff;--nav:#fff;--navborder:#e8eaf5;--shadow:0 2px 12px rgba(0,0,0,.07);
 }
-
-/* GIRL THEME */
-[data-gender="girl"] {
-  --p1: #FF6B9D; --p2: #E91E8C; --p3: #C2185B;
-  --p1-l: #FFE0EE; --p1-ll: #FFF5F9;
-  --p-grad: linear-gradient(135deg, #FF6B9D 0%, #E91E8C 100%);
-  --p-grad-soft: linear-gradient(135deg, #FFD6E8 0%, #FFAED2 100%);
-  --accent: #FF6B9D; --accent2: #9C27B0;
-  --icon: '👧';
+.dark{
+  --bg:#0f1117;--bg2:#171a24;--bg3:#1e2130;--text:#e8eaf5;--text2:#aab;--text3:#778;
+  --border:#2a2d3e;--card:#1a1d2a;--nav:#141620;--navborder:#252840;--shadow:0 2px 12px rgba(0,0,0,.3);
 }
-
-/* BOY THEME */
-[data-gender="boy"] {
-  --p1: #2196F3; --p2: #1565C0; --p3: #0D47A1;
-  --p1-l: #E3F2FD; --p1-ll: #F0F8FF;
-  --p-grad: linear-gradient(135deg, #42A5F5 0%, #1565C0 100%);
-  --p-grad-soft: linear-gradient(135deg, #BBDEFB 0%, #90CAF9 100%);
-  --accent: #2196F3; --accent2: #00BCD4;
-  --icon: '👦';
-}
-
-/* LIGHT MODE */
-[data-theme="light"] {
-  --bg: #FAFAFA; --bg2: #FFFFFF; --bg3: #F5F5F5;
-  --text: #1A1A2E; --text2: #555; --text3: #999;
-  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
-  --shadow: 0 2px 16px rgba(0,0,0,0.07);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-  --nav-bg: #FFFFFF; --card-bg: #FFFFFF;
-  --input-bg: #F8F8F8;
-  --modal-bg: rgba(0,0,0,0.45);
-}
-
-/* DARK MODE */
-[data-theme="dark"] {
-  --bg: #0F0F1A; --bg2: #1A1A2E; --bg3: #22223A;
-  --text: #F0F0FF; --text2: #AAA; --text3: #666;
-  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
-  --shadow: 0 2px 16px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
-  --nav-bg: #1A1A2E; --card-bg: #1E1E32;
-  --input-bg: #252540;
-  --modal-bg: rgba(0,0,0,0.7);
-}
-
-/* ===== RESET & BASE ===== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--ff-body);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  transition: background var(--transition), color var(--transition);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ===== PROFILE SCREEN ===== */
-#profileScreen {
-  min-height: 100vh;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-}
-
-.ps-header {
-  background: var(--p-grad);
-  padding: 40px 20px 60px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.ps-header::before {
-  content: '';
-  position: absolute; top: -50px; right: -50px;
-  width: 200px; height: 200px; border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-}
-.ps-header::after {
-  content: '';
-  position: absolute; bottom: -40px; left: -30px;
-  width: 150px; height: 150px; border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-}
-.ps-title {
-  font-family: var(--ff-display);
-  font-size: 28px; color: white;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  position: relative; z-index: 1;
-}
-.ps-sub { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 6px; z-index:1; position:relative; }
-
-.ps-body { padding: 20px; flex: 1; }
-.ps-section-title {
-  font-family: var(--ff-display);
-  font-size: 16px; color: var(--p2);
-  margin: 16px 0 10px;
-}
-
-.profile-list { display: flex; flex-direction: column; gap: 10px; }
-.profile-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all var(--transition);
-}
-.profile-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--p1); }
-.profile-avatar {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--p-grad);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; flex-shrink: 0;
-  border: 3px solid var(--p1-l);
-}
-.profile-info { flex: 1; }
-.profile-name { font-weight: 800; font-size: 16px; color: var(--text); }
-.profile-meta { font-size: 12px; color: var(--text2); margin-top: 3px; }
-.profile-del {
-  background: none; border: none; font-size: 18px; cursor: pointer;
-  opacity: 0.4; transition: opacity 0.2s; padding: 4px;
-}
-.profile-del:hover { opacity: 0.9; }
-.add-profile-btn {
-  background: var(--p-grad);
-  color: white; border: none; border-radius: var(--radius);
-  padding: 14px; font-family: var(--ff-body); font-size: 15px;
-  font-weight: 800; cursor: pointer; width: 100%; margin-top: 14px;
-  transition: opacity 0.2s, transform 0.1s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.add-profile-btn:hover { opacity: 0.9; }
-.add-profile-btn:active { transform: scale(0.98); }
-
-/* ===== TOP BAR ===== */
-#appScreen { display: none; flex-direction: column; min-height: 100vh; }
-
-.topbar {
-  background: var(--p-grad);
-  padding: 14px 16px 12px;
-  display: flex; align-items: center; gap: 12px;
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
-}
-.tb-back {
-  background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
-  width: 36px; height: 36px; color: white; font-size: 18px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-}
-.tb-back:hover { background: rgba(255,255,255,0.3); }
-.tb-avatar {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; border: 2px solid rgba(255,255,255,0.5);
-  animation: float 3s ease-in-out infinite; flex-shrink: 0;
-}
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-.tb-info { flex: 1; }
-.tb-name { font-family: var(--ff-display); font-size: 18px; color: white; }
-.tb-age { font-size: 11px; color: rgba(255,255,255,0.85); margin-top: 1px; }
-.tb-actions { display: flex; gap: 8px; }
-.tb-btn {
-  background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
-  width: 36px; height: 36px; color: white; font-size: 16px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-}
-.tb-btn:hover { background: rgba(255,255,255,0.35); }
-
-/* ===== NAV TABS ===== */
-.nav {
-  display: flex; gap: 4px; padding: 10px 12px 0;
-  background: var(--nav-bg); border-bottom: 1px solid var(--border);
-  overflow-x: auto; position: sticky; top: 70px; z-index: 99;
-  box-shadow: var(--shadow);
-}
-.nav::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 7px 12px; border-radius: 30px; font-size: 12px; font-weight: 800;
-  cursor: pointer; white-space: nowrap; border: none;
-  background: transparent; color: var(--text2); transition: all 0.2s;
-  display: flex; align-items: center; gap: 4px; font-family: var(--ff-body);
-}
-.tab.active { background: var(--p1-l); color: var(--p2); }
-.tab:hover:not(.active) { background: var(--bg3); }
-
-/* ===== PAGES ===== */
-.page { display: none; padding: 14px; animation: fadeIn 0.3s ease; }
-.page.active { display: block; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-/* ===== SECTION TITLE ===== */
-.sec-title {
-  font-family: var(--ff-display);
-  font-size: 16px; color: var(--p2);
-  margin: 14px 0 8px;
-  display: flex; align-items: center; gap: 7px;
-}
-
-/* ===== CARDS ===== */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-  transition: background var(--transition), box-shadow var(--transition);
-}
-
-/* ===== GROWTH SUMMARY ===== */
-.growth-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.g-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-sm);
-  padding: 14px 8px;
-  box-shadow: var(--shadow);
-  text-align: center;
-  border: 1px solid var(--border);
-  transition: transform 0.2s;
-}
-.g-card:hover { transform: translateY(-2px); }
-.g-card .ico { font-size: 24px; margin-bottom: 4px; }
-.g-card .val { font-family: var(--ff-display); font-size: 20px; color: var(--text); }
-.g-card .unt { font-size: 10px; color: var(--text2); font-weight: 700; }
-.g-card .lbl { font-size: 10px; color: var(--text3); margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.g-card.c1 { border-top: 3px solid var(--p1); }
-.g-card.c2 { border-top: 3px solid #00BCD4; }
-.g-card.c3 { border-top: 3px solid #4CAF50; }
-.g-card.c4 { border-top: 3px solid #FF9800; }
-.g-card.c5 { border-top: 3px solid #9C27B0; }
-
-/* ===== FORM ELEMENTS ===== */
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.form-row.r3 { grid-template-columns: 1fr 1fr 1fr; }
-.fg { display: flex; flex-direction: column; gap: 4px; }
-.fg label { font-size: 11px; font-weight: 800; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; }
-.fg input, .fg select, .fg textarea {
-  border: 1.5px solid var(--border2);
-  border-radius: var(--radius-xs);
-  padding: 9px 11px;
-  font-size: 13px;
-  font-family: var(--ff-body);
-  background: var(--input-bg);
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  width: 100%;
-}
-.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--p1); }
-.fg textarea { resize: vertical; min-height: 60px; }
-
-.btn-primary {
-  background: var(--p-grad);
-  color: white; border: none;
-  border-radius: var(--radius-sm);
-  padding: 11px 18px;
-  font-family: var(--ff-body); font-weight: 800; font-size: 14px;
-  cursor: pointer; width: 100%;
-  transition: opacity 0.2s, transform 0.1s;
-}
-.btn-primary:hover { opacity: 0.9; }
-.btn-primary:active { transform: scale(0.98); }
-
-.btn-sm {
-  background: var(--p1-l); color: var(--p2);
-  border: none; border-radius: 20px;
-  padding: 5px 12px; font-size: 12px; font-weight: 800;
-  cursor: pointer; font-family: var(--ff-body);
-  transition: background 0.2s;
-}
-.btn-sm:hover { background: var(--p1); color: white; }
-
-/* ===== HISTORY ITEM ===== */
-.hist-item {
-  background: var(--card-bg);
-  border-radius: var(--radius-sm); padding: 12px 14px;
-  margin-bottom: 8px; box-shadow: var(--shadow);
-  display: flex; align-items: center; gap: 12px;
-  border: 1px solid var(--border);
-  animation: slideIn 0.3s ease;
-  transition: background var(--transition);
-}
-@keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
-.hi-icon { font-size: 20px; flex-shrink: 0; }
-.hi-info { flex: 1; min-width: 0; }
-.hi-vals { font-weight: 700; font-size: 13px; color: var(--text); }
-.hi-date { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.del-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: 0.35; transition: opacity 0.2s; padding: 4px; }
-.del-btn:hover { opacity: 0.9; }
-
-/* ===== VACCINE ITEMS ===== */
-.vac-item {
-  background: var(--card-bg);
-  border-radius: var(--radius-sm); padding: 13px 14px;
-  margin-bottom: 7px; box-shadow: var(--shadow);
-  display: flex; align-items: center; gap: 12px;
-  cursor: pointer; border: 1px solid var(--border);
-  transition: all 0.15s;
-}
-.vac-item:hover { transform: translateX(3px); border-color: var(--p1); }
-.vac-check {
-  width: 30px; height: 30px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
-}
-.vac-check.done { background: #DCFCE7; color: #15803D; }
-.vac-check.pending { background: var(--bg3); color: var(--text3); border: 2px dashed var(--border2); }
-.vac-check.overdue { background: #FEE2E2; color: #DC2626; }
-.vac-name { font-weight: 800; font-size: 13px; color: var(--text); }
-.vac-detail { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.vac-badge {
-  font-size: 10px; font-weight: 800; padding: 3px 9px;
-  border-radius: 20px; margin-left: auto; white-space: nowrap; flex-shrink: 0;
-}
-.b-done { background: #DCFCE7; color: #15803D; }
-.b-pending { background: #DBEAFE; color: #1D4ED8; }
-.b-overdue { background: #FEE2E2; color: #DC2626; }
-
-/* ===== MILESTONE ===== */
-.mile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.mile-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-sm); padding: 12px;
-  box-shadow: var(--shadow); cursor: pointer;
-  border: 1.5px solid var(--border);
-  transition: all 0.2s; position: relative; overflow: hidden;
-}
-.mile-card:hover { transform: translateY(-2px); border-color: var(--p1); }
-.mile-card.done { border-color: #22C55E; }
-.mile-card.done::after {
-  content: '✓'; position: absolute; top: 8px; right: 10px;
-  width: 20px; height: 20px; border-radius: 50%; background: #22C55E;
-  color: white; font-size: 11px; display: flex; align-items: center; justify-content: center;
-  font-weight: 800; line-height: 20px; text-align: center;
-}
-.mile-emoji { font-size: 26px; margin-bottom: 5px; display: block; }
-.mile-name { font-weight: 800; font-size: 12px; color: var(--text); line-height: 1.3; }
-.mile-desc { font-size: 10px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
-.mile-date { font-size: 10px; color: var(--p1); font-weight: 800; margin-top: 5px; }
-
-/* ===== TEETH ===== */
-.teeth-diagram {
-  background: var(--card-bg);
-  border-radius: var(--radius); padding: 16px;
-  box-shadow: var(--shadow); margin-bottom: 12px;
-  border: 1px solid var(--border);
-}
-.jaw { display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; }
-.tooth {
-  width: 32px; height: 40px; border-radius: 6px 6px 10px 10px;
-  background: var(--bg3); border: 2px solid var(--border2);
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-  cursor: pointer; transition: all 0.2s; font-size: 8px; color: var(--text3);
-  font-weight: 800; text-align: center; line-height: 1.1; padding: 2px;
-  position: relative;
-}
-.tooth:hover { border-color: var(--p1); transform: scale(1.1); z-index: 2; }
-.tooth.erupted { background: linear-gradient(135deg, #DCFCE7, #BBF7D0); border-color: #22C55E; color: #15803D; }
-.tooth.fallen { background: linear-gradient(135deg, #FEF9C3, #FDE68A); border-color: #F59E0B; color: #92400E; }
-.tooth.erupted::before { content: '✦'; position: absolute; top: -7px; font-size: 9px; color: #22C55E; }
-.jaw-label { text-align: center; font-size: 10px; font-weight: 800; color: var(--text3); margin: 5px 0 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-.gum-sep { border-top: 3px solid #FDA4AF; margin: 5px 16px; border-radius: 2px; }
-.legend { display: flex; gap: 12px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
-.leg-item { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: var(--text2); }
-.leg-dot { width: 12px; height: 12px; border-radius: 3px; }
-
-/* ===== SOLID FOOD ===== */
-.food-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.food-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-sm); padding: 10px 8px;
-  box-shadow: var(--shadow); text-align: center;
-  cursor: pointer; border: 1.5px solid var(--border);
-  transition: all 0.2s; position: relative;
-}
-.food-card:hover { border-color: var(--p1); transform: translateY(-1px); }
-.food-card.tried { border-color: #22C55E; }
-.food-card.allergic { border-color: #EF4444; background: #FFF1F0; }
-.food-card.intolerant { border-color: #F59E0B; background: #FFFBEB; }
-[data-theme="dark"] .food-card.allergic { background: #2D0A0A; }
-[data-theme="dark"] .food-card.intolerant { background: #2A1F00; }
-.food-emoji { font-size: 24px; display: block; margin-bottom: 4px; }
-.food-name { font-size: 10px; font-weight: 800; color: var(--text); }
-.food-status { font-size: 9px; margin-top: 2px; font-weight: 700; }
-.food-card.tried .food-status { color: #15803D; }
-.food-card.allergic .food-status { color: #DC2626; }
-.food-card.intolerant .food-status { color: #D97706; }
-.food-card .tick {
-  position: absolute; top: 4px; right: 5px;
-  font-size: 11px;
-}
-.food-cat-title {
-  font-size: 12px; font-weight: 800; color: var(--text2);
-  margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.5px;
-  display: flex; align-items: center; gap: 5px;
-}
-
-/* ===== ALLERGY SUMMARY ===== */
-.allergy-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.a-tag {
-  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800;
-  display: flex; align-items: center; gap: 4px;
-}
-.a-tag.allergic { background: #FEE2E2; color: #DC2626; }
-.a-tag.intolerant { background: #FEF3C7; color: #D97706; }
-.a-tag.safe { background: #DCFCE7; color: #15803D; }
-[data-theme="dark"] .a-tag.allergic { background: #3D0000; color: #F87171; }
-[data-theme="dark"] .a-tag.intolerant { background: #2D1B00; color: #FBBF24; }
-[data-theme="dark"] .a-tag.safe { background: #002D0F; color: #4ADE80; }
-
-/* ===== MEMORIES ===== */
-.memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.mem-add-btn {
-  aspect-ratio: 1; border-radius: var(--radius-sm);
-  border: 2px dashed var(--p1); background: var(--p1-ll);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--p1); font-size: 11px; font-weight: 800; gap: 4px;
-  transition: all 0.2s;
-}
-.mem-add-btn:hover { background: var(--p1-l); }
-.mem-add-btn .plus { font-size: 22px; }
-.mem-card {
-  aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden;
-  position: relative; background: var(--p-grad-soft);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 30px; cursor: pointer;
-  border: 1.5px solid transparent; transition: border-color 0.2s;
-}
-.mem-card:hover { border-color: var(--p1); }
-.mem-label {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.52); color: white;
-  font-size: 8px; padding: 3px 5px; font-weight: 800; line-height: 1.3;
-}
-
-/* ===== PROGRESS BAR ===== */
-.prog-wrap { margin: 12px 0; }
-.prog-lbl { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--text2); margin-bottom: 5px; }
-.prog-bar { height: 9px; border-radius: 10px; background: var(--bg3); overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 10px; background: var(--p-grad); transition: width 0.8s cubic-bezier(.36,.07,.19,.97); }
-
-/* ===== MODAL ===== */
-.modal-bg {
-  display: none; position: fixed; inset: 0;
-  background: var(--modal-bg); z-index: 500;
-  align-items: center; justify-content: center; padding: 16px;
-}
-.modal-bg.show { display: flex; }
-.modal {
-  background: var(--card-bg); border-radius: 24px; padding: 22px;
-  width: 100%; max-width: 360px;
-  animation: popIn 0.28s cubic-bezier(.36,.07,.19,.97);
-  position: relative; max-height: 90vh; overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-}
-@keyframes popIn { from{transform:scale(0.82);opacity:0} to{transform:scale(1);opacity:1} }
-.modal h3 { font-family: var(--ff-display); font-size: 19px; color: var(--p2); margin-bottom: 14px; padding-right: 30px; }
-.modal-close {
-  position: absolute; top: 16px; right: 16px;
-  background: var(--bg3); border: none; border-radius: 50%;
-  width: 28px; height: 28px; cursor: pointer; color: var(--text2);
-  font-size: 14px; display: flex; align-items: center; justify-content: center;
-}
-
-/* ===== THEME PICKER ===== */
-.theme-section { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.theme-btn {
-  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border2);
-  background: var(--bg3); color: var(--text); font-family: var(--ff-body);
-  font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.theme-btn.active { border-color: var(--p1); background: var(--p1-l); color: var(--p2); }
-
-/* ===== EMPTY STATE ===== */
-.empty { text-align: center; padding: 28px 16px; color: var(--text3); }
-.empty .emo { font-size: 40px; margin-bottom: 8px; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-.empty p { font-size: 13px; }
-
-/* ===== MINI CHART ===== */
-.chart-wrap { background: var(--card-bg); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border); }
-
-/* ===== TOAST ===== */
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--text); color: var(--bg); padding: 11px 20px;
-  border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 600;
-  transition: transform 0.4s cubic-bezier(.36,.07,.19,.97); white-space: nowrap;
-  box-shadow: var(--shadow-lg);
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-/* ===== CONFETTI ===== */
-canvas.confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
-
-/* ===== CHECKLIST ITEM ===== */
-.check-item {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-  background: var(--card-bg); border-radius: var(--radius-sm);
-  margin-bottom: 6px; box-shadow: var(--shadow); cursor: pointer;
-  border: 1.5px solid var(--border); transition: all 0.15s;
-}
-.check-item:hover { border-color: var(--p1); }
-.check-box {
-  width: 22px; height: 22px; border-radius: 6px;
-  border: 2px solid var(--border2); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; font-size: 12px;
-}
-.check-box.checked { background: var(--p-grad); border-color: var(--p1); color: white; }
-.check-label { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
-.check-label.checked { text-decoration: line-through; opacity: 0.5; }
-
-/* ===== DIVIDER ===== */
-.divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-
-/* ===== BADGE ===== */
-.badge {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800;
-}
-.badge.green { background: #DCFCE7; color: #15803D; }
-.badge.red { background: #FEE2E2; color: #DC2626; }
-.badge.yellow { background: #FEF9C3; color: #92400E; }
-.badge.blue { background: #DBEAFE; color: #1D4ED8; }
-[data-theme="dark"] .badge.green { background: #002D0F; color: #4ADE80; }
-[data-theme="dark"] .badge.red { background: #2D0000; color: #F87171; }
-[data-theme="dark"] .badge.yellow { background: #2A1800; color: #FCD34D; }
-[data-theme="dark"] .badge.blue { background: #001A2D; color: #60A5FA; }
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--p1); border-radius: 4px; opacity: 0.5; }
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;font-size:14px}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.header{background:var(--nav);border-bottom:1px solid var(--navborder);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:300;box-shadow:var(--shadow);gap:10px}
+.logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 3px 10px rgba(124,111,222,.35)}
+.profile-bar{display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;scrollbar-width:none;min-width:0}
+.profile-bar::-webkit-scrollbar{display:none}
+.profile-chip{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 7px;border-radius:30px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .2s;white-space:nowrap;font-size:13px;font-weight:600;color:var(--text2);flex-shrink:0;user-select:none}
+.profile-chip:hover{border-color:var(--accent);background:var(--bg2)}
+.profile-chip.active{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(124,111,222,.4)}
+.chip-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.add-profile-btn{width:32px;height:32px;border-radius:50%;border:2px dashed var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text3);transition:all .2s;flex-shrink:0}
+.add-profile-btn:hover{border-color:var(--accent);color:var(--accent)}
+.header-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 11px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .2s;font-weight:500;white-space:nowrap}
+.theme-btn:hover{background:var(--border)}
+.import-btn{background:var(--accent);border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font-size:12px;color:#fff;font-weight:600;transition:all .2s;box-shadow:0 3px 10px rgba(124,111,222,.35);white-space:nowrap}
+.import-btn:hover{opacity:.9}
+.profile-banner{padding:10px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.banner-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.banner-name{font-size:15px;font-weight:700;color:var(--text)}
+.banner-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.banner-actions{display:flex;gap:7px;margin-left:auto}
+.banner-btn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 11px;cursor:pointer;font-size:12px;color:var(--text2);font-weight:500;transition:all .2s}
+.banner-btn:hover{border-color:var(--accent);color:var(--accent)}
+.banner-btn.danger:hover{border-color:#ef4444;color:#ef4444}
+.nav{background:var(--nav);border-bottom:1px solid var(--navborder);padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-item{padding:13px 14px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;user-select:none}
+.nav-item:hover{color:var(--text2)}
+.nav-item.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{flex:1;padding:20px;max-width:1140px;margin:0 auto;width:100%}
+.section{display:none;animation:fadeIn .25s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow)}
+.stat-card{padding:15px 17px}
+.stat-card .label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+.stat-card .value{font-size:30px;font-weight:700;line-height:1}
+.stat-card .sub{font-size:12px;color:var(--text3);margin-top:5px}
+.section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px}
+.chart-wrap{position:relative;width:100%;height:280px}
+.chart-sm{position:relative;width:100%;height:210px}
+.list-item{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
+.list-item:last-child{border-bottom:none}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-purple{background:#ede9fc;color:#5b21b6}.dark .badge-purple{background:#312e81;color:#c4b5fd}
+.badge-teal{background:#d1fae5;color:#065f46}.dark .badge-teal{background:#064e3b;color:#6ee7b7}
+.badge-orange{background:#fff7ed;color:#c2410c}.dark .badge-orange{background:#431407;color:#fdba74}
+.badge-blue{background:#eff6ff;color:#1d4ed8}.dark .badge-blue{background:#1e3a5f;color:#93c5fd}
+.badge-pink{background:#fdf2f8;color:#9d174d}.dark .badge-pink{background:#4a0428;color:#f9a8d4}
+.badge-green{background:#d1fae5;color:#065f46}.dark .badge-green{background:#064e3b;color:#6ee7b7}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.progress-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.tooth-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:6px 0}
+.tooth{width:100%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:transform .2s;cursor:default}
+.tooth:hover{transform:scale(1.1)}
+.tooth.out{background:#d1fae5;color:#065f46;border:1.5px solid #6ee7b7}
+.dark .tooth.out{background:#064e3b;color:#6ee7b7;border-color:#065f46}
+.tooth.fell{background:#ffe4e6;color:#be123c;border:1.5px solid #fca5a5}
+.dark .tooth.fell{background:#4c0519;color:#fda4af;border-color:#be123c}
+.tooth.empty{background:var(--bg2);color:var(--text3);border:1.5px dashed var(--border)}
+.tabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg3);color:var(--text2);border:1px solid var(--border);transition:all .2s;font-weight:500}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 3px 8px rgba(124,111,222,.3)}
+.mini-table{width:100%;font-size:13px;border-collapse:collapse}
+.mini-table th{text-align:left;color:var(--text3);font-weight:600;font-size:11px;padding:9px 7px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
+.mini-table td{padding:10px 7px;border-bottom:1px solid var(--border);color:var(--text2)}
+.mini-table tr:last-child td{border-bottom:none}
+.mini-table tr:hover td{background:var(--bg3)}
+.mini-table .val{font-weight:700;color:var(--text)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-icon{font-size:42px;margin-bottom:12px;opacity:.7}
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px}
+.form-input,.form-select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-size:14px;outline:none;transition:border .2s;font-family:inherit}
+.form-input:focus,.form-select:focus{border-color:var(--accent);background:var(--card)}
+textarea.form-input{resize:vertical;min-height:70px}
+.submit-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:all .2s;box-shadow:0 4px 12px rgba(124,111,222,.3);font-family:inherit}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px)}
+.log-item{padding:9px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.log-item:last-child{border-bottom:none}
+.color-strip{width:4px;height:32px;border-radius:2px;flex-shrink:0}
+.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.page-header h2{font-size:18px;font-weight:700;color:var(--text)}
+/* NO PROFILE */
+.no-profile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;text-align:center;padding:40px}
+.no-profile-icon{font-size:70px;margin-bottom:20px;animation:bounce 2s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.no-profile h2{font-size:22px;font-weight:700;margin-bottom:10px}
+.no-profile p{font-size:14px;color:var(--text3);margin-bottom:28px;max-width:340px;line-height:1.7}
+.big-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(124,111,222,.4);transition:all .2s;font-family:inherit}
+.big-btn:hover{opacity:.9;transform:translateY(-2px)}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;animation:ovIn .2s}
+.overlay.hidden{display:none}
+@keyframes ovIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--card);border-radius:16px;padding:26px;width:420px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:mdIn .22s ease}
+@keyframes mdIn{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+.modal h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:18px}
+.emoji-picker{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-bottom:14px}
+.emoji-opt{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.emoji-opt:hover,.emoji-opt.sel{border-color:var(--accent);background:var(--bg2);transform:scale(1.1)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.color-opt{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s}
+.color-opt:hover,.color-opt.sel{border-color:var(--text);transform:scale(1.15)}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.mbtn{flex:1;padding:10px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
+.mbtn.primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(124,111,222,.3)}
+.mbtn.primary:hover{opacity:.9}
+.mbtn.secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.mbtn.secondary:hover{background:var(--border)}
+.mbtn.del{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.dark .mbtn.del{background:#4c0519;color:#fda4af;border-color:#be123c}
+.mbtn.del:hover{background:#fca5a5}
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- ===================== PROFILE SCREEN ===================== -->
-<div id="profileScreen">
-  <div class="ps-header">
-    <div class="ps-title">👶 Bebek Gelişim</div>
-    <div class="ps-sub">Bebeğinizin her anını kaydedin</div>
-  </div>
-  <div class="ps-body">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="ps-section-title" style="margin:0">Bebekler</div>
-      <div style="display:flex;gap:8px">
-        <button class="theme-btn" id="modeTogglePs" onclick="toggleMode()" style="padding:6px 12px;font-size:12px">🌙 Karanlık</button>
-      </div>
-    </div>
-    <div class="profile-list" id="profileList"></div>
-    <button class="add-profile-btn" onclick="openAddProfileModal()">
-      <span>＋</span> Yeni Bebek Ekle
-    </button>
+<div class="header">
+  <div class="logo"><div class="logo-icon">👶</div>Bebek Takip</div>
+  <div class="profile-bar" id="profileBar"></div>
+  <div class="header-right">
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Karanlık</button>
+    <label class="import-btn" for="xlsxInput">📂 Excel Yükle</label>
+    <input type="file" id="xlsxInput" accept=".xlsx,.xls" style="display:none" onchange="loadExcel(event)">
   </div>
 </div>
 
-<!-- ===================== APP SCREEN ===================== -->
-<div id="appScreen">
-  <div class="topbar">
-    <button class="tb-back" onclick="goToProfiles()">←</button>
-    <div class="tb-avatar" id="tbAvatar">👶</div>
-    <div class="tb-info">
-      <div class="tb-name" id="tbName">Bebek</div>
-      <div class="tb-age" id="tbAge">Yaş yükleniyor...</div>
-    </div>
-    <div class="tb-actions">
-      <button class="tb-btn" onclick="toggleMode()" id="modeToggleApp" title="Mod Değiştir">🌙</button>
-      <button class="tb-btn" onclick="showPage('settings')" title="Ayarlar">⚙️</button>
-    </div>
+<div class="profile-banner" id="profileBanner" style="display:none">
+  <div class="banner-avatar" id="bannerAvatar"></div>
+  <div>
+    <div class="banner-name" id="bannerName">—</div>
+    <div class="banner-sub" id="bannerSub">Veri yüklenmedi</div>
   </div>
-
-  <div class="nav">
-    <button class="tab active" onclick="showPage('growth')" data-tab="growth">📏 Büyüme</button>
-    <button class="tab" onclick="showPage('vaccines')" data-tab="vaccines">💉 Aşılar</button>
-    <button class="tab" onclick="showPage('milestones')" data-tab="milestones">⭐ Gelişim</button>
-    <button class="tab" onclick="showPage('teeth')" data-tab="teeth">🦷 Dişler</button>
-    <button class="tab" onclick="showPage('food')" data-tab="food">🥣 Katı Gıda</button>
-    <button class="tab" onclick="showPage('memories')" data-tab="memories">📸 Anılar</button>
-    <button class="tab" onclick="showPage('settings')" data-tab="settings">⚙️ Ayarlar</button>
+  <div class="banner-actions">
+    <button class="banner-btn" onclick="openEditModal()">✏️ Düzenle</button>
+    <button class="banner-btn danger" onclick="confirmDelete()">🗑️ Sil</button>
   </div>
+</div>
 
-  <!-- GROWTH PAGE -->
-  <div class="page active" id="page-growth">
-    <div class="growth-grid">
-      <div class="g-card c1"><div class="ico">📏</div><div class="val" id="lastH">--</div><div class="unt">cm</div><div class="lbl">Boy</div></div>
-      <div class="g-card c2"><div class="ico">⚖️</div><div class="val" id="lastW">--</div><div class="unt">kg</div><div class="lbl">Kilo</div></div>
-      <div class="g-card c3"><div class="ico">🎯</div><div class="val" id="lastHd">--</div><div class="unt">cm</div><div class="lbl">Baş</div></div>
-    </div>
-    <div class="chart-wrap" id="chartWrap">
-      <div class="sec-title" style="margin-top:0">📈 Kilo Grafiği</div>
-      <canvas id="miniChart" height="120" style="width:100%;display:none"></canvas>
-      <div id="noChart" class="empty" style="padding:12px 0"><div class="emo">📊</div><p>Ölçüm ekleyince grafik oluşur</p></div>
-    </div>
+<div class="nav" id="mainNav" style="display:none">
+  <div class="nav-item active" onclick="showSec('dashboard',this)">📊 Genel Bakış</div>
+  <div class="nav-item" onclick="showSec('gelisim',this)">📏 Büyüme</div>
+  <div class="nav-item" onclick="showSec('kontrol',this)">🏥 Kontroller</div>
+  <div class="nav-item" onclick="showSec('asi',this)">💉 Aşılar</div>
+  <div class="nav-item" onclick="showSec('dis',this)">🦷 Dişler</div>
+  <div class="nav-item" onclick="showSec('gunluk',this)">📖 Günlük</div>
+  <div class="nav-item" onclick="showSec('giris',this)">✏️ Veri Giriş</div>
+</div>
+
+<div class="main" id="mainContent">
+
+<div id="noProfileState" class="no-profile">
+  <div class="no-profile-icon">👶</div>
+  <h2>Bebek Profili Ekleyin</h2>
+  <p>Başlamak için bir profil oluşturun. Her bebek için ayrı profil ekleyebilir, profiller arasında kolayca geçiş yapabilirsiniz.</p>
+  <button class="big-btn" onclick="openAddModal()">+ Yeni Profil Oluştur</button>
+</div>
+
+<div id="dashboard" class="section" style="display:none">
+  <div class="page-header mb20"><h2 id="babyTitle">Genel Bakış</h2><div style="font-size:12px;color:var(--text3)" id="dataStatus">Excel yüklenmedi</div></div>
+  <div class="grid4 mb20">
+    <div class="card stat-card"><div class="label" style="color:var(--accent)">📏 Son Boy</div><div class="value" id="lastHeight" style="color:var(--accent)">—</div><div class="sub" id="lastHeightDate">Veri yok</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent2)">⚖️ Son Kilo</div><div class="value" id="lastWeight" style="color:var(--accent2)">—</div><div class="sub" id="lastWeightDate">Veri yok</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent3)">💉 Aşı</div><div class="value" id="totalVaccines" style="color:var(--accent3)">—</div><div class="sub">Uygulanan</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent4)">🏥 Ziyaret</div><div class="value" id="totalVisits" style="color:var(--accent4)">—</div><div class="sub">Toplam</div></div>
+  </div>
+  <div class="grid2 mb20">
+    <div class="card"><div class="section-title">📈 Boy & Kilo Gelişimi</div><div class="chart-wrap"><canvas id="dashGrowthChart" role="img">Boy ve kilo verileri.</canvas></div></div>
     <div class="card">
-      <div class="sec-title" style="margin-top:0">➕ Yeni Ölçüm</div>
-      <div class="form-row">
-        <div class="fg"><label>Tarih</label><input type="date" id="mDate"></div>
-        <div class="fg"><label>Boy (cm)</label><input type="number" id="mH" placeholder="56"></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Kilo (kg)</label><input type="number" id="mW" step="0.01" placeholder="4.2"></div>
-        <div class="fg"><label>Baş (cm)</label><input type="number" id="mHd" placeholder="36"></div>
-      </div>
-      <button class="btn-primary" onclick="addMeasurement()">📏 Ölçümü Kaydet</button>
-    </div>
-    <div class="sec-title">📋 Geçmiş</div>
-    <div id="measureList"></div>
-  </div>
-
-  <!-- VACCINES PAGE -->
-  <div class="page" id="page-vaccines">
-    <div class="prog-wrap">
-      <div class="prog-lbl"><span>Aşı Takvimi</span><span id="vacProg">0 / 0</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="vacBar" style="width:0%"></div></div>
-    </div>
-    <div id="vaccineList"></div>
-  </div>
-
-  <!-- MILESTONES PAGE -->
-  <div class="page" id="page-milestones">
-    <div class="prog-wrap">
-      <div class="prog-lbl"><span>Kilometre Taşları</span><span id="mileProg">0 / 0</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="mileBar" style="width:0%"></div></div>
-    </div>
-    <div id="mileCats"></div>
-  </div>
-
-  <!-- TEETH PAGE -->
-  <div class="page" id="page-teeth">
-    <div class="sec-title">🦷 Diş Haritası</div>
-    <div class="teeth-diagram">
-      <div class="jaw-label">Üst Çene</div>
-      <div class="jaw" id="upperJaw"></div>
-      <div class="gum-sep"></div>
-      <div style="border-bottom:3px solid #FDA4AF;margin:2px 16px 5px;border-radius:2px"></div>
-      <div class="jaw" id="lowerJaw"></div>
-      <div class="jaw-label">Alt Çene</div>
-      <div class="legend">
-        <div class="leg-item"><div class="leg-dot" style="background:#BBF7D0;border:1.5px solid #22C55E"></div>Çıktı</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#FDE68A;border:1.5px solid #F59E0B"></div>Düştü</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--bg3);border:1.5px solid var(--border2)"></div>Bekleniyor</div>
+      <div class="section-title">🦷 Diş Haritası</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Üst Dişler</div>
+      <div class="tooth-grid" id="dashUpperTeeth"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">Alt Dişler</div>
+      <div class="tooth-grid" id="dashLowerTeeth"></div>
+      <div style="margin-top:10px;display:flex;gap:12px;font-size:11px;color:var(--text3)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#d1fae5;border:1.5px solid #6ee7b7;border-radius:3px;display:inline-block"></span>Çıkmış</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#ffe4e6;border:1.5px solid #fca5a5;border-radius:3px;display:inline-block"></span>Düşmüş</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--bg3);border:1.5px dashed var(--border);border-radius:3px;display:inline-block"></span>Bekl.</span>
       </div>
     </div>
-    <div class="sec-title">📋 Diş Kayıtları</div>
-    <div id="toothLog"></div>
   </div>
-
-  <!-- FOOD PAGE -->
-  <div class="page" id="page-food">
-    <div class="prog-wrap">
-      <div class="prog-lbl"><span>Denenen Gıdalar</span><span id="foodProg">0 / 0</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="foodBar" style="width:0%"></div></div>
-    </div>
-
-    <!-- Allergy summary -->
-    <div class="card" id="allergySummaryCard">
-      <div class="sec-title" style="margin-top:0">⚠️ Alerji / İntolerans Özeti</div>
-      <div id="allergySummary"><div class="empty" style="padding:8px 0"><p>Henüz kayıt yok</p></div></div>
-    </div>
-
-    <!-- Food list log -->
-    <div class="card">
-      <div class="sec-title" style="margin-top:0">📝 Gıda Günlüğü</div>
-      <button class="btn-primary" onclick="openAddFoodModal()" style="margin-bottom:10px">＋ Gıda Dene / Kaydet</button>
-      <div id="foodLog"></div>
-    </div>
-
-    <div class="sec-title">🛒 Gıda Listesi</div>
-    <div style="margin-bottom:8px">
-      <input type="text" id="foodSearch" placeholder="🔍 Gıda ara..." oninput="renderFoodGrid()" style="width:100%;border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:var(--ff-body);background:var(--input-bg);color:var(--text);outline:none">
-    </div>
-    <div id="foodGrid"></div>
-  </div>
-
-  <!-- MEMORIES PAGE -->
-  <div class="page" id="page-memories">
-    <div class="sec-title">📸 Özel Anlar</div>
-    <div class="memory-grid">
-      <div class="mem-add-btn" onclick="openMemModal()"><div class="plus">＋</div>Anı Ekle</div>
-      <div id="memoryGrid" style="display:contents"></div>
-    </div>
-  </div>
-
-  <!-- SETTINGS PAGE -->
-  <div class="page" id="page-settings">
-    <div class="sec-title">👶 Bebek Bilgileri</div>
-    <div class="card">
-      <div class="fg" style="margin-bottom:10px"><label>İsim</label><input type="text" id="setName" placeholder="Bebeğin adı"></div>
-      <div class="form-row">
-        <div class="fg"><label>Doğum Tarihi</label><input type="date" id="setBirth"></div>
-        <div class="fg"><label>Cinsiyet</label>
-          <select id="setGender">
-            <option value="girl">👧 Kız</option>
-            <option value="boy">👦 Erkek</option>
-          </select>
-        </div>
-      </div>
-      <button class="btn-primary" onclick="saveSettings()">💾 Kaydet</button>
-    </div>
-
-    <div class="sec-title">🎨 Tema</div>
-    <div class="card">
-      <div class="theme-section">
-        <button class="theme-btn" id="lightBtn" onclick="setMode('light')">☀️ Aydınlık</button>
-        <button class="theme-btn" id="darkBtn" onclick="setMode('dark')">🌙 Karanlık</button>
-      </div>
-    </div>
-
-    <div class="sec-title">🗑️ Tehlikeli Bölge</div>
-    <div class="card">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Bu bebeğe ait tüm veriler silinir. Bu işlem geri alınamaz.</p>
-      <button onclick="deleteCurrentProfile()" style="background:#EF4444;color:white;border:none;border-radius:var(--radius-sm);padding:11px 18px;font-family:var(--ff-body);font-size:14px;font-weight:800;cursor:pointer;width:100%">🗑️ Bu Profili Sil</button>
-    </div>
-  </div>
+  <div class="card"><div class="section-title">📅 Son Etkinlikler</div><div id="recentEvents"><div class="empty-state"><div class="empty-icon">📂</div><div style="font-weight:600;margin-bottom:6px">Excel Dosyası Yükleyin</div><div style="font-size:13px">Sağ üstteki "Excel Yükle" butonuna tıklayın.</div></div></div></div>
 </div>
 
-<!-- ===================== MODALS ===================== -->
+<div id="gelisim" class="section" style="display:none">
+  <div class="page-header mb20"><h2>📏 Büyüme & Gelişim</h2></div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],0,this)">Boy & Kilo</div>
+    <div class="tab" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],1,this)">Baş Çevresi</div>
+    <div class="tab" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],2,this)">Tablo</div>
+  </div>
+  <div id="gBoyKilo">
+    <div class="card mb16"><div class="section-title">📏 Boy Gelişimi</div><div class="chart-wrap" style="height:300px"><canvas id="heightChart" role="img">Boy verileri.</canvas></div></div>
+    <div class="card"><div class="section-title">⚖️ Kilo Gelişimi</div><div class="chart-wrap" style="height:300px"><canvas id="weightChart" role="img">Kilo verileri.</canvas></div></div>
+  </div>
+  <div id="gBas" style="display:none"><div class="card"><div class="section-title">🔵 Baş Çevresi</div><div class="chart-wrap" style="height:320px"><canvas id="headChart" role="img">Baş verileri.</canvas></div></div></div>
+  <div id="gTablo" style="display:none"><div class="card" style="overflow-x:auto"><table class="mini-table"><thead><tr><th>Tarih</th><th>Yaş</th><th>Boy cm</th><th>Kilo kg</th><th>Baş cm</th><th>Hastane</th></tr></thead><tbody id="gelisimTbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Veri bekleniyor...</td></tr></tbody></table></div></div>
+</div>
 
-<!-- ADD PROFILE MODAL -->
-<div class="modal-bg" id="addProfileModal">
+<div id="kontrol" class="section" style="display:none">
+  <div class="page-header mb20"><h2>🏥 Doktor Ziyaretleri</h2></div>
+  <div class="grid2 mb16">
+    <div class="card stat-card"><div class="label">🏨 En Çok Gidilen</div><div id="topHospital" style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-top:4px">—</div></div>
+    <div class="card stat-card"><div class="label">👨‍⚕️ En Çok Görülen</div><div id="topDoctor" style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-top:4px">—</div></div>
+  </div>
+  <div class="card mb16"><div class="section-title">📊 Aylık Ziyaretler</div><div class="chart-sm"><canvas id="visitChart" role="img">Ziyaret verileri.</canvas></div></div>
+  <div class="card"><div class="section-title">📋 Ziyaret Listesi</div><div id="kontrolList"><div class="empty-state" style="padding:20px">Veri bekleniyor...</div></div></div>
+</div>
+
+<div id="asi" class="section" style="display:none">
+  <div class="page-header mb20"><h2>💉 Aşı Takvimi</h2></div>
+  <div class="grid3 mb16">
+    <div class="card stat-card"><div class="label" style="color:#059669">✅ Uygulanan</div><div class="value" id="doneVax" style="color:#059669">0</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent4)">⏳ Bekleyen</div><div class="value" id="pendingVax" style="color:var(--accent4)">0</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent)">📊 Tamamlama</div><div class="value" id="vaxPct" style="color:var(--accent)">0%</div><div class="progress-bar"><div class="progress-fill" id="vaxBar" style="width:0%;background:var(--accent)"></div></div></div>
+  </div>
+  <div class="card"><div class="section-title">💉 Aşı Listesi</div><div id="asiList"><div class="empty-state" style="padding:20px">Veri bekleniyor...</div></div></div>
+</div>
+
+<div id="dis" class="section" style="display:none">
+  <div class="page-header mb20"><h2>🦷 Diş Gelişimi</h2></div>
+  <div class="grid2 mb16">
+    <div class="card stat-card"><div class="label" style="color:var(--accent2)">🌱 Çıkan</div><div class="value" id="teethOut" style="color:var(--accent2)">0</div></div>
+    <div class="card stat-card"><div class="label" style="color:var(--accent3)">🍂 Düşen</div><div class="value" id="teethFell" style="color:var(--accent3)">0</div></div>
+  </div>
+  <div class="grid2 mb16">
+    <div class="card"><div class="section-title">🦷 Üst Dişler</div><div id="upperTeethDetail"></div></div>
+    <div class="card"><div class="section-title">🦷 Alt Dişler</div><div id="lowerTeethDetail"></div></div>
+  </div>
+  <div class="card"><div class="section-title">🍂 Düşen Dişler</div><div id="fellTeethDetail"></div></div>
+</div>
+
+<div id="gunluk" class="section" style="display:none">
+  <div class="page-header mb20"><h2>📖 Günlük Anılar</h2></div>
+  <div class="card"><div id="gunlukList"><div class="empty-state"><div class="empty-icon">📝</div><div style="font-weight:600;margin-bottom:6px">Anılar burada görünecek</div></div></div></div>
+</div>
+
+<div id="giris" class="section" style="display:none">
+  <div class="page-header mb20"><h2>✏️ Yeni Kayıt Ekle</h2></div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchGirisTab('fBoy',this)">📏 Boy & Kilo</div>
+    <div class="tab" onclick="switchGirisTab('fKontrol',this)">🏥 Kontrol</div>
+    <div class="tab" onclick="switchGirisTab('fGunluk',this)">📖 Anı</div>
+    <div class="tab" onclick="switchGirisTab('fAsi',this)">💉 Aşı</div>
+  </div>
+  <div id="fBoy" class="card mb16">
+    <div class="section-title">📏 Büyüme Ölçümü</div>
+    <div class="grid2"><div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="gTarih"></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="gHastane" placeholder="Hastane adı"></div></div>
+    <div class="grid3"><div class="form-group"><label class="form-label">Boy (cm)</label><input type="number" class="form-input" id="gBoy" placeholder="75.5" step="0.1"></div><div class="form-group"><label class="form-label">Kilo (kg)</label><input type="number" class="form-input" id="gKilo" placeholder="9.2" step="0.01"></div><div class="form-group"><label class="form-label">Baş (cm)</label><input type="number" class="form-input" id="gBas" placeholder="43.0" step="0.1"></div></div>
+    <div class="form-group"><label class="form-label">Not</label><textarea class="form-input" id="gNot" placeholder="Ek notlar..."></textarea></div>
+    <button class="submit-btn" onclick="addGrowthRecord()">+ Ölçüm Ekle</button>
+  </div>
+  <div id="fKontrol" class="card mb16" style="display:none">
+    <div class="section-title">🏥 Doktor Ziyareti</div>
+    <div class="grid2"><div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="kTarih"></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="kHastane" placeholder="Hastane adı"></div></div>
+    <div class="grid2"><div class="form-group"><label class="form-label">Doktor</label><input type="text" class="form-input" id="kDoktor" placeholder="Dr. Adı Soyadı"></div><div class="form-group"><label class="form-label">Teşhis / Neden</label><input type="text" class="form-input" id="kTeshis" placeholder="Rutin kontrol..."></div></div>
+    <div class="form-group"><label class="form-label">Notlar</label><textarea class="form-input" id="kNot" placeholder="Muayene notları..."></textarea></div>
+    <button class="submit-btn" onclick="addVisitRecord()">+ Ziyaret Ekle</button>
+  </div>
+  <div id="fGunluk" class="card mb16" style="display:none">
+    <div class="section-title">📖 Anı Kaydet</div>
+    <div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="anTarih"></div>
+    <div class="form-group"><label class="form-label">Başlık *</label><input type="text" class="form-input" id="anBaslik" placeholder="İlk adımını attım..."></div>
+    <div class="form-group"><label class="form-label">Detay</label><textarea class="form-input" id="anDetay" placeholder="Bu anıyı anlat..."></textarea></div>
+    <button class="submit-btn" onclick="addMemory()">+ Anı Ekle</button>
+  </div>
+  <div id="fAsi" class="card mb16" style="display:none">
+    <div class="section-title">💉 Aşı Kaydı</div>
+    <div class="grid2"><div class="form-group"><label class="form-label">Tarih</label><input type="date" class="form-input" id="aTarih"></div><div class="form-group"><label class="form-label">Aşı Adı *</label><input type="text" class="form-input" id="aAdi" placeholder="KKK, DaBT-IPA..."></div></div>
+    <div class="grid2"><div class="form-group"><label class="form-label">Doz</label><select class="form-select" id="aDoz"><option>I. Doz</option><option>II. Doz</option><option>III. Doz</option><option>R (Rapel)</option></select></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="aHastane" placeholder="Uygulama yeri"></div></div>
+    <div class="form-group"><label class="form-label">Not</label><input type="text" class="form-input" id="aNot" placeholder="Ek bilgi..."></div>
+    <button class="submit-btn" onclick="addVaccine()">+ Aşı Ekle</button>
+  </div>
+  <div class="card"><div class="section-title">📋 Son Eklenen Kayıtlar</div><div id="logList"><div class="empty-state" style="padding:16px">Henüz kayıt yok</div></div></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- MODAL: Profil -->
+<div class="overlay hidden" id="profileModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('addProfileModal')">✕</button>
-    <h3>👶 Yeni Bebek Ekle</h3>
-    <div class="fg" style="margin-bottom:10px"><label>İsim</label><input type="text" id="npName" placeholder="Bebeğin adı"></div>
-    <div class="form-row">
-      <div class="fg"><label>Doğum Tarihi</label><input type="date" id="npBirth"></div>
-      <div class="fg"><label>Cinsiyet</label>
-        <select id="npGender">
-          <option value="girl">👧 Kız</option>
-          <option value="boy">👦 Erkek</option>
-        </select>
-      </div>
+    <h3 id="modalTitle">Yeni Bebek Profili</h3>
+    <div class="form-group"><label class="form-label">Bebeğin Adı *</label><input type="text" class="form-input" id="pName" placeholder="Adını girin..."></div>
+    <div class="form-group"><label class="form-label">Doğum Tarihi</label><input type="date" class="form-input" id="pBirth"></div>
+    <div class="form-group"><label class="form-label">Emoji</label><div class="emoji-picker" id="emojiPicker"></div></div>
+    <div class="form-group"><label class="form-label">Renk</label><div class="color-row" id="colorPicker"></div></div>
+    <div class="modal-actions">
+      <button class="mbtn secondary" onclick="closeModal('profileModal')">İptal</button>
+      <button class="mbtn primary" onclick="saveProfile()" id="savePBtn">Oluştur</button>
     </div>
-    <button class="btn-primary" onclick="addProfile()">✅ Profil Oluştur</button>
   </div>
 </div>
 
-<!-- VACCINE MODAL -->
-<div class="modal-bg" id="vacModal">
+<!-- MODAL: Sil -->
+<div class="overlay hidden" id="deleteModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('vacModal')">✕</button>
-    <h3 id="vacModalTitle">Aşı</h3>
-    <div id="vacModalBody"></div>
-  </div>
-</div>
-
-<!-- MILESTONE MODAL -->
-<div class="modal-bg" id="mileModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('mileModal')">✕</button>
-    <h3 id="mileModalTitle">Gelişim</h3>
-    <div id="mileModalBody"></div>
-  </div>
-</div>
-
-<!-- TOOTH MODAL -->
-<div class="modal-bg" id="toothModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('toothModal')">✕</button>
-    <h3 id="toothModalTitle">Diş</h3>
-    <div id="toothModalBody"></div>
-  </div>
-</div>
-
-<!-- FOOD MODAL (detail) -->
-<div class="modal-bg" id="foodModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('foodModal')">✕</button>
-    <h3 id="foodModalTitle">Gıda</h3>
-    <div id="foodModalBody"></div>
-  </div>
-</div>
-
-<!-- ADD FOOD MODAL -->
-<div class="modal-bg" id="addFoodModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('addFoodModal')">✕</button>
-    <h3>🥣 Gıda Kaydet</h3>
-    <div class="fg" style="margin-bottom:10px"><label>Gıda Adı</label><input type="text" id="afName" placeholder="Havuç, elma, pirinç..."></div>
-    <div class="fg" style="margin-bottom:10px"><label>Emoji</label>
-      <div id="afEmojiPicker" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
+    <h3>Profili Sil</h3>
+    <p style="color:var(--text2);margin-bottom:20px;line-height:1.6"><strong id="delName"></strong> profilini ve tüm verilerini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+    <div class="modal-actions">
+      <button class="mbtn secondary" onclick="closeModal('deleteModal')">İptal</button>
+      <button class="mbtn del" onclick="deleteProfile()">Evet, Sil</button>
     </div>
-    <div class="fg" style="margin-bottom:10px"><label>İlk Deneme Tarihi</label><input type="date" id="afDate"></div>
-    <div class="fg" style="margin-bottom:10px"><label>Reaksiyon</label>
-      <select id="afReaction">
-        <option value="ok">✅ Normal — Sorunsuz</option>
-        <option value="allergic">🚨 Alerji Reaksiyonu</option>
-        <option value="intolerant">⚠️ İntolerans / Hassasiyet</option>
-        <option value="disliked">😖 Sevmedi</option>
-        <option value="liked">😋 Çok Sevdi</option>
-      </select>
-    </div>
-    <div class="fg" style="margin-bottom:14px"><label>Not</label><textarea id="afNote" placeholder="Reaksiyon detayları, miktar, vb..."></textarea></div>
-    <button class="btn-primary" onclick="saveNewFood()">💾 Kaydet</button>
   </div>
 </div>
 
-<!-- MEMORY MODAL -->
-<div class="modal-bg" id="memModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('memModal')">✕</button>
-    <h3>📸 Anı Ekle</h3>
-    <div class="fg" style="margin-bottom:10px"><label>Başlık</label><input type="text" id="memTitle" placeholder="İlk adım, ilk gülüş..."></div>
-    <div class="fg" style="margin-bottom:10px"><label>Tarih</label><input type="date" id="memDate"></div>
-    <div class="fg" style="margin-bottom:14px"><label>Emoji Seç</label>
-      <div id="memEmojiPicker" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
-    </div>
-    <button class="btn-primary" onclick="saveMemory()">💾 Kaydet</button>
-  </div>
-</div>
-
-<!-- TOAST & CONFETTI -->
-<div class="toast" id="toast"></div>
-<canvas class="confetti" id="confettiCanvas"></canvas>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-// ========================= DATA =========================
-const VACCINES = [
-  {id:'v1',name:'Hepatit B (1. Doz)',age:'Doğumda',month:0,desc:'Hepatit B virüsüne karşı koruma. Doğumda yapılır.'},
-  {id:'v2',name:'BCG (Verem)',age:'2. ay',month:2,desc:'Tüberküloz hastalığına karşı koruma.'},
-  {id:'v3',name:'Hepatit B (2. Doz)',age:'2. ay',month:2,desc:'2. doz Hepatit B aşısı.'},
-  {id:'v4',name:'DBT-İPA-Hib-HepB (1. Doz)',age:'2. ay',month:2,desc:'Difteri, Boğmaca, Tetanoz, Polio, Hib, Hepatit B kombine.'},
-  {id:'v5',name:'Pnömokok (1. Doz)',age:'2. ay',month:2,desc:'Pnömokok hastalıklarına karşı koruma.'},
-  {id:'v6',name:'DBT-İPA-Hib-HepB (2. Doz)',age:'4. ay',month:4,desc:'2. doz kombine aşı.'},
-  {id:'v7',name:'Pnömokok (2. Doz)',age:'4. ay',month:4,desc:'2. doz Pnömokok aşısı.'},
-  {id:'v8',name:'DBT-İPA-Hib-HepB (3. Doz)',age:'6. ay',month:6,desc:'3. doz kombine aşı.'},
-  {id:'v9',name:'Pnömokok (3. Doz)',age:'6. ay',month:6,desc:'3. doz Pnömokok aşısı.'},
-  {id:'v10',name:'Hepatit B (3. Doz)',age:'6. ay',month:6,desc:'3. doz Hepatit B.'},
-  {id:'v11',name:'Suçiçeği',age:'12. ay',month:12,desc:'Suçiçeği hastalığına karşı koruma.'},
-  {id:'v12',name:'KKK (1. Doz)',age:'12. ay',month:12,desc:'Kızamık, Kızamıkçık, Kabakulak.'},
-  {id:'v13',name:'Hepatit A (1. Doz)',age:'18. ay',month:18,desc:'Hepatit A virüsüne karşı koruma.'},
-  {id:'v14',name:'DBT-İPA Rapel',age:'18. ay',month:18,desc:'Rapel dozu.'},
-  {id:'v15',name:'Hepatit A (2. Doz)',age:'24. ay',month:24,desc:'2. doz Hepatit A aşısı.'},
-  {id:'v16',name:'KKK (2. Doz)',age:'4-6 yaş',month:48,desc:'2. doz KKK aşısı.'},
-];
+/* ===== GLOBALS ===== */
+var isDark=false,charts={};
+var profiles={},activeId=null,editingId=null;
+var selEmoji='👶',selColor='#7C6FDE';
+var EMOJIS=['👶','🌸','🌟','🐣','🦋','🌈','🐥','🍀','🎀','🌙','☀️','❤️','🐧','🐰','🦊','🐻'];
+var COLORS=['#7C6FDE','#5CB8B2','#F4845F','#E8A838','#EC4899','#10B981','#3B82F6','#8B5CF6','#F97316','#06B6D4'];
 
-const MILESTONES = [
-  {cat:'🗣️ Dil & İletişim', items:[
-    {id:'m1',name:'İlk ses çıkarma',emoji:'🔊',desc:'Agulama başlar',target:'1-2 ay'},
-    {id:'m2',name:'İlk gülümseme',emoji:'😊',desc:'Sosyal gülümseme',target:'6-8 hafta'},
-    {id:'m3',name:'Sesli gülme',emoji:'😄',desc:'Güldüğünde ses çıkarır',target:'3-4 ay'},
-    {id:'m4',name:'İsmine dönme',emoji:'👂',desc:'Adı seslenilince döner',target:'5-6 ay'},
-    {id:'m5',name:'İlk hece (ba-ba)',emoji:'💬',desc:'ba-ba, ma-ma heceleri',target:'6-9 ay'},
-    {id:'m6',name:'"Anne" demek',emoji:'👩',desc:'Anne kelimesini söyler',target:'9-12 ay'},
-    {id:'m7',name:'"Baba" demek',emoji:'👨',desc:'Baba kelimesini söyler',target:'9-12 ay'},
-    {id:'m8',name:'3 anlamlı kelime',emoji:'💡',desc:'3 kelime söyler',target:'12-15 ay'},
-    {id:'m9',name:'10 kelime',emoji:'📢',desc:'10+ kelime söyler',target:'18 ay'},
-    {id:'m10',name:'2 kelimelik cümle',emoji:'💬',desc:'İki kelimeyi birleştirir',target:'18-24 ay'},
-  ]},
-  {cat:'🏃 Motor Gelişim', items:[
-    {id:'m11',name:'Baş tutma',emoji:'💪',desc:'Başını dik tutar',target:'3-4 ay'},
-    {id:'m12',name:'Sırtüstü / yüzüstü dönme',emoji:'🔄',desc:'Dönerek yatma',target:'4-6 ay'},
-    {id:'m13',name:'Desteksiz oturma',emoji:'🪑',desc:'Yardımsız oturur',target:'6-8 ay'},
-    {id:'m14',name:'Emekleme',emoji:'🐾',desc:'Emeklemeye başlar',target:'7-10 ay'},
-    {id:'m15',name:'Tutunarak ayakta durma',emoji:'🧍',desc:'Bir yere tutunarak ayakta',target:'8-10 ay'},
-    {id:'m16',name:'İlk adım',emoji:'👣',desc:'İlk adımını atar',target:'9-12 ay'},
-    {id:'m17',name:'Bağımsız yürüme',emoji:'🚶',desc:'Desteksiz yürür',target:'12-15 ay'},
-    {id:'m18',name:'Merdiven çıkma',emoji:'🪜',desc:'Merdiveni tırmanır',target:'18-24 ay'},
-    {id:'m19',name:'Koşma',emoji:'🏃',desc:'Koşmaya başlar',target:'18-24 ay'},
-  ]},
-  {cat:'🧠 Bilişsel Gelişim', items:[
-    {id:'m20',name:'Nesne takibi',emoji:'👀',desc:'Hareket eden nesneyi izler',target:'1-2 ay'},
-    {id:'m21',name:'Yüz tanıma',emoji:'😍',desc:'Anne-babayı tanır',target:'2-3 ay'},
-    {id:'m22',name:'El-ağız koordinasyon',emoji:'✋',desc:'Elini ağzına götürür',target:'3-4 ay'},
-    {id:'m23',name:'Nesne kalıcılığı',emoji:'🎁',desc:'Saklanan nesneyi arar',target:'8-10 ay'},
-    {id:'m24',name:'İşaret etme',emoji:'☝️',desc:'İstediğini parmakla gösterir',target:'10-12 ay'},
-    {id:'m25',name:'Sıralama & kule yapma',emoji:'🧱',desc:'Blokları üst üste koyar',target:'15-18 ay'},
-  ]},
-  {cat:'🤝 Sosyal & Duygusal', items:[
-    {id:'m26',name:'Göz teması',emoji:'👁️',desc:'Gözlere bakarak iletişim',target:'1-2 ay'},
-    {id:'m27',name:'Ayna sevinci',emoji:'🪞',desc:'Aynada kendine güler',target:'4-6 ay'},
-    {id:'m28',name:'Yabancı kaygısı',emoji:'😟',desc:'Yabancılara karşı çekingen',target:'6-9 ay'},
-    {id:'m29',name:'El sallama',emoji:'👋',desc:'Hoşça kal el sallar',target:'9-12 ay'},
-    {id:'m30',name:'Alkış yapma',emoji:'👏',desc:'Ellerini çırpar',target:'9-12 ay'},
-  ]},
-];
-
-const TEETH_DATA = [
-  {id:'u1',abbr:'MK',name:'Üst Orta Kesici',jaw:'upper',eruptAge:'8-12 ay'},
-  {id:'u2',abbr:'YK',name:'Üst Yan Kesici',jaw:'upper',eruptAge:'9-13 ay'},
-  {id:'u3',abbr:'KP',name:'Üst Köpek',jaw:'upper',eruptAge:'16-22 ay'},
-  {id:'u4',abbr:'1A',name:'Üst 1. Azı',jaw:'upper',eruptAge:'13-19 ay'},
-  {id:'u5',abbr:'2A',name:'Üst 2. Azı',jaw:'upper',eruptAge:'25-33 ay'},
-  {id:'u5b',abbr:'2A',name:'Üst 2. Azı',jaw:'upper',eruptAge:'25-33 ay'},
-  {id:'u4b',abbr:'1A',name:'Üst 1. Azı',jaw:'upper',eruptAge:'13-19 ay'},
-  {id:'u3b',abbr:'KP',name:'Üst Köpek',jaw:'upper',eruptAge:'16-22 ay'},
-  {id:'u2b',abbr:'YK',name:'Üst Yan Kesici',jaw:'upper',eruptAge:'9-13 ay'},
-  {id:'u1b',abbr:'MK',name:'Üst Orta Kesici',jaw:'upper',eruptAge:'8-12 ay'},
-  {id:'l1',abbr:'MK',name:'Alt Orta Kesici',jaw:'lower',eruptAge:'6-10 ay'},
-  {id:'l2',abbr:'YK',name:'Alt Yan Kesici',jaw:'lower',eruptAge:'10-16 ay'},
-  {id:'l3',abbr:'KP',name:'Alt Köpek',jaw:'lower',eruptAge:'17-23 ay'},
-  {id:'l4',abbr:'1A',name:'Alt 1. Azı',jaw:'lower',eruptAge:'14-18 ay'},
-  {id:'l5',abbr:'2A',name:'Alt 2. Azı',jaw:'lower',eruptAge:'23-31 ay'},
-  {id:'l5b',abbr:'2A',name:'Alt 2. Azı',jaw:'lower',eruptAge:'23-31 ay'},
-  {id:'l4b',abbr:'1A',name:'Alt 1. Azı',jaw:'lower',eruptAge:'14-18 ay'},
-  {id:'l3b',abbr:'KP',name:'Alt Köpek',jaw:'lower',eruptAge:'17-23 ay'},
-  {id:'l2b',abbr:'YK',name:'Alt Yan Kesici',jaw:'lower',eruptAge:'10-16 ay'},
-  {id:'l1b',abbr:'MK',name:'Alt Orta Kesici',jaw:'lower',eruptAge:'6-10 ay'},
-];
-
-const FOOD_CATEGORIES = [
-  {cat:'🥕 Sebzeler', items:[
-    {id:'f1',name:'Havuç',emoji:'🥕'},{id:'f2',name:'Patates',emoji:'🥔'},{id:'f3',name:'Kabak',emoji:'🥦'},
-    {id:'f4',name:'Bezelye',emoji:'🟢'},{id:'f5',name:'Ispanak',emoji:'🌿'},{id:'f6',name:'Brokoli',emoji:'🥦'},
-    {id:'f7',name:'Tatlı Patates',emoji:'🍠'},{id:'f8',name:'Soğan',emoji:'🧅'},{id:'f9',name:'Domates',emoji:'🍅'},
-    {id:'f10',name:'Salatalık',emoji:'🥒'},
-  ]},
-  {cat:'🍎 Meyveler', items:[
-    {id:'f11',name:'Elma',emoji:'🍎'},{id:'f12',name:'Armut',emoji:'🍐'},{id:'f13',name:'Muz',emoji:'🍌'},
-    {id:'f14',name:'Şeftali',emoji:'🍑'},{id:'f15',name:'Erik',emoji:'🫐'},{id:'f16',name:'Çilek',emoji:'🍓'},
-    {id:'f17',name:'Kivi',emoji:'🥝'},{id:'f18',name:'Kavun',emoji:'🍈'},{id:'f19',name:'Karpuz',emoji:'🍉'},
-    {id:'f20',name:'Üzüm',emoji:'🍇'},
-  ]},
-  {cat:'🌾 Tahıllar & Baklagiller', items:[
-    {id:'f21',name:'Pirinç',emoji:'🍚'},{id:'f22',name:'Yulaf',emoji:'🌾'},{id:'f23',name:'Buğday Unu',emoji:'🍞'},
-    {id:'f24',name:'Makarna',emoji:'🍝'},{id:'f25',name:'Mercimek',emoji:'🟤'},{id:'f26',name:'Nohut',emoji:'🟡'},
-    {id:'f27',name:'Fasulye',emoji:'🫘'},
-  ]},
-  {cat:'🥩 Et & Protein', items:[
-    {id:'f28',name:'Tavuk',emoji:'🍗'},{id:'f29',name:'Kırmızı Et',emoji:'🥩'},{id:'f30',name:'Balık',emoji:'🐟'},
-    {id:'f31',name:'Yumurta (Sarısı)',emoji:'🥚'},{id:'f32',name:'Yumurta (Tamamı)',emoji:'🍳'},
-  ]},
-  {cat:'🥛 Süt Ürünleri', items:[
-    {id:'f33',name:'Yoğurt',emoji:'🥛'},{id:'f34',name:'Peynir',emoji:'🧀'},{id:'f35',name:'Tereyağı',emoji:'🧈'},
-    {id:'f36',name:'İnek Sütü',emoji:'🐄'},
-  ]},
-  {cat:'🥜 Yaygın Alerjenler', items:[
-    {id:'f37',name:'Fıstık',emoji:'🥜'},{id:'f38',name:'Fındık',emoji:'🌰'},{id:'f39',name:'Susam',emoji:'🌱'},
-    {id:'f40',name:'Soya',emoji:'🫘'},{id:'f41',name:'Gluten',emoji:'🌾'},{id:'f42',name:'Kabuklu Deniz Ür.',emoji:'🦐'},
-  ]},
-];
-
-const MEM_EMOJIS = ['🌟','🎉','👣','💕','🎈','🌈','🍼','🦋','🌸','🎂','🎠','🌙','✨','🐣','💫','🎵','🦄','🌺','🥰','🎀','🏆','🎯','💎','🌻'];
-const FOOD_EMOJIS = ['🥣','🍎','🥕','🍌','🥦','🍑','🐟','🥚','🥛','🌾','🥩','🍗','🍠','🫐','🥝'];
-
-// ========================= STATE =========================
-let profiles = [];
-let currentProfileId = null;
-let selectedMemEmoji = '🌟';
-let selectedFoodEmoji = '🥣';
-
-function getCurrentProfile() {
-  return profiles.find(p => p.id === currentProfileId);
+/* ===== HELPERS ===== */
+function genId(){return 'p'+Date.now()+Math.random().toString(36).slice(2,5);}
+function esc(s){if(!s||s==='NaN'||s==='null'||s==='undefined')return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(d){if(!d)return'—';return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'});}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function parseDate(v){
+  if(!v)return null;
+  if(v instanceof Date&&!isNaN(v))return v;
+  if(typeof v==='number'){var d=new Date((v-25569)*86400*1000);return(d.getFullYear()>1990&&d.getFullYear()<2035)?d:null;}
+  if(typeof v==='string'){var d2=new Date(v);return(!isNaN(d2)&&d2.getFullYear()>1990&&d2.getFullYear()<2035)?d2:null;}
+  return null;
 }
+function normStr(s){return s.toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c');}
+function emptyState(){return{growth:[],visits:[],vaccines:[],teeth:{upper:[],lower:[],upperFell:[],lowerFell:[]},diary:[],logs:[]};}
+function destroyChart(id){if(charts[id]){try{charts[id].destroy();}catch(e){}delete charts[id];}}
 
-function getProfileData(key, def) {
-  const p = getCurrentProfile();
-  if (!p) return def;
-  if (p[key] === undefined) p[key] = def;
-  return p[key];
+/* ===== STORAGE ===== */
+function save(){
+  try{
+    var out={};
+    Object.keys(profiles).forEach(function(id){
+      var p=profiles[id];
+      out[id]={meta:p.meta,state:{
+        growth:p.state.growth.map(r=>({...r,date:r.date?r.date.toISOString():null})),
+        visits:p.state.visits.map(r=>({...r,date:r.date?r.date.toISOString():null})),
+        vaccines:p.state.vaccines.map(r=>({...r,date:r.date?r.date.toISOString():null})),
+        teeth:p.state.teeth,
+        diary:p.state.diary.map(r=>({...r,date:r.date?r.date.toISOString():null})),
+        logs:p.state.logs
+      }};
+    });
+    localStorage.setItem('bt_p',JSON.stringify(out));
+    localStorage.setItem('bt_a',activeId||'');
+    localStorage.setItem('bt_th',isDark?'1':'0');
+  }catch(e){}
 }
-
-function setProfileData(key, val) {
-  const p = getCurrentProfile();
-  if (p) { p[key] = val; saveAll(); }
-}
-
-// ========================= STORAGE =========================
-function saveAll() {
-  localStorage.setItem('bgProfiles', JSON.stringify(profiles));
-}
-
-function loadAll() {
-  const saved = localStorage.getItem('bgProfiles');
-  if (saved) {
-    try { profiles = JSON.parse(saved); } catch(e) { profiles = []; }
-  }
-  // Ensure each profile has all needed arrays
-  profiles.forEach(p => {
-    if (!p.measurements) p.measurements = [];
-    if (!p.vaccines) p.vaccines = VACCINES.map(v => ({...v, done:false, date:'', hospital:'', notes:''}));
-    if (!p.milestones) {
-      p.milestones = [];
-      MILESTONES.forEach(c => c.items.forEach(i => p.milestones.push({...i, done:false, date:'', notes:''})));
+function load(){
+  try{
+    var raw=localStorage.getItem('bt_p');
+    if(raw){
+      var saved=JSON.parse(raw);
+      Object.keys(saved).forEach(function(id){
+        var p=saved[id];
+        var dd=function(v){var d=parseDate(v);return d;};
+        profiles[id]={meta:p.meta,state:{
+          growth:(p.state.growth||[]).map(r=>({...r,date:dd(r.date)})),
+          visits:(p.state.visits||[]).map(r=>({...r,date:dd(r.date)})),
+          vaccines:(p.state.vaccines||[]).map(r=>({...r,date:dd(r.date)})),
+          teeth:p.state.teeth||{upper:[],lower:[],upperFell:[],lowerFell:[]},
+          diary:(p.state.diary||[]).map(r=>({...r,date:dd(r.date)})),
+          logs:p.state.logs||[]
+        }};
+      });
     }
-    if (!p.teeth) p.teeth = {};
-    if (!p.foods) p.foods = {};
-    if (!p.memories) p.memories = [];
-  });
+    var sa=localStorage.getItem('bt_a');
+    if(sa&&profiles[sa])activeId=sa;
+    else if(Object.keys(profiles).length)activeId=Object.keys(profiles)[0];
+    if(localStorage.getItem('bt_th')==='1'){isDark=true;document.body.classList.add('dark');document.getElementById('themeBtn').textContent='☀️ Açık Mod';}
+  }catch(e){}
+}
+function getP(){return activeId&&profiles[activeId]?profiles[activeId]:null;}
+function getSt(){var p=getP();return p?p.state:emptyState();}
+
+/* ===== PROFILE CRUD ===== */
+function createProfile(name,birth,emoji,color){
+  var id=genId();
+  profiles[id]={meta:{id,name,birth:birth||'',emoji:emoji||'👶',color:color||'#7C6FDE',dataStatus:'Excel yüklenmedi'},state:emptyState()};
+  save();return id;
+}
+function switchProfile(id){
+  activeId=id;save();
+  renderBar();renderBanner();
+  showNav();
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[0].classList.add('active');
+  showSec('dashboard',document.querySelectorAll('.nav-item')[0]);
+  renderAll();
 }
 
-// ========================= THEME =========================
-function setMode(mode) {
-  document.documentElement.setAttribute('data-theme', mode);
-  localStorage.setItem('bgTheme', mode);
-  updateModeButtons(mode);
+/* ===== MODAL ===== */
+function buildEmojiPicker(){
+  document.getElementById('emojiPicker').innerHTML=EMOJIS.map(e=>'<div class="emoji-opt'+(e===selEmoji?' sel':'')+'" onclick="pickEmoji(this,\''+e+'\')">'+e+'</div>').join('');
 }
-
-function toggleMode() {
-  const cur = document.documentElement.getAttribute('data-theme');
-  setMode(cur === 'dark' ? 'light' : 'dark');
+function buildColorPicker(){
+  document.getElementById('colorPicker').innerHTML=COLORS.map(c=>'<div class="color-opt'+(c===selColor?' sel':'')+'" style="background:'+c+'" onclick="pickColor(this,\''+c+'\')"></div>').join('');
 }
-
-function updateModeButtons(mode) {
-  const isDark = mode === 'dark';
-  const lb = document.getElementById('lightBtn');
-  const db = document.getElementById('darkBtn');
-  const mps = document.getElementById('modeTogglePs');
-  const map = document.getElementById('modeToggleApp');
-  if (lb) lb.classList.toggle('active', !isDark);
-  if (db) db.classList.toggle('active', isDark);
-  if (mps) mps.textContent = isDark ? '☀️ Aydınlık' : '🌙 Karanlık';
-  if (map) map.textContent = isDark ? '☀️' : '🌙';
+function pickEmoji(el,e){selEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}
+function pickColor(el,c){selColor=c;document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}
+function openAddModal(){
+  editingId=null;selEmoji='👶';selColor='#7C6FDE';
+  document.getElementById('modalTitle').textContent='Yeni Bebek Profili';
+  document.getElementById('savePBtn').textContent='Oluştur';
+  document.getElementById('pName').value='';document.getElementById('pBirth').value='';
+  buildEmojiPicker();buildColorPicker();
+  document.getElementById('profileModal').classList.remove('hidden');
 }
-
-function applyGender(gender) {
-  document.documentElement.setAttribute('data-gender', gender || 'girl');
+function openEditModal(){
+  var p=getP();if(!p)return;
+  editingId=activeId;selEmoji=p.meta.emoji;selColor=p.meta.color;
+  document.getElementById('modalTitle').textContent='Profili Düzenle';
+  document.getElementById('savePBtn').textContent='Kaydet';
+  document.getElementById('pName').value=p.meta.name;
+  document.getElementById('pBirth').value=p.meta.birth||'';
+  buildEmojiPicker();buildColorPicker();
+  document.getElementById('profileModal').classList.remove('hidden');
 }
-
-// ========================= PROFILES =========================
-function renderProfiles() {
-  const list = document.getElementById('profileList');
-  if (profiles.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="emo">👶</div><p>Henüz bebek profili oluşturulmadı</p></div>';
-    return;
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function saveProfile(){
+  var name=document.getElementById('pName').value.trim();
+  if(!name){document.getElementById('pName').focus();return;}
+  var birth=document.getElementById('pBirth').value;
+  if(editingId){
+    profiles[editingId].meta.name=name;profiles[editingId].meta.birth=birth;
+    profiles[editingId].meta.emoji=selEmoji;profiles[editingId].meta.color=selColor;
+    save();renderBar();renderBanner();
+  }else{
+    var id=createProfile(name,birth,selEmoji,selColor);
+    switchProfile(id);
   }
-  list.innerHTML = profiles.map(p => {
-    const age = calcAge(p.birth);
-    const isGirl = p.gender === 'girl';
-    const emo = isGirl ? '👧' : '👦';
-    return `<div class="profile-card" onclick="openProfile('${p.id}')">
-      <div class="profile-avatar" style="background:${isGirl ? 'linear-gradient(135deg,#FF6B9D,#E91E8C)' : 'linear-gradient(135deg,#42A5F5,#1565C0)'}">${emo}</div>
-      <div class="profile-info">
-        <div class="profile-name">${p.name}</div>
-        <div class="profile-meta">${isGirl ? 'Kız' : 'Erkek'} · ${age}</div>
-      </div>
-      <button class="profile-del" onclick="event.stopPropagation();deleteProfile('${p.id}')">🗑️</button>
-    </div>`;
-  }).join('');
+  closeModal('profileModal');
+}
+function confirmDelete(){
+  var p=getP();if(!p)return;
+  document.getElementById('delName').textContent=p.meta.name;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+function deleteProfile(){
+  if(!activeId)return;
+  delete profiles[activeId];
+  activeId=Object.keys(profiles)[0]||null;
+  save();closeModal('deleteModal');
+  renderBar();
+  if(activeId){renderBanner();showNav();renderAll();}
+  else{document.getElementById('profileBanner').style.display='none';document.getElementById('mainNav').style.display='none';document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById('noProfileState').style.display='flex';}
 }
 
-function calcAge(birth) {
-  if (!birth) return 'Tarih girilmedi';
-  const b = new Date(birth), now = new Date();
-  let months = (now.getFullYear() - b.getFullYear()) * 12 + now.getMonth() - b.getMonth();
-  if (months < 0) months = 0;
-  const days = Math.floor((now - b) / 86400000);
-  if (days < 0) return 'Tarih hatalı';
-  if (months < 1) return days + ' günlük';
-  if (months < 24) return months + ' aylık';
-  return Math.floor(months/12) + ' yaş ' + (months%12) + ' ay';
+/* ===== UI ===== */
+function renderBar(){
+  var bar=document.getElementById('profileBar');
+  bar.innerHTML=Object.keys(profiles).map(function(id){
+    var p=profiles[id],isA=id===activeId;
+    return'<div class="profile-chip'+(isA?' active':'')+'" onclick="switchProfile(\''+id+'\')">'+
+      '<div class="chip-avatar" style="background:'+(isA?'rgba(255,255,255,.2)':p.meta.color+'20')+';color:'+(isA?'#fff':p.meta.color)+'">'+p.meta.emoji+'</div>'+
+      esc(p.meta.name)+
+    '</div>';
+  }).join('')+'<button class="add-profile-btn" onclick="openAddModal()" title="Yeni profil">+</button>';
+}
+function renderBanner(){
+  var p=getP();if(!p)return;
+  document.getElementById('profileBanner').style.display='flex';
+  var av=document.getElementById('bannerAvatar');
+  av.textContent=p.meta.emoji;av.style.background=p.meta.color+'22';
+  document.getElementById('bannerName').textContent=p.meta.name;
+  var age='';
+  if(p.meta.birth){var b=new Date(p.meta.birth),now=new Date(),m=(now.getFullYear()-b.getFullYear())*12+now.getMonth()-b.getMonth(),y=Math.floor(m/12),rm=m%12;age=(y>0?y+' yaş ':'')+(rm>0?rm+' aylık':'')+' · ';}
+  document.getElementById('bannerSub').textContent=age+(p.meta.dataStatus||'Excel yüklenmedi');
+}
+function showNav(){
+  document.getElementById('mainNav').style.display='flex';
+  document.getElementById('profileBanner').style.display='flex';
+  document.getElementById('noProfileState').style.display='none';
+}
+function showSec(id,el){
+  document.querySelectorAll('.section').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  var s=document.getElementById(id);
+  if(s){s.style.display='block';requestAnimationFrame(()=>s.classList.add('active'));}
+  if(el)el.classList.add('active');
+}
+function switchTab(prefix,ids,idx,el){
+  document.querySelectorAll('#'+prefix+' .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ids.forEach((id,i)=>document.getElementById(id).style.display=i===idx?'block':'none');
+}
+function switchGirisTab(sid,el){
+  document.querySelectorAll('#giris .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['fBoy','fKontrol','fGunluk','fAsi'].forEach(id=>document.getElementById(id).style.display=id===sid?'block':'none');
+}
+function toggleTheme(){
+  isDark=!isDark;document.body.classList.toggle('dark',isDark);
+  document.getElementById('themeBtn').textContent=isDark?'☀️ Açık Mod':'🌙 Karanlık';
+  setTimeout(renderAll,100);save();
 }
 
-function openAddProfileModal() {
-  document.getElementById('npName').value = '';
-  document.getElementById('npBirth').value = '';
-  document.getElementById('npGender').value = 'girl';
-  document.getElementById('addProfileModal').classList.add('show');
-}
-
-function addProfile() {
-  const name = document.getElementById('npName').value.trim();
-  const birth = document.getElementById('npBirth').value;
-  const gender = document.getElementById('npGender').value;
-  if (!name) { showToast('⚠️ İsim girin'); return; }
-  const p = {
-    id: 'p_' + Date.now(),
-    name, birth, gender,
-    measurements: [],
-    vaccines: VACCINES.map(v => ({...v, done:false, date:'', hospital:'', notes:''})),
-    milestones: [],
-    teeth: {}, foods: {}, memories: []
+/* ===== EXCEL ===== */
+function loadExcel(e){
+  var f=e.target.files[0];if(!f)return;
+  var p=getP();if(!p){alert('Önce profil seçin');return;}
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var wb=XLSX.read(ev.target.result,{type:'binary'});
+      parseWB(wb,p.state);
+      p.meta.dataStatus='✅ '+f.name;
+      save();renderBanner();renderAll();
+    }catch(err){alert('Hata: '+err.message);}
   };
-  MILESTONES.forEach(c => c.items.forEach(i => p.milestones.push({...i, done:false, date:'', notes:''})));
-  profiles.push(p);
-  saveAll();
-  closeModal('addProfileModal');
-  renderProfiles();
-  showToast('🎉 Profil oluşturuldu!');
-  launchConfetti();
+  r.readAsBinaryString(f);e.target.value='';
 }
-
-function deleteProfile(id) {
-  if (!confirm('Bu profili silmek istiyor musunuz? Tüm veriler silinir.')) return;
-  profiles = profiles.filter(p => p.id !== id);
-  saveAll();
-  renderProfiles();
-  showToast('🗑️ Profil silindi');
-}
-
-function openProfile(id) {
-  currentProfileId = id;
-  const p = getCurrentProfile();
-  if (!p) return;
-  applyGender(p.gender);
-  document.getElementById('profileScreen').style.display = 'none';
-  const app = document.getElementById('appScreen');
-  app.style.display = 'flex';
-  updateTopBar();
-  showPage('growth');
-}
-
-function goToProfiles() {
-  currentProfileId = null;
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('profileScreen').style.display = 'flex';
-  document.documentElement.setAttribute('data-gender', 'girl');
-  renderProfiles();
-}
-
-function deleteCurrentProfile() {
-  if (!confirm('Bu bebek profilini ve tüm verilerini silmek istiyor musunuz?')) return;
-  profiles = profiles.filter(p => p.id !== currentProfileId);
-  saveAll();
-  goToProfiles();
-  showToast('🗑️ Profil silindi');
-}
-
-function updateTopBar() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  document.getElementById('tbName').textContent = (p.gender === 'girl' ? '🌸 ' : '🚀 ') + p.name;
-  document.getElementById('tbAge').textContent = calcAge(p.birth);
-  document.getElementById('tbAvatar').textContent = p.gender === 'girl' ? '👧' : '👦';
-}
-
-// ========================= NAVIGATION =========================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const pg = document.getElementById('page-' + id);
-  if (pg) pg.classList.add('active');
-  const tab = document.querySelector(`[data-tab="${id}"]`);
-  if (tab) tab.classList.add('active');
-  updateTopBar();
-  const renders = {
-    growth: renderMeasurements,
-    vaccines: renderVaccines,
-    milestones: renderMilestones,
-    teeth: renderTeeth,
-    food: renderFoodPage,
-    memories: renderMemories,
-    settings: loadSettings,
-  };
-  if (renders[id]) renders[id]();
-}
-
-// ========================= GROWTH =========================
-function addMeasurement() {
-  const date = document.getElementById('mDate').value;
-  const h = parseFloat(document.getElementById('mH').value);
-  const w = parseFloat(document.getElementById('mW').value);
-  const hd = parseFloat(document.getElementById('mHd').value);
-  if (!date) { showToast('⚠️ Tarih seçin'); return; }
-  if (isNaN(h) && isNaN(w) && isNaN(hd)) { showToast('⚠️ En az bir ölçüm girin'); return; }
-  const p = getCurrentProfile();
-  if (!p) return;
-  p.measurements.push({date, h: isNaN(h)?null:h, w: isNaN(w)?null:w, hd: isNaN(hd)?null:hd});
-  p.measurements.sort((a,b) => a.date < b.date ? -1 : 1);
-  saveAll();
-  renderMeasurements();
-  showToast('✅ Ölçüm kaydedildi!');
-  ['mH','mW','mHd'].forEach(id => document.getElementById(id).value = '');
-}
-
-function renderMeasurements() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  const m = p.measurements;
-  if (m.length === 0) {
-    document.getElementById('lastH').textContent = '--';
-    document.getElementById('lastW').textContent = '--';
-    document.getElementById('lastHd').textContent = '--';
-    document.getElementById('noChart').style.display = 'block';
-    document.getElementById('miniChart').style.display = 'none';
-    document.getElementById('measureList').innerHTML = '<div class="empty"><div class="emo">📏</div><p>Henüz ölçüm yok</p></div>';
-    return;
-  }
-  const last = m[m.length - 1];
-  document.getElementById('lastH').textContent = last.h ?? '--';
-  document.getElementById('lastW').textContent = last.w ?? '--';
-  document.getElementById('lastHd').textContent = last.hd ?? '--';
-  document.getElementById('noChart').style.display = 'none';
-  drawChart(m);
-  document.getElementById('measureList').innerHTML = [...m].reverse().map((item, i) => `
-    <div class="hist-item">
-      <div class="hi-icon">📋</div>
-      <div class="hi-info">
-        <div class="hi-vals">${item.h ? '📏 '+item.h+'cm ' : ''}${item.w ? '⚖️ '+item.w+'kg ' : ''}${item.hd ? '🎯 '+item.hd+'cm' : ''}</div>
-        <div class="hi-date">${fmtDate(item.date)}</div>
-      </div>
-      <button class="del-btn" onclick="delMeasurement(${m.length-1-i})">🗑️</button>
-    </div>`).join('');
-}
-
-function delMeasurement(idx) {
-  const p = getCurrentProfile();
-  if (!p) return;
-  p.measurements.splice(idx, 1);
-  saveAll();
-  renderMeasurements();
-  showToast('🗑️ Silindi');
-}
-
-function drawChart(data) {
-  const canvas = document.getElementById('miniChart');
-  const wData = data.filter(d => d.w !== null);
-  if (wData.length < 2) { canvas.style.display = 'none'; return; }
-  canvas.style.display = 'block';
-  const W = canvas.offsetWidth || 300, H = 120;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  const vals = wData.map(d => d.w);
-  const minV = Math.min(...vals), maxV = Math.max(...vals);
-  const pad = 28;
-  const color = document.documentElement.getAttribute('data-gender') === 'boy' ? '#2196F3' : '#FF6B9D';
-  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
-  ctx.beginPath();
-  wData.forEach((d, i) => {
-    const x = pad + (i/(wData.length-1))*(W-pad*2);
-    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
-    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  const grad = ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0, color.replace(')',',0.18)').replace('rgb','rgba'));
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  // Refill for area
-  ctx.beginPath();
-  wData.forEach((d,i) => {
-    const x = pad + (i/(wData.length-1))*(W-pad*2);
-    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
-    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-  });
-  const lastX = pad + (wData.length-1)/(wData.length-1)*(W-pad*2);
-  ctx.lineTo(lastX, H-pad/2);
-  ctx.lineTo(pad, H-pad/2);
-  ctx.closePath();
-  ctx.fillStyle = grad; ctx.fill();
-  wData.forEach((d,i) => {
-    const x = pad + (i/(wData.length-1))*(W-pad*2);
-    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
-    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fillStyle = color; ctx.fill();
-    ctx.fillStyle = document.documentElement.getAttribute('data-theme')==='dark'?'#F0F0FF':'#1A1A2E';
-    ctx.font = '9px Nunito'; ctx.textAlign = 'center';
-    ctx.fillText(d.w+'kg', x, y-8);
+function parseWB(wb,st){
+  wb.SheetNames.forEach(function(name){
+    var ws=wb.Sheets[name];var data=XLSX.utils.sheet_to_json(ws,{header:1});var n=normStr(name);
+    if(n==='gelisim')parseGrowth(data,st);
+    else if(n==='kontrol')parseKontrol(data,st);
+    else if(n==='asi')parseAsi(data,st);
+    else if(n==='dis')parseDis(data,st);
+    else if(n==='gunluk')parseGunluk(data,st);
   });
 }
+function parseGrowth(rows,st){
+  st.growth=[];
+  rows.forEach(function(r){if(!r||r.length<12)return;var d=parseDate(r[10]);if(!d)return;var h=parseFloat(r[11]),w=parseFloat(r[12]),hd=parseFloat(r[13]);if(!isNaN(w)||!isNaN(h))st.growth.push({date:d,height:isNaN(h)?null:h,weight:isNaN(w)?null:w,head:isNaN(hd)?null:hd,hospital:String(r[16]||''),age:String(r[15]||'')});});
+  st.growth.sort((a,b)=>a.date-b.date);
+}
+function parseKontrol(rows,st){
+  st.visits=[];
+  rows.forEach(function(r){if(!r||r.length<5)return;var d=parseDate(r[3]);if(!d)return;var h=String(r[4]||'').trim();if(h==='Hastane'||h==='NaN'||!h)return;st.visits.push({date:d,hospital:h,doctor:String(r[5]||''),diagnosis:String(r[6]||''),notes:String(r[7]||''),age:String(r[13]||'')});});
+  st.visits.sort((a,b)=>a.date-b.date);
+}
+function parseAsi(rows,st){
+  st.vaccines=[];
+  rows.forEach(function(r){if(!r||r.length<7)return;var s=String(r[5]||''),v=String(r[6]||'');if(v.length<2)return;if(s.includes('Uygulandı')||s.includes('Uygulanmadı'))st.vaccines.push({status:s,name:v,dose:String(r[7]||''),date:parseDate(r[8]),hospital:String(r[9]||''),note:String(r[10]||'')});});
+}
+function parseDis(rows,st){
+  st.teeth={upper:[],lower:[],upperFell:[],lowerFell:[]};var sec='';
+  var ns=['Merkez kesici','Yan kesici','Köpek dişi','1. Azıdişi','2. Azıdişi'];
+  rows.forEach(function(r){if(!r)return;var t=String(r[4]||'');if(t.includes('Üst dişler (Çıkma)'))sec='upper';else if(t.includes('Alt dişler (Çıkma)'))sec='lower';else if(t.includes('Üst dişler (Düşme)'))sec='upperFell';else if(t.includes('Alt dişler (Düşme)'))sec='lowerFell';if(ns.includes(t.trim())&&sec)st.teeth[sec].push({name:t.trim(),right:parseDate(r[6]),left:parseDate(r[8])});});
+}
+function parseGunluk(rows,st){
+  st.diary=[];
+  rows.forEach(function(r){if(!r||!r[1])return;var d=parseDate(r[1]);if(!d)return;var ev=String(r[2]||'').trim();if(ev.length<2||ev==='Günlük')return;st.diary.push({date:d,event:ev,note:String(r[3]||'').trim()});});
+  st.diary.sort((a,b)=>a.date-b.date);
+}
 
-// ========================= VACCINES =========================
-function renderVaccines() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  const done = p.vaccines.filter(v => v.done).length;
-  document.getElementById('vacProg').textContent = done+' / '+p.vaccines.length;
-  document.getElementById('vacBar').style.width = Math.round(done/p.vaccines.length*100)+'%';
-  const groups = {};
-  p.vaccines.forEach(v => { if (!groups[v.age]) groups[v.age]=[]; groups[v.age].push(v); });
-  let html = '';
-  Object.entries(groups).forEach(([age, vacs]) => {
-    html += `<div class="sec-title">⏰ ${age}</div>`;
-    vacs.forEach(v => {
-      const s = v.done ? 'done' : 'pending';
-      html += `<div class="vac-item" onclick="openVacModal('${v.id}')">
-        <div class="vac-check ${s}">${v.done ? '✓' : '○'}</div>
-        <div style="flex:1">
-          <div class="vac-name">${v.name}</div>
-          <div class="vac-detail">${v.done ? '📅 '+fmtDate(v.date)+(v.hospital?' · 🏥 '+v.hospital:'') : v.desc}</div>
-        </div>
-        <div class="vac-badge ${v.done?'b-done':'b-pending'}">${v.done?'Yapıldı':'Bekliyor'}</div>
-      </div>`;
-    });
+/* ===== RENDER ===== */
+function renderAll(){var st=getSt();rdDash(st);rdGelisim(st);rdKontrol(st);rdAsi(st);rdDis(st);rdGunluk(st);}
+
+function rdDash(st){
+  var lh=st.growth.filter(x=>x.height!=null),lw=st.growth.filter(x=>x.weight!=null);
+  if(lh.length){var e=lh[lh.length-1];document.getElementById('lastHeight').textContent=e.height+' cm';document.getElementById('lastHeightDate').textContent=fmt(e.date);}else{document.getElementById('lastHeight').textContent='—';document.getElementById('lastHeightDate').textContent='Veri yok';}
+  if(lw.length){var e2=lw[lw.length-1];document.getElementById('lastWeight').textContent=e2.weight+' kg';document.getElementById('lastWeightDate').textContent=fmt(e2.date);}else{document.getElementById('lastWeight').textContent='—';document.getElementById('lastWeightDate').textContent='Veri yok';}
+  var done=st.vaccines.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı'));
+  document.getElementById('totalVaccines').textContent=done.length||'—';
+  document.getElementById('totalVisits').textContent=st.visits.length||'—';
+  buildDashChart(st);buildToothMaps(st);buildRecent(st);
+}
+function buildDashChart(st){
+  var g=st.growth;var s=g.length>20?g.filter((_,i)=>i%Math.ceil(g.length/20)===0||i===g.length-1):g;
+  destroyChart('dashGrowthChart');var ctx=document.getElementById('dashGrowthChart');if(!ctx)return;
+  charts['dashGrowthChart']=new Chart(ctx,{type:'line',data:{labels:s.map(x=>fmt(x.date)),datasets:[{label:'Boy (cm)',data:s.map(x=>x.height),borderColor:'#7C6FDE',backgroundColor:'rgba(124,111,222,.12)',tension:0.4,fill:true,pointRadius:3},{label:'Kilo×10',data:s.map(x=>x.weight?+(x.weight*10).toFixed(1):null),borderColor:'#5CB8B2',backgroundColor:'rgba(92,184,178,.12)',tension:0.4,fill:true,pointRadius:3,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{x:{ticks:{font:{size:10},maxRotation:45,maxTicksLimit:8}},y:{ticks:{font:{size:10}}}}}});
+}
+function buildToothMaps(st){
+  buildTeethRow('dashUpperTeeth',st.teeth.upper,st.teeth.upperFell);
+  buildTeethRow('dashLowerTeeth',st.teeth.lower,st.teeth.lowerFell);
+}
+function buildTeethRow(cid,outD,fellD){
+  var el=document.getElementById(cid);if(!el)return;el.innerHTML='';
+  var ns=['M','YK','K','1A','2A'];
+  ['Sağ','Sol'].forEach(function(side){
+    for(var i=0;i<5;i++){
+      var t=outD[i],ft=fellD?fellD[i]:null;
+      var hasO=t&&(side==='Sağ'?t.right:t.left);
+      var hasF=ft&&(side==='Sağ'?ft.right:ft.left);
+      var cls=hasF?'fell':hasO?'out':'empty';
+      var date=hasO?(side==='Sağ'?t.right:t.left):null;
+      var d=document.createElement('div');
+      d.className='tooth '+cls;
+      d.title=(ns[i]||'')+' '+side+(date?' — '+fmt(date):'');
+      d.textContent=ns[i]||'?';
+      el.appendChild(d);
+    }
   });
-  document.getElementById('vaccineList').innerHTML = html;
+}
+function buildRecent(st){
+  var ev=[];
+  st.visits.slice(-4).forEach(v=>ev.push({date:v.date,text:(v.hospital||'').substring(0,35)+': '+(v.diagnosis||''),type:'k'}));
+  st.vaccines.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı')&&v.date).slice(-3).forEach(v=>ev.push({date:v.date,text:'Aşı: '+v.name+' — '+v.dose,type:'a'}));
+  st.diary.slice(-4).forEach(d=>ev.push({date:d.date,text:d.event,type:'g'}));
+  ev.sort((a,b)=>b.date-a.date);
+  var el=document.getElementById('recentEvents');
+  if(!ev.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div style="font-weight:600;margin-bottom:6px">Excel Dosyası Yükleyin</div><div style="font-size:13px">Sağ üstteki "Excel Yükle" butonuna tıklayın.</div></div>';return;}
+  var col={k:'#5CB8B2',a:'#F4845F',g:'#7C6FDE'};
+  var bdg={k:'badge-blue',a:'badge-pink',g:'badge-purple'};
+  var lbl={k:'Kontrol',a:'Aşı',g:'Anı'};
+  el.innerHTML=ev.slice(0,9).map(e=>'<div class="list-item"><div class="dot" style="background:'+col[e.type]+'"></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">'+esc(e.text.substring(0,90))+'</div><div style="font-size:12px;color:var(--text3);margin-top:3px"><span class="badge '+bdg[e.type]+'">'+lbl[e.type]+'</span>  '+fmt(e.date)+'</div></div></div>').join('');
 }
 
-function openVacModal(id) {
-  const p = getCurrentProfile();
-  const v = p.vaccines.find(x => x.id === id);
-  if (!v) return;
-  document.getElementById('vacModalTitle').textContent = '💉 '+v.name;
-  document.getElementById('vacModalBody').innerHTML = `
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">${v.desc}</p>
-    <div class="fg" style="margin-bottom:8px"><label>Yapılma Tarihi</label><input type="date" id="vd" value="${v.date}"></div>
-    <div class="fg" style="margin-bottom:8px"><label>Hastane / Klinik</label><input type="text" id="vh" value="${v.hospital}" placeholder="Nerede yapıldı?"></div>
-    <div class="fg" style="margin-bottom:12px"><label>Notlar</label><input type="text" id="vn" value="${v.notes||''}" placeholder="Herhangi bir not..."></div>
-    <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:14px;color:var(--text)">
-      <input type="checkbox" id="vdone" ${v.done?'checked':''} style="width:18px;height:18px;accent-color:var(--p1)"> Aşı yapıldı ✓
-    </label>
-    <button class="btn-primary" onclick="saveVac('${id}')">💾 Kaydet</button>`;
-  document.getElementById('vacModal').classList.add('show');
+function rdGelisim(st){
+  var g=st.growth;var s=g.length>30?g.filter((_,i)=>i%Math.ceil(g.length/30)===0||i===g.length-1):g;
+  var lb=s.map(x=>fmt(x.date));
+  ['heightChart','weightChart','headChart'].forEach(id=>destroyChart(id));
+  function lc(id,label,data,color){var c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels:lb,datasets:[{label:label,data:data,borderColor:color,backgroundColor:color.replace('1)','0.15)').replace('#','rgba(').replace(/([0-9a-f]{2})/gi,function(m,p,o){return o===0?parseInt(m,16)+',':o===2?parseInt(m,16)+',':o===4?parseInt(m,16)+', ':m})+'0.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}},y:{}}}});}
+  var c1=document.getElementById('heightChart');if(c1)charts['heightChart']=new Chart(c1,{type:'line',data:{labels:lb,datasets:[{label:'Boy (cm)',data:s.map(x=>x.height),borderColor:'#7C6FDE',backgroundColor:'rgba(124,111,222,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
+  var c2=document.getElementById('weightChart');if(c2)charts['weightChart']=new Chart(c2,{type:'line',data:{labels:lb,datasets:[{label:'Kilo (kg)',data:s.map(x=>x.weight),borderColor:'#5CB8B2',backgroundColor:'rgba(92,184,178,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
+  var c3=document.getElementById('headChart');if(c3)charts['headChart']=new Chart(c3,{type:'line',data:{labels:lb,datasets:[{label:'Baş (cm)',data:s.map(x=>x.head),borderColor:'#F4845F',backgroundColor:'rgba(244,132,95,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
+  var tb=document.getElementById('gelisimTbody');if(tb)tb.innerHTML=g.slice().reverse().map(r=>'<tr><td>'+fmt(r.date)+'</td><td class="val">'+esc(r.age.substring(0,25))+'</td><td class="val">'+(r.height!=null?r.height:'—')+'</td><td class="val">'+(r.weight!=null?r.weight:'—')+'</td><td class="val">'+(r.head!=null?r.head:'—')+'</td><td>'+esc(r.hospital.substring(0,30))+'</td></tr>').join('');
 }
 
-function saveVac(id) {
-  const p = getCurrentProfile();
-  const v = p.vaccines.find(x => x.id === id);
-  const wasDone = v.done;
-  v.done = document.getElementById('vdone').checked;
-  v.date = document.getElementById('vd').value;
-  v.hospital = document.getElementById('vh').value;
-  v.notes = document.getElementById('vn').value;
-  saveAll();
-  renderVaccines();
-  closeModal('vacModal');
-  if (v.done && !wasDone) { showToast('🎉 Aşı tamamlandı!'); launchConfetti(); }
-  else showToast('💾 Kaydedildi');
+function rdKontrol(st){
+  var v=st.visits;
+  if(!v.length){document.getElementById('kontrolList').innerHTML='<div class="empty-state">Veri yüklenmedi</div>';document.getElementById('topHospital').textContent='—';document.getElementById('topDoctor').textContent='—';destroyChart('visitChart');return;}
+  var hc={},dc={};
+  v.forEach(x=>{var h=(x.hospital||'').trim().substring(0,45);var d=(x.doctor||'').trim();if(h&&h!='NaN')hc[h]=(hc[h]||0)+1;if(d&&d!='NaN')dc[d]=(dc[d]||0)+1;});
+  var tH=Object.keys(hc).sort((a,b)=>hc[b]-hc[a])[0]||'—';
+  var tD=Object.keys(dc).sort((a,b)=>dc[b]-dc[a])[0]||'—';
+  document.getElementById('topHospital').textContent=tH+(hc[tH]?' ('+hc[tH]+' kez)':'');
+  document.getElementById('topDoctor').textContent=tD+(dc[tD]?' ('+dc[tD]+' kez)':'');
+  destroyChart('visitChart');
+  var mn={};v.forEach(x=>{if(x.date){var k=x.date.getFullYear()+'/'+String(x.date.getMonth()+1).padStart(2,'0');mn[k]=(mn[k]||0)+1;}});
+  var mk=Object.keys(mn).sort();
+  var vc=document.getElementById('visitChart');if(vc)charts['visitChart']=new Chart(vc,{type:'bar',data:{labels:mk,datasets:[{label:'Ziyaret',data:mk.map(k=>mn[k]),backgroundColor:'rgba(124,111,222,.7)',borderColor:'#7C6FDE',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxRotation:45,font:{size:9}}},y:{ticks:{stepSize:1}}}}});
+  document.getElementById('kontrolList').innerHTML=v.slice().reverse().slice(0,30).map(x=>'<div class="list-item"><div class="dot" style="background:var(--accent2)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc((x.diagnosis||'Kontrol').substring(0,65))+'</div><div style="font-size:12px;color:var(--text3);margin-top:3px">'+fmt(x.date)+' · '+esc((x.hospital||'').substring(0,35))+(x.doctor&&x.doctor!='NaN'?' · '+esc(x.doctor.substring(0,25)):'')+'</div></div></div>').join('');
 }
 
-// ========================= MILESTONES =========================
-function renderMilestones() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  const done = p.milestones.filter(m => m.done).length;
-  document.getElementById('mileProg').textContent = done+' / '+p.milestones.length;
-  document.getElementById('mileBar').style.width = Math.round(done/p.milestones.length*100)+'%';
-  let html = '';
-  MILESTONES.forEach(cat => {
-    html += `<div class="sec-title">${cat.cat}</div><div class="mile-grid">`;
-    cat.items.forEach(item => {
-      const ms = p.milestones.find(m => m.id === item.id) || item;
-      html += `<div class="mile-card ${ms.done?'done':''}" onclick="openMileModal('${item.id}')">
-        <span class="mile-emoji">${item.emoji}</span>
-        <div class="mile-name">${item.name}</div>
-        <div class="mile-desc">${item.desc}</div>
-        <div class="mile-date">${ms.done ? '✅ '+fmtDate(ms.date) : '🎯 '+item.target}</div>
-      </div>`;
-    });
-    html += '</div>';
-  });
-  document.getElementById('mileCats').innerHTML = html;
+function rdAsi(st){
+  var vax=st.vaccines;
+  var done=vax.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı'));
+  var pend=vax.filter(v=>v.status.includes('Uygulanmadı'));
+  document.getElementById('doneVax').textContent=done.length;document.getElementById('pendingVax').textContent=pend.length;
+  var pct=vax.length?Math.round(done.length/vax.length*100):0;
+  document.getElementById('vaxPct').textContent=pct+'%';document.getElementById('vaxBar').style.width=pct+'%';
+  var html=done.map(v=>'<div class="list-item"><div class="dot" style="background:#059669"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(v.name)+' <span class="badge badge-green">'+esc(v.dose)+'</span></div><div style="font-size:12px;color:var(--text3);margin-top:3px">'+fmt(v.date)+(v.hospital&&v.hospital!='NaN'?' · '+esc(v.hospital.substring(0,30)):'')+'</div></div></div>');
+  if(pend.length){html.push('<div style="padding:10px 0 3px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Bekleyen</div>');html=html.concat(pend.map(v=>'<div class="list-item"><div class="dot" style="background:var(--accent4)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(v.name)+' <span class="badge badge-orange">Bekliyor</span></div></div></div>'));}
+  document.getElementById('asiList').innerHTML=html.join('')||'<div class="empty-state" style="padding:20px">Veri yüklenmedi</div>';
 }
 
-function openMileModal(id) {
-  const p = getCurrentProfile();
-  const item = MILESTONES.flatMap(c => c.items).find(i => i.id === id);
-  const ms = p.milestones.find(m => m.id === id) || {};
-  document.getElementById('mileModalTitle').textContent = item.emoji+' '+item.name;
-  document.getElementById('mileModalBody').innerHTML = `
-    <p style="font-size:13px;color:var(--text2);margin-bottom:3px">${item.desc}</p>
-    <p style="font-size:12px;color:var(--p1);font-weight:800;margin-bottom:12px">🎯 Hedef: ${item.target}</p>
-    <div class="fg" style="margin-bottom:8px"><label>Gerçekleşme Tarihi</label><input type="date" id="md" value="${ms.date||''}"></div>
-    <div class="fg" style="margin-bottom:12px"><label>Not</label><input type="text" id="mn" value="${ms.notes||''}" placeholder="O anı tarif edin..."></div>
-    <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:14px;color:var(--text)">
-      <input type="checkbox" id="mdone" ${ms.done?'checked':''} style="width:18px;height:18px;accent-color:var(--p1)"> Bu gelişim gerçekleşti! 🎉
-    </label>
-    <button class="btn-primary" onclick="saveMilestone('${id}')">💾 Kaydet</button>`;
-  document.getElementById('mileModal').classList.add('show');
+function rdDis(st){
+  var ut=st.teeth.upper,lt=st.teeth.lower,uf=st.teeth.upperFell,lf=st.teeth.lowerFell;
+  document.getElementById('teethOut').textContent=ut.filter(t=>t.right||t.left).length+lt.filter(t=>t.right||t.left).length;
+  document.getElementById('teethFell').textContent=uf.filter(t=>t.right||t.left).length+lf.filter(t=>t.right||t.left).length;
+  var tl=function(data){if(!data.length)return'<div class="empty-state" style="padding:14px">Veri yok</div>';return data.map(t=>'<div class="list-item"><div class="dot" style="background:var(--accent2)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(t.name)+'</div><div style="font-size:12px;color:var(--text3);margin-top:2px">'+(t.right?'🦷 Sağ: '+fmt(t.right):'— Sağ')+'  |  '+(t.left?'🦷 Sol: '+fmt(t.left):'— Sol')+'</div></div></div>').join('');};
+  document.getElementById('upperTeethDetail').innerHTML=tl(ut);document.getElementById('lowerTeethDetail').innerHTML=tl(lt);
+  var fell=[...uf,...lf].filter(t=>t.right||t.left);
+  document.getElementById('fellTeethDetail').innerHTML=fell.length?fell.map(t=>'<div class="list-item"><div class="dot" style="background:var(--accent3)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(t.name)+' <span class="badge badge-orange">Düştü</span></div><div style="font-size:12px;color:var(--text3);margin-top:2px">'+(t.right?'Sağ: '+fmt(t.right):'')+(t.left?' Sol: '+fmt(t.left):'')+'</div></div></div>').join(''):'<div class="empty-state" style="padding:14px">Henüz düşen diş yok</div>';
 }
 
-function saveMilestone(id) {
-  const p = getCurrentProfile();
-  const ms = p.milestones.find(m => m.id === id);
-  const wasDone = ms ? ms.done : false;
-  const nowDone = document.getElementById('mdone').checked;
-  if (ms) {
-    ms.done = nowDone;
-    ms.date = document.getElementById('md').value;
-    ms.notes = document.getElementById('mn').value;
-  }
-  saveAll();
-  renderMilestones();
-  closeModal('mileModal');
-  if (nowDone && !wasDone) { showToast('🎉 Tebrikler! Yeni gelişim!'); launchConfetti(); }
-  else showToast('💾 Kaydedildi');
+function rdGunluk(st){
+  var d=st.diary;
+  if(!d.length){document.getElementById('gunlukList').innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><div style="font-weight:600;margin-bottom:6px">Anılar burada görünecek</div></div>';return;}
+  document.getElementById('gunlukList').innerHTML=d.slice().reverse().map((e,i)=>'<div class="list-item" style="animation:fadeIn .3s ease '+Math.min(i*20,400)+'ms both"><div class="dot" style="background:var(--accent)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(e.event.substring(0,110))+'</div>'+(e.note&&e.note!='NaN'&&e.note.length>1?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5">'+esc(e.note.substring(0,160))+'</div>':'')+'<div style="font-size:11px;color:var(--text3);margin-top:3px">'+fmt(e.date)+'</div></div></div>').join('');
 }
 
-// ========================= TEETH =========================
-function renderTeeth() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  function renderJaw(arr, cid) {
-    const c = document.getElementById(cid);
-    c.innerHTML = '';
-    arr.forEach(t => {
-      const info = p.teeth[t.id] || {};
-      const cls = info.fallen ? 'fallen' : info.erupted ? 'erupted' : '';
-      const div = document.createElement('div');
-      div.className = 'tooth '+cls;
-      div.innerHTML = `<span>${t.abbr}</span>`;
-      div.title = t.name;
-      div.onclick = () => openToothModal(t.id);
-      c.appendChild(div);
-    });
-  }
-  renderJaw(TEETH_DATA.filter(t => t.jaw==='upper'), 'upperJaw');
-  renderJaw(TEETH_DATA.filter(t => t.jaw==='lower'), 'lowerJaw');
-  renderToothLog();
+/* ===== VERİ GİRİŞ ===== */
+function addGrowthRecord(){
+  var p=getP();if(!p){alert('Profil seçin');return;}
+  var t=document.getElementById('gTarih').value;if(!t){alert('Tarih girin');return;}
+  var b=document.getElementById('gBoy').value,k=document.getElementById('gKilo').value,ba=document.getElementById('gBas').value;
+  p.state.growth.push({date:new Date(t),height:b?parseFloat(b):null,weight:k?parseFloat(k):null,head:ba?parseFloat(ba):null,hospital:document.getElementById('gHastane').value,age:'—'});
+  p.state.growth.sort((a,b)=>a.date-b.date);
+  addLog(p,'📏 Büyüme — '+new Date(t).toLocaleDateString('tr-TR')+(b?' Boy:'+b:'')+(k?' Kilo:'+k:''));
+  save();renderAll();['gBoy','gKilo','gBas','gHastane','gNot'].forEach(id=>document.getElementById(id).value='');
+}
+function addVisitRecord(){
+  var p=getP();if(!p)return;var t=document.getElementById('kTarih').value;if(!t){alert('Tarih girin');return;}
+  p.state.visits.push({date:new Date(t),hospital:document.getElementById('kHastane').value,doctor:document.getElementById('kDoktor').value,diagnosis:document.getElementById('kTeshis').value,notes:document.getElementById('kNot').value,age:'—'});
+  p.state.visits.sort((a,b)=>a.date-b.date);
+  addLog(p,'🏥 Kontrol — '+document.getElementById('kTeshis').value);
+  save();renderAll();['kHastane','kDoktor','kTeshis','kNot'].forEach(id=>document.getElementById(id).value='');
+}
+function addMemory(){
+  var p=getP();if(!p)return;var t=document.getElementById('anTarih').value,b=document.getElementById('anBaslik').value;if(!t||!b){alert('Tarih ve başlık zorunlu');return;}
+  p.state.diary.push({date:new Date(t),event:b,note:document.getElementById('anDetay').value});
+  p.state.diary.sort((a,b)=>a.date-b.date);
+  addLog(p,'📖 Anı — '+b);save();rdGunluk(p.state);buildRecent(p.state);
+  ['anBaslik','anDetay'].forEach(id=>document.getElementById(id).value='');
+}
+function addVaccine(){
+  var p=getP();if(!p)return;var a=document.getElementById('aAdi').value;if(!a){alert('Aşı adı girin');return;}
+  var t=document.getElementById('aTarih').value;
+  p.state.vaccines.push({status:'Uygulandı',name:a,dose:document.getElementById('aDoz').value,date:t?new Date(t):null,hospital:document.getElementById('aHastane').value,note:document.getElementById('aNot').value});
+  addLog(p,'💉 Aşı — '+a+' '+document.getElementById('aDoz').value);save();rdAsi(p.state);rdDash(p.state);
+  ['aAdi','aHastane','aNot'].forEach(id=>document.getElementById(id).value='');
+}
+function addLog(p,msg){
+  p.state.logs.unshift({msg:msg,time:new Date().toISOString()});
+  var el=document.getElementById('logList');
+  el.innerHTML=p.state.logs.slice(0,15).map(function(l){var t=new Date(l.time);return'<div class="log-item"><div class="color-strip" style="background:var(--accent)"></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">'+esc(l.msg)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+t.toLocaleTimeString('tr-TR')+' · '+t.toLocaleDateString('tr-TR')+'</div></div></div>';}).join('');
 }
 
-function renderToothLog() {
-  const p = getCurrentProfile();
-  const entries = Object.entries(p.teeth).filter(([,v]) => v.erupted || v.fallen);
-  const log = document.getElementById('toothLog');
-  if (!entries.length) { log.innerHTML = '<div class="empty"><div class="emo">🦷</div><p>Dişlere tıklayarak kayıt ekleyin</p></div>'; return; }
-  log.innerHTML = entries.map(([id, info]) => {
-    const t = TEETH_DATA.find(x => x.id === id);
-    if (!t) return '';
-    return `<div class="hist-item">
-      <div class="hi-icon">${info.fallen ? '⭐' : '🦷'}</div>
-      <div class="hi-info">
-        <div class="hi-vals">${t.name} — ${info.fallen ? 'Düştü' : 'Çıktı'}</div>
-        <div class="hi-date">${info.eruptDate ? '📅 Çıkma: '+fmtDate(info.eruptDate) : ''} ${info.fallenDate ? '· Düşme: '+fmtDate(info.fallenDate) : ''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openToothModal(id) {
-  const p = getCurrentProfile();
-  const t = TEETH_DATA.find(x => x.id === id);
-  const info = p.teeth[id] || {};
-  document.getElementById('toothModalTitle').textContent = '🦷 '+t.name;
-  document.getElementById('toothModalBody').innerHTML = `
-    <p style="font-size:12px;color:var(--p1);font-weight:800;margin-bottom:12px">🎯 Beklenen çıkış: ${t.eruptAge}</p>
-    <div class="fg" style="margin-bottom:8px"><label>Diş Çıkma Tarihi</label><input type="date" id="te" value="${info.eruptDate||''}"></div>
-    <div class="fg" style="margin-bottom:8px"><label>Diş Düşme Tarihi</label><input type="date" id="tf" value="${info.fallenDate||''}"></div>
-    <div class="fg" style="margin-bottom:14px"><label>Not</label><input type="text" id="tn" value="${info.notes||''}" placeholder="Not..."></div>
-    <button class="btn-primary" onclick="saveTooth('${id}')">💾 Kaydet</button>`;
-  document.getElementById('toothModal').classList.add('show');
-}
-
-function saveTooth(id) {
-  const p = getCurrentProfile();
-  const eruptDate = document.getElementById('te').value;
-  const fallenDate = document.getElementById('tf').value;
-  p.teeth[id] = { erupted: !!eruptDate, eruptDate, fallen: !!fallenDate, fallenDate, notes: document.getElementById('tn').value };
-  saveAll();
-  renderTeeth();
-  closeModal('toothModal');
-  showToast('🦷 Diş kaydı güncellendi!');
-}
-
-// ========================= FOOD =========================
-function renderFoodPage() {
-  renderFoodSummary();
-  renderFoodLog();
-  renderFoodGrid();
-}
-
-function renderFoodSummary() {
-  const p = getCurrentProfile();
-  const allergic = Object.entries(p.foods).filter(([,v]) => v.reaction === 'allergic').map(([,v]) => v.name);
-  const intolerant = Object.entries(p.foods).filter(([,v]) => v.reaction === 'intolerant').map(([,v]) => v.name);
-  const safe = Object.entries(p.foods).filter(([,v]) => v.reaction === 'ok' || v.reaction === 'liked').map(([,v]) => v.name);
-  const el = document.getElementById('allergySummary');
-  if (!allergic.length && !intolerant.length) {
-    el.innerHTML = '<div class="empty" style="padding:8px 0"><p>Alerji / intolerans kaydı yok — harika! 🎉</p></div>';
-  } else {
-    let html = '';
-    if (allergic.length) html += `<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:#DC2626;margin-bottom:4px">🚨 Alerji (${allergic.length})</div><div class="allergy-tags">${allergic.map(n=>`<span class="a-tag allergic">🚨 ${n}</span>`).join('')}</div></div>`;
-    if (intolerant.length) html += `<div><div style="font-size:11px;font-weight:800;color:#D97706;margin-bottom:4px">⚠️ İntolerans (${intolerant.length})</div><div class="allergy-tags">${intolerant.map(n=>`<span class="a-tag intolerant">⚠️ ${n}</span>`).join('')}</div></div>`;
-    el.innerHTML = html;
-  }
-}
-
-function renderFoodLog() {
-  const p = getCurrentProfile();
-  const entries = Object.entries(p.foods);
-  const log = document.getElementById('foodLog');
-  if (!entries.length) { log.innerHTML = '<div class="empty" style="padding:8px 0"><div class="emo" style="font-size:28px">🥣</div><p>Henüz gıda kaydı yok</p></div>'; return; }
-  const reactionMap = { ok:'✅ Sorunsuz', allergic:'🚨 Alerji', intolerant:'⚠️ İntolerans', disliked:'😖 Sevmedi', liked:'😋 Çok Sevdi' };
-  const reactionClass = { ok:'green', allergic:'red', intolerant:'yellow', disliked:'blue', liked:'green' };
-  log.innerHTML = [...entries].reverse().map(([id, f]) => `
-    <div class="hist-item" onclick="openFoodDetailModal('${id}')">
-      <div class="hi-icon">${f.emoji}</div>
-      <div class="hi-info">
-        <div class="hi-vals" style="display:flex;align-items:center;gap:6px">
-          ${f.name}
-          <span class="badge ${reactionClass[f.reaction]||'blue'}">${reactionMap[f.reaction]||f.reaction}</span>
-        </div>
-        <div class="hi-date">${f.date ? '📅 '+fmtDate(f.date) : ''} ${f.note ? '· '+f.note.substring(0,40)+(f.note.length>40?'...':'') : ''}</div>
-      </div>
-      <button class="del-btn" onclick="event.stopPropagation();delFood('${id}')">🗑️</button>
-    </div>`).join('');
-}
-
-function renderFoodGrid() {
-  const p = getCurrentProfile();
-  const q = (document.getElementById('foodSearch')?.value || '').toLowerCase();
-  const tried = Object.keys(p.foods).length;
-  const total = FOOD_CATEGORIES.reduce((s,c) => s+c.items.length, 0);
-  document.getElementById('foodProg').textContent = tried+' / '+total;
-  document.getElementById('foodBar').style.width = Math.round(tried/total*100)+'%';
-  let html = '';
-  FOOD_CATEGORIES.forEach(cat => {
-    const filtered = cat.items.filter(i => !q || i.name.toLowerCase().includes(q));
-    if (!filtered.length) return;
-    html += `<div class="food-cat-title">${cat.cat}</div><div class="food-grid">`;
-    filtered.forEach(item => {
-      const f = p.foods[item.id];
-      const cls = f ? (f.reaction === 'allergic' ? 'allergic' : f.reaction === 'intolerant' ? 'intolerant' : 'tried') : '';
-      const status = f ? (f.reaction === 'allergic' ? '🚨 Alerji' : f.reaction === 'intolerant' ? '⚠️ İntolerans' : f.reaction === 'disliked' ? '😖 Sevmedi' : f.reaction === 'liked' ? '😋 Sevdi' : '✅ Denendi') : '';
-      const tick = f ? (f.reaction === 'allergic' ? '🚨' : f.reaction === 'intolerant' ? '⚠️' : '✓') : '';
-      html += `<div class="food-card ${cls}" onclick="openFoodModal('${item.id}','${item.name}','${item.emoji}')">
-        ${tick ? `<div class="tick">${tick}</div>` : ''}
-        <span class="food-emoji">${item.emoji}</span>
-        <div class="food-name">${item.name}</div>
-        ${f ? `<div class="food-status">${status}</div>` : ''}
-      </div>`;
-    });
-    html += '</div>';
-  });
-  document.getElementById('foodGrid').innerHTML = html;
-}
-
-function openFoodModal(id, name, emoji) {
-  const p = getCurrentProfile();
-  const f = p.foods[id];
-  if (f) { openFoodDetailModal(id); return; }
-  // Open add modal for new food
-  document.getElementById('afName').value = name;
-  document.getElementById('afDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('afNote').value = '';
-  document.getElementById('afReaction').value = 'ok';
-  selectedFoodEmoji = emoji;
-  buildEmojiPicker('afEmojiPicker', FOOD_EMOJIS, 'selectedFoodEmoji', emoji);
-  // Store food id for saving
-  document.getElementById('addFoodModal').dataset.foodId = id;
-  document.getElementById('addFoodModal').classList.add('show');
-}
-
-function openAddFoodModal() {
-  document.getElementById('afName').value = '';
-  document.getElementById('afDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('afNote').value = '';
-  document.getElementById('afReaction').value = 'ok';
-  selectedFoodEmoji = '🥣';
-  buildEmojiPicker('afEmojiPicker', FOOD_EMOJIS, 'selectedFoodEmoji', '🥣');
-  document.getElementById('addFoodModal').dataset.foodId = 'custom_' + Date.now();
-  document.getElementById('addFoodModal').classList.add('show');
-}
-
-function saveNewFood() {
-  const name = document.getElementById('afName').value.trim();
-  if (!name) { showToast('⚠️ Gıda adı girin'); return; }
-  const p = getCurrentProfile();
-  const id = document.getElementById('addFoodModal').dataset.foodId || 'custom_'+Date.now();
-  const reaction = document.getElementById('afReaction').value;
-  p.foods[id] = {
-    name, emoji: selectedFoodEmoji,
-    date: document.getElementById('afDate').value,
-    reaction, note: document.getElementById('afNote').value
-  };
-  saveAll();
-  renderFoodPage();
-  closeModal('addFoodModal');
-  if (reaction === 'allergic') { showToast('🚨 Alerji kaydedildi! Dikkatli olun.'); }
-  else if (reaction === 'intolerant') { showToast('⚠️ İntolerans kaydedildi.'); }
-  else showToast('✅ Gıda kaydedildi!');
-}
-
-function openFoodDetailModal(id) {
-  const p = getCurrentProfile();
-  const f = p.foods[id];
-  if (!f) return;
-  const reactionMap = { ok:'✅ Sorunsuz', allergic:'🚨 Alerji Reaksiyonu', intolerant:'⚠️ İntolerans / Hassasiyet', disliked:'😖 Sevmedi', liked:'😋 Çok Sevdi' };
-  const reactionClass = { ok:'green', allergic:'red', intolerant:'yellow', disliked:'blue', liked:'green' };
-  document.getElementById('foodModalTitle').textContent = f.emoji+' '+f.name;
-  document.getElementById('foodModalBody').innerHTML = `
-    <div style="text-align:center;margin-bottom:14px">
-      <span style="font-size:48px">${f.emoji}</span>
-      <div style="margin-top:8px"><span class="badge ${reactionClass[f.reaction]||'blue'}" style="font-size:13px;padding:5px 14px">${reactionMap[f.reaction]||f.reaction}</span></div>
-    </div>
-    ${f.date ? `<div class="hist-item" style="margin-bottom:6px"><div class="hi-icon">📅</div><div class="hi-info"><div class="hi-vals">İlk Deneme</div><div class="hi-date">${fmtDate(f.date)}</div></div></div>` : ''}
-    ${f.note ? `<div class="hist-item" style="margin-bottom:14px"><div class="hi-icon">📝</div><div class="hi-info"><div class="hi-vals">Not</div><div class="hi-date">${f.note}</div></div></div>` : ''}
-    ${f.reaction === 'allergic' ? '<div style="background:#FEE2E2;border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#DC2626;font-weight:700">⚠️ Bu gıdada alerji reaksiyonu kaydedilmiştir. Doktor tavsiyesi alın.</div>' : ''}
-    ${f.reaction === 'intolerant' ? '<div style="background:#FEF3C7;border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#D97706;font-weight:700">⚠️ Bu gıdada intolerans / hassasiyet kaydedilmiştir.</div>' : ''}
-    <button class="btn-primary" onclick="delFood('${id}');closeModal('foodModal')">🗑️ Kaydı Sil</button>`;
-  document.getElementById('foodModal').classList.add('show');
-}
-
-function delFood(id) {
-  const p = getCurrentProfile();
-  delete p.foods[id];
-  saveAll();
-  renderFoodPage();
-  showToast('🗑️ Gıda kaydı silindi');
-}
-
-// ========================= MEMORIES =========================
-function renderMemories() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  const grid = document.getElementById('memoryGrid');
-  grid.innerHTML = p.memories.map((m, i) => `
-    <div class="mem-card" onclick="delMemory(${i})">
-      ${m.emoji}
-      <div class="mem-label">${m.title}<br>${m.date ? fmtDate(m.date) : ''}</div>
-    </div>`).join('');
-}
-
-function openMemModal() {
-  document.getElementById('memDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('memTitle').value = '';
-  selectedMemEmoji = '🌟';
-  buildEmojiPicker('memEmojiPicker', MEM_EMOJIS, 'selectedMemEmoji', '🌟');
-  document.getElementById('memModal').classList.add('show');
-}
-
-function saveMemory() {
-  const title = document.getElementById('memTitle').value || 'Özel an';
-  const date = document.getElementById('memDate').value;
-  const p = getCurrentProfile();
-  p.memories.unshift({ title, date, emoji: selectedMemEmoji });
-  saveAll();
-  renderMemories();
-  closeModal('memModal');
-  showToast('📸 Anı kaydedildi! '+selectedMemEmoji);
-  launchConfetti();
-}
-
-function delMemory(i) {
-  if (!confirm('Bu anıyı silmek istiyor musunuz?')) return;
-  const p = getCurrentProfile();
-  p.memories.splice(i, 1);
-  saveAll();
-  renderMemories();
-  showToast('🗑️ Silindi');
-}
-
-// ========================= SETTINGS =========================
-function loadSettings() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  document.getElementById('setName').value = p.name;
-  document.getElementById('setBirth').value = p.birth || '';
-  document.getElementById('setGender').value = p.gender || 'girl';
-  const mode = document.documentElement.getAttribute('data-theme');
-  updateModeButtons(mode);
-}
-
-function saveSettings() {
-  const p = getCurrentProfile();
-  if (!p) return;
-  p.name = document.getElementById('setName').value.trim() || p.name;
-  p.birth = document.getElementById('setBirth').value;
-  p.gender = document.getElementById('setGender').value;
-  saveAll();
-  applyGender(p.gender);
-  updateTopBar();
-  showToast('💾 Bilgiler güncellendi!');
-}
-
-// ========================= HELPERS =========================
-function fmtDate(d) {
-  if (!d) return '';
-  try { return new Date(d+'T00:00:00').toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}); }
-  catch { return d; }
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function buildEmojiPicker(containerId, emojis, varName, initial) {
-  const c = document.getElementById(containerId);
-  c.innerHTML = emojis.map(e =>
-    `<span onclick="selectEmoji('${e}','${varName}','${containerId}')" id="ep_${containerId}_${e}"
-      style="font-size:22px;cursor:pointer;padding:4px 5px;border-radius:8px;transition:background 0.15s;${e===initial?'background:var(--p1-l)':''}">${e}</span>`
-  ).join('');
-}
-
-function selectEmoji(emoji, varName, containerId) {
-  if (varName === 'selectedMemEmoji') selectedMemEmoji = emoji;
-  if (varName === 'selectedFoodEmoji') selectedFoodEmoji = emoji;
-  document.querySelectorAll(`[id^="ep_${containerId}_"]`).forEach(el => el.style.background = '');
-  const el = document.getElementById(`ep_${containerId}_${emoji}`);
-  if (el) el.style.background = 'var(--p1-l)';
-}
-
-// ========================= CONFETTI =========================
-function launchConfetti() {
-  const canvas = document.getElementById('confettiCanvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const colors = document.documentElement.getAttribute('data-gender') === 'boy'
-    ? ['#2196F3','#00BCD4','#4CAF50','#FFC107','#9C27B0']
-    : ['#FF6B9D','#E91E8C','#9C27B0','#FFC107','#4CAF50'];
-  const pieces = Array.from({length:80}, () => ({
-    x: Math.random()*canvas.width, y: -20,
-    size: Math.random()*8+4,
-    color: colors[Math.floor(Math.random()*colors.length)],
-    vx: (Math.random()-0.5)*4, vy: Math.random()*4+2,
-    rot: Math.random()*360, rots: (Math.random()-0.5)*8,
-  }));
-  let frame = 0;
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p => {
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
-      ctx.restore();
-      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rots; p.vy+=0.08;
-    });
-    frame++;
-    if (frame < 130) requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-  draw();
-}
-
-// ========================= INIT =========================
-loadAll();
-const savedTheme = localStorage.getItem('bgTheme') || 'light';
-setMode(savedTheme);
-document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
-renderProfiles();
+/* ===== INIT ===== */
+(function(){
+  load();renderBar();
+  if(Object.keys(profiles).length&&activeId){renderBanner();showNav();renderAll();}
+  var ts=todayStr();['gTarih','kTarih','anTarih','aTarih'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=ts;});
+  buildTeethRow('dashUpperTeeth',[],[]);buildTeethRow('dashLowerTeeth',[],[]);
+})();
 </script>
 </body>
 </html>
