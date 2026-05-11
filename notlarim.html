@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.08
+  Version : Pro 1.0.09
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -89,7 +89,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .icon-btn.accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-size:1.2rem;font-weight:900;box-shadow:0 3px 12px rgba(200,169,110,0.3)}
 
 /* TOOLBAR */
-.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:58px;z-index:99}
+.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:58px;z-index:99} /* top JS ile güncellenir */
 .filters{flex:1;display:flex;gap:6px;padding:9px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filter-chip{padding:5px 12px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);font-family:'DM Sans',sans-serif;flex-shrink:0}
@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.08</span>
+  <span>Pro 1.0.09</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -292,6 +292,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()">
   </div>
   <div class="topbar-actions">
+    <button class="icon-btn" onclick="openStatsModal()" title="İstatistikler">📊</button>
     <button class="icon-btn" onclick="openPanel()" title="Tema & Görünüm">⚙</button>
     <button class="icon-btn accent" onclick="openAdd()">+</button>
   </div>
@@ -437,6 +438,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
       </div>
+      <!-- Hatırlatıcı -->
+      <div class="field" id="field-reminder">
+        <label>🔔 Hatırlatıcı (opsiyonel)</label>
+        <input type="datetime-local" id="f-reminder" style="width:100%;box-sizing:border-box;-webkit-appearance:none">
+        <div style="font-size:0.68rem;color:var(--text3);margin-top:4px">Tarayıcı bildirimi gönderilir</div>
+      </div>
+
+      <!-- Seçenekler satırı -->
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--text2)">
+          <input type="checkbox" id="f-pin" style="width:16px;height:16px;accent-color:var(--accent)"> 📌 Sabitle
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--text2)" id="pin-protect-wrap">
+          <input type="checkbox" id="f-pinProtect" style="width:16px;height:16px;accent-color:var(--accent)"> 🔐 PIN Kilidi
+        </label>
+      </div>
+
+      <!-- Not bağla -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🔗 Bağlı Not</div>
+        <div id="f-linked-preview" style="display:none"></div>
+        <button onclick="openLinkNoteModal()" class="btn btn-secondary" style="font-size:0.8rem;padding:8px 14px;width:auto">+ Not Bağla</button>
+      </div>
+
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="closeModal('editModal')">İptal</button>
         <button class="btn btn-primary" onclick="saveNote()">💾 Kaydet</button>
@@ -460,9 +485,75 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- İSTATİSTİK MODALİ -->
+<div class="modal-overlay" id="statsModal" onclick="if(event.target===this)closeModal('statsModal')">
+  <div class="modal" style="border-radius:var(--r)">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll">
+      <div class="modal-title">📊 İstatistikler</div>
+      <div id="statsContent"></div>
+      <button class="btn btn-secondary" onclick="closeModal('statsModal')" style="margin-top:8px">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN KİLİT MODALİ -->
+<div class="modal-overlay" id="pinModal" onclick="if(event.target===this)pinCancel()">
+  <div class="modal" style="border-radius:var(--r)">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll" style="padding:10px 20px 40px">
+      <div class="modal-title" id="pinTitle">🔐 PIN Gir</div>
+      <div class="pin-lock-overlay">
+        <div class="pin-hint" id="pinHint">Kart notunu görüntülemek için PIN girin</div>
+        <div class="pin-dots" id="pinDots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div id="pinError" class="pin-error" style="min-height:18px"></div>
+        <div class="pin-keypad">
+          <button class="pin-key" onclick="pinKey('1')">1</button>
+          <button class="pin-key" onclick="pinKey('2')">2</button>
+          <button class="pin-key" onclick="pinKey('3')">3</button>
+          <button class="pin-key" onclick="pinKey('4')">4</button>
+          <button class="pin-key" onclick="pinKey('5')">5</button>
+          <button class="pin-key" onclick="pinKey('6')">6</button>
+          <button class="pin-key" onclick="pinKey('7')">7</button>
+          <button class="pin-key" onclick="pinKey('8')">8</button>
+          <button class="pin-key" onclick="pinKey('9')">9</button>
+          <button class="pin-key empty"></button>
+          <button class="pin-key" onclick="pinKey('0')">0</button>
+          <button class="pin-key del" onclick="pinDel()">⌫</button>
+        </div>
+        <button class="btn btn-secondary" onclick="pinCancel()" style="width:100%;margin-top:8px">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOT BAĞLANTISI MODALİ -->
+<div class="modal-overlay" id="linkNoteModal" onclick="if(event.target===this)closeModal('linkNoteModal')">
+  <div class="modal" style="border-radius:var(--r)">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll">
+      <div class="modal-title">🔗 Not Bağla</div>
+      <div class="field">
+        <label>Notlarda Ara</label>
+        <input type="text" id="linkNoteSearch" placeholder="Başlık ara…" oninput="renderLinkNoteList()">
+      </div>
+      <div id="linkNoteList" style="max-height:320px;overflow-y:auto"></div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-secondary" onclick="closeModal('linkNoteModal')">İptal</button>
+        <button class="btn btn-primary" onclick="saveLinkNote()">✓ Bağla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LİGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <div class="lightbox-inner">
+<div class="lightbox" id="lightbox" onclick="if(event.target===this||event.target.closest('.lightbox-inner')===this.firstElementChild&&event.target===this.firstElementChild)closeLightbox(event)">
+  <div class="lightbox-inner" onclick="if(event.target!==document.getElementById('lightboxImg'))closeLightbox(event)">
     <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <img id="lightboxImg" src="" alt="" draggable="false">
     <div class="lightbox-hint">Kapatmak için dokun · Yakınlaştırmak için iki parmak</div>
@@ -475,6 +566,8 @@ const SK='notlarim_v3',PK='notlarim_prefs';
 const TC={kişisel:'#c8a96e',iş:'#5ca0e0',alışveriş:'#5ce07a',seyahat:'#a06ce0',finans:'#e05c5c',fikir:'#e07a5c',önemli:'#e8c98e'};
 const TE={kişisel:'👤',iş:'💼',alışveriş:'🛒',seyahat:'✈️',finans:'💰',fikir:'💡',önemli:'⭐'};
 const TYE={metin:'📝',fotograf:'📷',link:'🔗',kart:'💳',diger:'📌'};
+
+let currentSort='newest', currentGroup='none'; // HATA1 fix: load()'dan önce tanımla
 
 function save(){try{localStorage.setItem(SK,JSON.stringify(notes))}catch(e){}}
 function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter}))}catch(e){}}
@@ -509,7 +602,6 @@ function setView(v,el){
   savePrefs();renderNotes();
 }
 function setViewP(v,el){setView(v,el)}
-let currentSort='newest', currentGroup='none';
 const SORT_LABELS={newest:'Yeni→Eski',oldest:'Eski→Yeni',az:'A→Z',za:'Z→A',updated:'Düzenleme'};
 const GROUP_LABELS={none:'Gruplandırma Yok',tag:'Etikete Göre',type:'Türe Göre',date:'Tarihe Göre'};
 
@@ -603,12 +695,13 @@ async function fetchOGImage(){
           showImgRemoveBtn(true);
           if(statusEl){ statusEl.textContent='✅ Önizleme yüklendi — istersen değiştirebilirsin'; }
         } catch(e) {
-          // CORS engeli — direkt URL'i sakla
+          // CORS engeli — data URL'e çevrilemedi, harici URL olarak sakla (offline'da görünmeyebilir)
+          // Not: Bu durumda img direkt URL olarak saklanır
           const prev = document.getElementById('imgPreview');
           prev.src = imgUrl; prev.style.display='block';
           document.getElementById('imgHint').style.display='none';
           showImgRemoveBtn(true);
-          if(statusEl){ statusEl.textContent='✅ Önizleme yüklendi'; }
+          if(statusEl){ statusEl.textContent='⚠️ Önizleme yüklendi (internet gerektirir) — kendi görselini eklemek daha güvenli'; }
         }
       };
       img.onerror = () => {
@@ -714,8 +807,10 @@ function openLightbox(src){
   document.body.style.overflow = 'hidden';
 }
 function closeLightbox(e){
-  if(e && e.target === document.getElementById('lightboxImg')) return; // resme tıklayınca kapanmasın
+  // Sadece overlay'e (siyah alan) tıklayınca kapat, resme veya close btn'e tıklayınca zaten çalışır
+  if(e && e.target.closest('#lightboxImg')) return;
   document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxImg').src = ''; // bellek temizle
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
@@ -841,6 +936,220 @@ function renderNotes(){
   }
 }
 
+// ══════════════════════════════════════════════════
+// 1. SABİT NOT (PIN)
+// ══════════════════════════════════════════════════
+function togglePin(id, e) {
+  if(e) e.stopPropagation();
+  const n = notes.find(n=>n.id===id); if(!n) return;
+  n.pinned = !n.pinned;
+  save(); renderNotes();
+  showToast(n.pinned ? '📌 Sabitlendı' : '📌 Sabit kaldırıldı');
+}
+
+// ══════════════════════════════════════════════════
+// 2. PIN KİLİT
+// ══════════════════════════════════════════════════
+let pinBuffer = '', pinMode = null, pinResolve = null;
+const PIN_KEY = 'notlarim_pin';
+
+function getStoredPin() { try { return localStorage.getItem(PIN_KEY)||'' } catch(e){return''} }
+function setStoredPin(p) { try { localStorage.setItem(PIN_KEY,p) } catch(e){} }
+
+function pinKey(k) {
+  if(pinBuffer.length>=4) return;
+  pinBuffer += k;
+  updatePinDots();
+  if(pinBuffer.length===4) setTimeout(checkPin, 120);
+}
+function pinDel() { pinBuffer=pinBuffer.slice(0,-1); updatePinDots(); }
+function updatePinDots() {
+  for(let i=0;i<4;i++) {
+    const d=document.getElementById('pd'+i);
+    if(d) d.classList.toggle('filled', i<pinBuffer.length);
+  }
+}
+function pinCancel() { pinBuffer=''; pinResolve&&pinResolve(false); pinResolve=null; closeModal('pinModal'); }
+
+function checkPin() {
+  const stored = getStoredPin();
+  if(pinMode==='set') {
+    setStoredPin(pinBuffer);
+    pinResolve&&pinResolve(true); pinResolve=null;
+    closeModal('pinModal');
+    showToast('🔐 PIN ayarlandı');
+  } else if(pinMode==='verify') {
+    if(!stored || pinBuffer===stored) {
+      pinResolve&&pinResolve(true); pinResolve=null;
+      closeModal('pinModal');
+    } else {
+      const err=document.getElementById('pinError');
+      if(err){err.textContent='❌ Yanlış PIN'; setTimeout(()=>err.textContent='',1500);}
+      pinBuffer=''; updatePinDots();
+    }
+  }
+}
+
+function askPin(mode, hint) {
+  return new Promise(resolve => {
+    pinMode=mode; pinBuffer=''; pinResolve=resolve;
+    updatePinDots();
+    const t=document.getElementById('pinTitle');
+    const h=document.getElementById('pinHint');
+    const err=document.getElementById('pinError');
+    if(t) t.textContent = mode==='set'?'🔐 PIN Belirle':'🔐 PIN Gir';
+    if(h) h.textContent = hint||'PIN girin';
+    if(err) err.textContent='';
+    openModal('pinModal');
+  });
+}
+
+// ══════════════════════════════════════════════════
+// 4. HATIRLATİCİ (Notification API)
+// ══════════════════════════════════════════════════
+function scheduleReminder(note) {
+  if(!note.reminder) return;
+  const t = new Date(note.reminder).getTime() - Date.now();
+  if(t<=0) return;
+  if(t > 7*24*60*60*1000) return; // 7 günden uzaksa atla (sayfa kapalıyken çalışmaz zaten)
+  setTimeout(async ()=>{
+    if(Notification.permission==='granted') {
+      new Notification('📝 Notlarım — Hatırlatıcı', {
+        body: note.title || note.text || 'Not hatırlatıcısı',
+        icon: document.getElementById('favicon')?.href||''
+      });
+    }
+  }, t);
+}
+
+async function requestNotifPerm() {
+  if(!('Notification' in window)) return false;
+  if(Notification.permission==='granted') return true;
+  const p = await Notification.requestPermission();
+  return p==='granted';
+}
+
+// ══════════════════════════════════════════════════
+// 5. ARAMA VURGU
+// ══════════════════════════════════════════════════
+function highlight(str, q) {
+  if(!q||!str) return escPure(str||'');
+  const safe = escPure(str);
+  const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return safe.replace(new RegExp('('+safeQ+')', 'gi'), '<span class="hl">$1</span>');
+}
+function escPure(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════════════════════════
+// 6. İSTATİSTİK
+// ══════════════════════════════════════════════════
+function openStatsModal() {
+  const total = notes.length;
+  const pinned = notes.filter(n=>n.pinned).length;
+  const withImg = notes.filter(n=>n.img).length;
+  const withReminder = notes.filter(n=>n.reminder && new Date(n.reminder)>new Date()).length;
+  const linked = notes.filter(n=>n.linkedId).length;
+
+  // Tür dağılımı
+  const typeCounts = {};
+  const TN = {metin:'📝 Metin',fotograf:'📷 Fotoğraf',link:'🔗 Link',kart:'💳 Kart',diger:'📌 Diğer'};
+  notes.forEach(n=>{ typeCounts[n.type]=(typeCounts[n.type]||0)+1; });
+
+  // Etiket dağılımı
+  const tagCounts = {};
+  notes.forEach(n=>{ if(n.tag) tagCounts[n.tag]=(tagCounts[n.tag]||0)+1; });
+  const topTag = Object.entries(tagCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  // Toplam img boyutu (yaklaşık)
+  let imgSize = 0;
+  notes.forEach(n=>{ if(n.img&&n.img.startsWith('data:')) imgSize+=n.img.length*0.75; });
+  const imgSizeStr = imgSize>1024*1024 ? (imgSize/1024/1024).toFixed(1)+' MB' : imgSize>1024 ? (imgSize/1024).toFixed(0)+' KB' : imgSize+' B';
+
+  let html = `<div class="stat-grid">
+    <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-lbl">Toplam Not</div></div>
+    <div class="stat-card"><div class="stat-val">${pinned}</div><div class="stat-lbl">📌 Sabitlenmiş</div></div>
+    <div class="stat-card"><div class="stat-val">${withImg}</div><div class="stat-lbl">📷 Görselli</div></div>
+    <div class="stat-card"><div class="stat-val">${withReminder}</div><div class="stat-lbl">🔔 Bekleyen</div></div>
+    <div class="stat-card"><div class="stat-val">${linked}</div><div class="stat-lbl">🔗 Bağlı</div></div>
+    <div class="stat-card"><div class="stat-val">${imgSizeStr}</div><div class="stat-lbl">💾 Görsel Boyutu</div></div>
+  </div>`;
+
+  if(topTag) html += `<div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">En Çok Kullanılan Etiket</div>
+    <div style="background:var(--surface2);border-radius:12px;padding:10px 14px;font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:16px">${topTag[0]} — ${topTag[1]} not</div>`;
+
+  html += `<div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Tür Dağılımı</div>`;
+  Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).forEach(([type,count])=>{
+    const pct = total ? Math.round(count/total*100) : 0;
+    html += `<div class="dist-row"><span style="width:80px;color:var(--text2)">${TN[type]||type}</span><div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%"></div></div><div class="dist-count">${count}</div></div>`;
+  });
+
+  if(Object.keys(tagCounts).length) {
+    html += `<div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin:14px 0 10px">Etiket Dağılımı</div>`;
+    Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]).forEach(([tag,count])=>{
+      const pct = total ? Math.round(count/total*100) : 0;
+      html += `<div class="dist-row"><span style="width:80px;color:var(--text2)">${tag}</span><div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%"></div></div><div class="dist-count">${count}</div></div>`;
+    });
+  }
+
+  document.getElementById('statsContent').innerHTML = html;
+  openModal('statsModal');
+}
+
+// ══════════════════════════════════════════════════
+// 7. NOT BAĞLANTISI
+// ══════════════════════════════════════════════════
+let linkingNoteId = null, selectedLinkId = null;
+
+function openLinkNoteModal() {
+  linkingNoteId = editId;
+  selectedLinkId = null;
+  document.getElementById('linkNoteSearch').value = '';
+  renderLinkNoteList();
+  openModal('linkNoteModal');
+}
+
+function renderLinkNoteList() {
+  const q = document.getElementById('linkNoteSearch').value.toLowerCase();
+  const list = document.getElementById('linkNoteList');
+  const candidates = notes.filter(n => n.id !== editId && (
+    !q || (n.title||n.text||'').toLowerCase().includes(q)
+  )).slice(0,20);
+
+  if(!candidates.length) { list.innerHTML=`<div style="color:var(--text3);font-size:0.82rem;padding:12px">Not bulunamadı</div>`; return; }
+  list.innerHTML = candidates.map(n=>`
+    <div class="link-note-item ${selectedLinkId===n.id?'selected':''}" onclick="selectLinkNote('${n.id}')">
+      <span style="font-size:1rem">${TYE[n.type]||'📝'}</span>
+      <span style="flex:1;font-size:0.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escPure(n.title||n.text||'—')}</span>
+      ${selectedLinkId===n.id?'<span style="color:var(--accent)">✓</span>':''}
+    </div>`).join('');
+}
+
+function selectLinkNote(id) {
+  selectedLinkId = selectedLinkId===id ? null : id;
+  renderLinkNoteList();
+}
+
+function saveLinkNote() {
+  // f-linked-preview güncelle
+  if(selectedLinkId) {
+    const n = notes.find(n=>n.id===selectedLinkId);
+    if(n) {
+      const prev = document.getElementById('f-linked-preview');
+      prev.style.display='block';
+      prev.innerHTML=`<div class="linked-note-chip" onclick="clearLinkNote()">${TYE[n.type]||'📝'} <span>${escPure(n.title||n.text||'—')}</span> <span style="color:var(--red);margin-left:auto">✕</span></div>`;
+    }
+  } else {
+    clearLinkNote();
+  }
+  closeModal('linkNoteModal');
+}
+
+function clearLinkNote() {
+  selectedLinkId = null;
+  const prev = document.getElementById('f-linked-preview');
+  prev.style.display='none'; prev.innerHTML='';
+}
+
 function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden'}
 function closePanel(){document.getElementById('settingsPanel').classList.remove('open');document.body.style.overflow=''}
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
@@ -850,8 +1159,67 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('editMod
 let toastT;
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
 
-function exportNotes(){const blob=new Blob([JSON.stringify({version:'notlarim_v3',date:new Date().toISOString(),notes},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`notlarim-${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.json`;a.click();URL.revokeObjectURL(a.href);showToast('✅ Yedek indirildi')}
-function importNotes(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);const imp=d.notes||d;if(!Array.isArray(imp))throw new Error('Geçersiz format');if(!confirm(`${imp.length} not geri yüklensin mi?`))return;notes=imp;save();closePanel();renderNotes();showToast(`✅ ${imp.length} not yüklendi`)}catch(err){showToast('❌ '+err.message)}};r.readAsText(f);e.target.value=''}
+function exportNotes(){
+  const APP_VER = document.querySelector('.version-bar span')?.textContent || 'Pro 1.0.09';
+  const blob=new Blob([JSON.stringify({
+    version: APP_VER,
+    appName: 'Notlarım',
+    date: new Date().toISOString(),
+    noteCount: notes.length,
+    prefs: {theme:currentTheme, view:currentView, sort:currentSort, group:currentGroup, filter:currentFilter},
+    notes
+  },null,2)],{type:'application/json'});
+  const now = new Date();
+  const ds = now.toLocaleDateString('tr-TR').replace(/\./g,'-');
+  const ts = now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}).replace(':','-');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`notlarim-${APP_VER.replace(/\s/g,'_')}-${ds}_${ts}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+  showToast(`✅ ${notes.length} not yedeklendi`);
+}
+function importNotes(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      const imp=d.notes||d;
+      if(!Array.isArray(imp))throw new Error('Geçersiz format');
+      const info = d.noteCount!=null ? `${d.noteCount} not` : `${imp.length} not`;
+      const dateStr = d.date ? new Date(d.date).toLocaleString('tr-TR') : '?';
+      const ver = d.version || '?';
+      if(!confirm(`📦 Yedek: ${ver}\n📅 ${dateStr}\n📝 ${info}\n\nGeri yüklensin mi? Mevcut notlar silinecek.`))return;
+      notes=imp;
+      save();
+      // HATA6 fix: yedekteki prefs varsa geri yükle, UI'ı senkronize et
+      if(d.prefs){
+        const p=d.prefs;
+        currentTheme=p.theme||'dark';
+        currentView=p.view||'grid';
+        currentSort=p.sort||'newest';
+        currentGroup=p.group||'none';
+        currentFilter=p.filter||'all';
+        savePrefs();
+        document.documentElement.setAttribute('data-theme',currentTheme);
+        document.documentElement.setAttribute('data-view',currentView);
+        document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
+        document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+        const vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};
+        const vi=document.getElementById('viewIcon');const vl=document.getElementById('viewLabel');
+        if(vi)vi.textContent=vm.icon;if(vl)vl.textContent=vm.label;
+        document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
+        document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
+        document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
+        updateSortBtnState();
+      }
+      closePanel();
+      renderNotes();
+      showToast(`✅ ${imp.length} not yüklendi`);
+    }catch(err){showToast('❌ '+err.message)}
+  };
+  r.readAsText(f);e.target.value='';
+}
 
 // ══ PWA SETUP ══
 function generateIcon(size) {
@@ -986,6 +1354,15 @@ self.addEventListener('fetch', e => {
   }
 }
 
+// ── HATA 2 fix: toolbar top'u dinamik ayarla ──
+function fixToolbarTop(){
+  const tb = document.querySelector('.topbar');
+  const toolbar = document.querySelector('.toolbar');
+  if(tb && toolbar){
+    toolbar.style.top = tb.offsetTop + tb.offsetHeight + 'px';
+  }
+}
+
 // INIT
 load();
 document.documentElement.setAttribute('data-theme',currentTheme);
@@ -1000,6 +1377,8 @@ updateSortBtnState();
 // Filtre UI'ı yükle
 document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
 renderNotes();
+fixToolbarTop();
+window.addEventListener('resize', fixToolbarTop);
 setupPWA();
 </script>
 </body>
