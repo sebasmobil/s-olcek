@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.09
+  Version : Pro 1.0.10
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -274,11 +274,56 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* FAB */
 .fab{position:fixed;bottom:22px;right:18px;z-index:150;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;cursor:pointer;font-size:1.5rem;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 20px rgba(200,169,110,0.45);transition:transform 0.15s;font-weight:900}
 .fab:active{transform:scale(0.92)}
+
+/* 1. SABİT NOT — pin rozeti */
+.pin-badge{position:absolute;top:7px;right:8px;font-size:0.85rem;line-height:1;z-index:2;transition:filter 0.18s,transform 0.18s}
+.pin-badge.pinned{filter:drop-shadow(0 0 3px rgba(200,169,110,0.9));transform:scale(1.15)}
+.note-card.is-pinned{border-color:rgba(200,169,110,0.4)!important;box-shadow:0 2px 16px rgba(200,169,110,0.12)}
+
+/* 3. KART ARKA PLAN RENK TONU */
+.note-card.has-color-tint{background:var(--card-tint,var(--surface))}
+
+/* 5. ARAMA VURGU */
+.hl{background:rgba(255,220,50,0.38);color:var(--text);border-radius:3px;padding:0 1px}
+[data-theme="light"] .hl{background:rgba(240,180,0,0.32)}
+
+/* 6. İSTATİSTİK */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.stat-card{background:var(--surface2);border-radius:var(--r2);padding:12px 8px;text-align:center}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;color:var(--accent)}
+.stat-lbl{font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin-top:3px}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:0.78rem}
+.dist-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.dist-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.5s ease}
+.dist-count{font-size:0.72rem;font-weight:700;color:var(--text3);min-width:20px;text-align:right}
+
+/* 7. BAĞLI NOT chip */
+.linked-note-chip{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--surface2);border-radius:10px;font-size:0.78rem;font-weight:600;color:var(--text2);cursor:pointer;border:1px solid var(--border);margin-bottom:8px}
+.linked-note-chip:hover{border-color:var(--accent)}
+.link-note-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--r2);cursor:pointer;transition:background 0.12s;border:1px solid transparent}
+.link-note-item:hover{background:var(--surface2)}
+.link-note-item.selected{background:rgba(200,169,110,0.1);border-color:var(--accent)}
+/* Detay ekranında bağlı not */
+.detail-linked-box{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--surface2);border-radius:var(--r2);margin:10px 0;font-size:0.81rem;font-weight:600;color:var(--text2);cursor:pointer;border:1px solid var(--border);transition:border-color 0.15s}
+.detail-linked-box:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PIN modal */
+.pin-lock-overlay{display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0}
+.pin-hint{font-size:0.82rem;color:var(--text2);text-align:center}
+.pin-dots{display:flex;gap:14px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent);background:transparent;transition:background 0.15s}
+.pin-dot.filled{background:var(--accent)}
+.pin-error{font-size:0.78rem;color:var(--red);font-weight:600;min-height:18px;text-align:center}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:216px}
+.pin-key{width:64px;height:56px;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface2);font-size:1.3rem;font-weight:700;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--trans);display:flex;align-items:center;justify-content:center}
+.pin-key:active{background:var(--accent);color:#fff;transform:scale(0.94)}
+.pin-key.empty{background:transparent;border:none;cursor:default}
+.pin-key.del{font-size:1rem}
 </style>
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.09</span>
+  <span>Pro 1.0.10</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -744,11 +789,17 @@ function openAdd(){editId=null;document.getElementById('editModalTitle').textCon
 function resetForm(){
   ['f-title','f-text','f-link','f-card'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-tag').value='';
+  document.getElementById('f-pin').checked=false;
+  document.getElementById('f-pinProtect').checked=false;
+  document.getElementById('f-reminder').value='';
   document.getElementById('imgPreview').style.display='none';
   document.getElementById('imgHint').style.display='';
   document.getElementById('f-img').value='';
   const ogS=document.getElementById('og-status'); if(ogS)ogS.style.display='none';
   showImgRemoveBtn(false);
+  selectedLinkId=null;
+  const prev=document.getElementById('f-linked-preview');
+  if(prev){prev.style.display='none';prev.innerHTML='';}
   currentType='metin';currentColor='#c8a96e';
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='metin'));
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color==='#c8a96e'));
@@ -760,11 +811,21 @@ function populateForm(n){
   document.getElementById('f-link').value=n.link||'';
   document.getElementById('f-card').value=n.card||'';
   document.getElementById('f-tag').value=n.tag||'';
+  document.getElementById('f-pin').checked=!!n.pinned;
+  document.getElementById('f-pinProtect').checked=!!n.pinProtect;
+  document.getElementById('f-reminder').value=n.reminder?n.reminder.slice(0,16):'';
   currentType=n.type||'metin';currentColor=n.color||'#c8a96e';
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===currentColor));
   setType(currentType,null);
   if(n.img){const p=document.getElementById('imgPreview');p.src=n.img;p.style.display='block';document.getElementById('imgHint').style.display='none';showImgRemoveBtn(true);}else{showImgRemoveBtn(false);}
+  // Bağlı not
+  selectedLinkId=n.linkedId||null;
+  const prev=document.getElementById('f-linked-preview');
+  if(selectedLinkId){
+    const ln=notes.find(x=>x.id===selectedLinkId);
+    if(ln){prev.style.display='block';prev.innerHTML=`<div class="linked-note-chip" onclick="clearLinkNote()">${TYE[ln.type]||'📝'} <span>${escPure(ln.title||ln.text||'—')}</span> <span style="color:var(--red);margin-left:auto">✕</span></div>`;}
+  } else {prev.style.display='none';prev.innerHTML='';}
 }
 function saveNote(){
   const title=document.getElementById('f-title').value.trim();
@@ -773,20 +834,34 @@ function saveNote(){
   const card=document.getElementById('f-card').value.trim();
   const tag=document.getElementById('f-tag').value;
   const ip=document.getElementById('imgPreview');
-  // Görsel silindiyse (display:none veya src boş) → img='' yani silinmiş kabul et
-  // Sadece görsel gerçekten görünür durumdaysa sakla
+  const pinned=document.getElementById('f-pin').checked;
+  const pinProtect=document.getElementById('f-pinProtect').checked;
+  const reminderVal=document.getElementById('f-reminder').value;
+  const reminder=reminderVal?new Date(reminderVal).toISOString():'';
+
   let img='';
   if(ip.style.display!=='none' && ip.src && ip.src.length>10){
-    img=ip.src; // data: veya http: her ikisi de geçerli
+    img=ip.src;
   }
-  // editId varsa ve görsel alanı hiç açılmadıysa (tip fotoğraf/link değil) → eski resmi koru
   const imgFieldVisible=document.getElementById('field-img').style.display!=='none';
   if(editId && !imgFieldVisible){
     img=(notes.find(n=>n.id===editId)||{}).img||'';
   }
   if(!title&&!text&&!link&&!card&&!img){showToast('⚠️ En az bir alan doldur');return}
-  if(editId){const i=notes.findIndex(n=>n.id===editId);if(i>-1)notes[i]={...notes[i],title,text,link,card,tag,img,type:currentType,color:currentColor,updatedAt:Date.now()};showToast('✅ Güncellendi')}
-  else{notes.unshift({id:uid(),title,text,link,card,tag,img,type:currentType,color:currentColor,createdAt:Date.now(),updatedAt:Date.now()});showToast('✅ Kaydedildi')}
+
+  if(editId){
+    const i=notes.findIndex(n=>n.id===editId);
+    if(i>-1) notes[i]={...notes[i],title,text,link,card,tag,img,type:currentType,color:currentColor,pinned,pinProtect,linkedId:selectedLinkId||notes[i].linkedId||null,reminder,updatedAt:Date.now()};
+    showToast('✅ Güncellendi');
+  } else {
+    notes.unshift({id:uid(),title,text,link,card,tag,img,type:currentType,color:currentColor,pinned,pinProtect,linkedId:selectedLinkId||null,reminder,createdAt:Date.now(),updatedAt:Date.now()});
+    showToast('✅ Kaydedildi');
+  }
+  // Hatırlatıcı planla
+  if(reminder){
+    const saved=editId?notes.find(n=>n.id===editId):notes[0];
+    if(saved) scheduleReminder(saved);
+  }
   save();closeModal('editModal');renderNotes();
 }
 function editNote(id){const n=notes.find(n=>n.id===id);if(!n)return;editId=n.id;document.getElementById('editModalTitle').textContent='Notu Düzenle';populateForm(n);openModal('editModal')}
@@ -815,18 +890,39 @@ function closeLightbox(e){
 }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
 
-function openDetail(id){
+async function openDetail(id){
   const n=notes.find(n=>n.id===id);if(!n)return;
+
+  // 2. PIN kilidi — kart türü ve pinProtect işaretliyse
+  if(n.pinProtect){
+    const ok=await askPin('verify','Bu notu görüntülemek için PIN girin');
+    if(!ok) return;
+  }
+
   detailId=id;
-  const tc=TC[n.tag]||'var(--text3)';
-  let html='';
+  const tc=TC[n.tag]||n.color||'var(--text3)';
+
+  // 3. Renk tonu detay başlık şeridi
+  let colorBanner='';
+  if(n.color && n.color!=='#c8a96e'){
+    const hex=n.color;
+    const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    colorBanner=`<div style="height:4px;background:${n.color};border-radius:4px 4px 0 0;margin:-1px -1px 0"></div>`;
+  }
+
+  let html=colorBanner;
   if(n.img)html+=`<img class="detail-img" src="${esc(n.img)}" alt="" onclick="openLightbox('${esc(n.img).replace(/'/g,"\\'")}')" style="cursor:zoom-in" title="Tam ekran için dokun">`;
   html+=`<div class="detail-body">`;
-  if(n.tag)html+=`<div style="margin-bottom:10px"><span style="color:${tc};border:1px solid ${tc};font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 10px;border-radius:30px">${TE[n.tag]||''} ${n.tag}</span></div>`;
+  if(n.tag)html+=`<div style="margin-bottom:10px"><span style="color:${tc};border:1px solid ${tc};font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 10px;border-radius:30px">${TE[n.tag]||''} ${n.tag}</span>${n.pinned?' <span style="font-size:0.85rem">📌</span>':''}</div>`;
+  else if(n.pinned)html+=`<div style="margin-bottom:10px;font-size:0.9rem">📌 Sabitlenmiş</div>`;
   if(n.title)html+=`<div class="detail-title">${esc(n.title)}</div>`;
   if(n.card)html+=`<div class="detail-card-box"><span>${maskCard(n.card)}</span><button class="copy-btn" onclick="copyText('${n.card.replace(/'/g,"\\'")}')">📋 Kopyala</button></div>`;
   if(n.link)html+=`<a class="detail-link-box" href="${esc(n.link)}" target="_blank" rel="noopener">🔗 <span>${esc(n.link)}</span></a>`;
   if(n.text)html+=`<div class="detail-text">${esc(n.text)}</div>`;
+  // 4. Hatırlatıcı
+  if(n.reminder){const rd=new Date(n.reminder);html+=`<div style="margin-top:10px;font-size:0.75rem;color:var(--text3);background:var(--surface2);border-radius:8px;padding:6px 10px">🔔 ${rd.toLocaleString('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>`;}
+  // 7. Bağlı not
+  if(n.linkedId){const ln=notes.find(x=>x.id===n.linkedId);if(ln)html+=`<div class="detail-linked-box" onclick="closeModal('detailModal');setTimeout(()=>openDetail('${ln.id}'),150)">${TYE[ln.type]||'📝'} <span>bkz. ${escPure(ln.title||ln.text||'—')}</span> <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">→</span></div>`;}
   const d=new Date(n.createdAt);
   html+=`<div class="detail-meta">${TYE[n.type]||''} ${d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>`;
   document.getElementById('detailContent').innerHTML=html;
@@ -877,23 +973,49 @@ function groupNotes(arr){
 
 function noteCardHtml(n,i){
   const isCompact=currentView==='compact';
-  const tc=TC[n.tag]||'var(--border)';
+  const tc=TC[n.tag]||n.color||'var(--border)';
   const d=new Date(n.updatedAt||n.createdAt);
   const ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
   const delay=Math.min(i*0.03,0.22);
+  const q=document.getElementById('searchInput').value.trim();
+
+  // 3. Kart arka plan renk tonu
+  let cardStyle=`--tag-color:${tc};animation-delay:${delay}s;`;
+  let cardClass='note-card';
+  if(n.color && n.color!=='#c8a96e'){
+    // rgba tonu — çok hafif
+    const hex=n.color;
+    const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+    cardStyle+=`--card-tint:rgba(${r},${g},${b},0.07);`;
+    cardClass+=' has-color-tint';
+  }
+  if(n.pinned) cardClass+=' is-pinned';
+
+  // 1. Pin rozeti
+  const pinBadge=`<div class="pin-badge${n.pinned?' pinned':''}" onclick="togglePin('${n.id}',event)" title="${n.pinned?'Sabiti Kaldır':'Sabitle'}">${n.pinned?'📌':'📍'}</div>`;
+
   let top='';
   if(!isCompact){
     if(n.img) top=`<div class="note-img-wrap"><img class="note-img" src="${esc(n.img)}" alt="" loading="lazy"></div>`;
     else if(n.type==='fotograf') top=`<div class="note-img-wrap"><div class="note-img-ph">${TYE[n.type]}</div></div>`;
   }
+
+  // 5. Arama vurgusu — başlık ve preview için
+  const titleHtml=n.title?`<div class="note-title">${highlight(n.title,q)}</div>`:'';
+  const previewHtml=n.text?`<div class="note-preview">${highlight(n.text,q)}</div>`:'';
+
   let extras='';
-  if(!isCompact){if(n.card)extras+=`<div class="note-card-num">${maskCard(n.card)}</div>`;if(n.link)extras+=`<div class="note-link-chip">🔗<span>${esc(n.link)}</span></div>`}
+  if(!isCompact){
+    if(n.card)extras+=`<div class="note-card-num">${maskCard(n.card)}</div>`;
+    if(n.link)extras+=`<div class="note-link-chip">🔗<span>${esc(n.link)}</span></div>`;
+    if(n.linkedId){const ln=notes.find(x=>x.id===n.linkedId);if(ln)extras+=`<div style="font-size:0.68rem;color:var(--text3);margin-top:5px">🔗 bkz. ${escPure(ln.title||ln.text||'—').slice(0,28)}</div>`;}
+  }
   const tagHtml=(!isCompact&&n.tag&&currentGroup!=='tag')?`<div class="note-tags"><span class="note-tag" style="color:${tc};border-color:${tc}">${TE[n.tag]||''} ${n.tag}</span></div>`:'';
-  return`<div class="note-card" onclick="openDetail('${n.id}')" style="--tag-color:${tc};animation-delay:${delay}s">
-    ${top}<div class="compact-dot" style="--tag-color:${TC[n.tag]||'var(--text3)'}"></div>
-    <div class="note-body">${tagHtml}${n.title?`<div class="note-title">${esc(n.title)}</div>`:''}${n.text?`<div class="note-preview">${esc(n.text)}</div>`:''}${extras}</div>
+  return`<div class="${cardClass}" onclick="openDetail('${n.id}')" style="${cardStyle}">
+    ${pinBadge}${top}<div class="compact-dot" style="--tag-color:${TC[n.tag]||'var(--text3)'}"></div>
+    <div class="note-body">${tagHtml}${titleHtml}${previewHtml}${extras}</div>
     <div class="note-footer">
-      <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}</span>
+      <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}${n.reminder&&new Date(n.reminder)>new Date()?' 🔔':''}</span>
       <div class="note-actions">
         <button class="note-action-btn" onclick="event.stopPropagation();editNote('${n.id}')">✏️</button>
         <button class="note-action-btn del" onclick="deleteNote('${n.id}',event)">🗑</button>
@@ -915,14 +1037,16 @@ function renderNotes(){
     return;
   }
   const sorted=sortNotes(filtered);
-  const groups=groupNotes(sorted);
+  // 1. Sabitlenmiş notları üste al
+  const pinnedFirst=[...sorted.filter(n=>n.pinned),...sorted.filter(n=>!n.pinned)];
+  const groups=groupNotes(pinnedFirst);
   const hasGroups=currentGroup!=='none';
   // Gruplu modda ana grid her zaman flex column — inner grid kendi stilini alır
   if(hasGroups) grid.style.cssText='display:flex;flex-direction:column;gap:14px';
   else grid.style.cssText='';
 
   if(!hasGroups){
-    grid.innerHTML=sorted.map((n,i)=>noteCardHtml(n,i)).join('');
+    grid.innerHTML=pinnedFirst.map((n,i)=>noteCardHtml(n,i)).join('');
   } else {
     // Gruplu: her grup için başlık + grid
     grid.innerHTML=groups.map(g=>{
@@ -944,7 +1068,7 @@ function togglePin(id, e) {
   const n = notes.find(n=>n.id===id); if(!n) return;
   n.pinned = !n.pinned;
   save(); renderNotes();
-  showToast(n.pinned ? '📌 Sabitlendı' : '📌 Sabit kaldırıldı');
+  showToast(n.pinned ? '📌 Sabitlendi' : '📌 Sabit kaldırıldı');
 }
 
 // ══════════════════════════════════════════════════
@@ -1380,6 +1504,11 @@ renderNotes();
 fixToolbarTop();
 window.addEventListener('resize', fixToolbarTop);
 setupPWA();
+// Kayıtlı hatırlatıcıları planla
+notes.forEach(n=>{ if(n.reminder) scheduleReminder(n); });
+// Hatırlatıcı alanı değişince izin iste
+const remEl=document.getElementById('f-reminder');
+if(remEl) remEl.addEventListener('change',()=>{ if(remEl.value) requestNotifPerm(); });
 </script>
 </body>
 </html>
