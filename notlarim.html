@@ -1,0 +1,865 @@
+<!--
+  Notlarım — Kişisel Not Uygulaması
+  Copyright (C) 2026 sebasmobil
+
+  Bu program özgür yazılımdır: Free Software Foundation tarafından
+  yayımlanan GNU Affero Genel Kamu Lisansı'nın 3. sürümü veya
+  (tercihinize göre) sonraki sürümleri kapsamında yeniden dağıtabilir
+  ve/veya değiştirebilirsiniz.
+
+  Bu program, yararlı olacağı umuduyla dağıtılmaktadır; ancak herhangi
+  bir garantisi YOKTUR; hatta ZIMNİ GARANTİ bile verilmez. Ayrıntılar
+  için GNU Affero Genel Kamu Lisansı'na bakınız.
+
+  Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
+  almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
+
+  Version : Pro 1.0.01
+  License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
+  Author  : sebasmobil
+  Year    : 2026
+-->
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark" data-view="grid">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Notlarım">
+<meta name="application-name" content="Notlarım">
+<meta name="theme-color" content="#0f0f13">
+<meta name="description" content="Kişisel not uygulaması — metin, fotoğraf, link, kart">
+<link rel="apple-touch-icon" id="apple-touch-icon" href="">
+<link rel="icon" type="image/png" id="favicon" href="">
+<link rel="manifest" id="pwa-manifest" href="">
+<title>Notlarım</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease}
+[data-theme="dark"]{--bg:#0f0f13;--surface:#18181f;--surface2:#1f1f2a;--surface3:#252532;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);--text:#f0f0f5;--text2:#9090a8;--text3:#5a5a72;--shadow:0 8px 32px rgba(0,0,0,0.55);--topbar-bg:rgba(15,15,19,0.93)}
+[data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.04);--text:#1a1916;--text2:#5a5850;--text3:#9a9890;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
+[data-theme="sepia"]{--bg:#f5ede0;--surface:#fdf6ec;--surface2:#f0e4d0;--surface3:#e8d8c0;--border:rgba(120,80,30,0.12);--border2:rgba(120,80,30,0.06);--text:#3a2a18;--text2:#7a6048;--text3:#b09070;--shadow:0 4px 24px rgba(80,40,0,0.12);--topbar-bg:rgba(245,237,224,0.93);--accent:#9a6030;--accent2:#c08050}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
+
+/* VERSİYON BARI */
+.version-bar{
+  width:100%;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  padding:5px 16px;
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;
+  font-size:0.62rem;
+  font-weight:500;
+  letter-spacing:0.04em;
+  color:var(--text3);
+  user-select:none;
+  -webkit-user-select:none;
+}
+.vb-sep{opacity:0.35;font-size:0.55rem}
+.vb-link{
+  color:var(--text3);
+  text-decoration:none;
+  cursor:pointer;
+  transition:color 0.15s;
+}
+.vb-link:hover{color:var(--accent)}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 14px;height:58px;display:flex;align-items:center;gap:10px}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
+.search-wrap{flex:1;position:relative}
+.search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:8px 14px 8px 34px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:0.85rem;pointer-events:none}
+.topbar-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:1rem;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:var(--trans);flex-shrink:0}
+.icon-btn.accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-size:1.2rem;font-weight:900;box-shadow:0 3px 12px rgba(200,169,110,0.3)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:58px;z-index:99}
+.filters{flex:1;display:flex;gap:6px;padding:9px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter-chip{padding:5px 12px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);font-family:'DM Sans',sans-serif;flex-shrink:0}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.view-switcher{padding:6px 12px 6px 0;flex-shrink:0;position:relative}
+.view-toggle-btn{height:32px;padding:0 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:6px;transition:var(--trans);white-space:nowrap;font-family:'DM Sans',sans-serif}
+/* SIRALAMA */
+.sort-wrap{position:relative;flex-shrink:0;padding:6px 0 6px 6px}
+.sort-btn{height:32px;padding:0 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px;transition:var(--trans);white-space:nowrap;font-family:'DM Sans',sans-serif}
+.sort-btn.has-sort{border-color:var(--accent);color:var(--accent)}
+.sort-dropdown{position:absolute;top:calc(100% + 4px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow);overflow:hidden;display:none;z-index:200;min-width:180px;animation:dropIn 0.18s ease}
+.sort-dropdown.open{display:block}
+.sort-drop-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font-size:0.82rem;font-weight:600;color:var(--text2);cursor:pointer;transition:background 0.12s;font-family:'DM Sans',sans-serif;border:none;background:none;width:100%;text-align:left;gap:8px}
+.sort-drop-item:hover{background:var(--surface2)}
+.sort-drop-item.active{color:var(--accent)}
+.sort-drop-item .sort-check{font-size:0.8rem;opacity:0;flex-shrink:0}
+.sort-drop-item.active .sort-check{opacity:1}
+.sort-divider{height:1px;background:var(--border);margin:4px 0}
+.sort-section-label{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:8px 14px 4px}
+/* GRUP BAŞLIĞI */
+.group-header{display:flex;align-items:center;gap:10px;padding:6px 2px 4px;margin-top:8px}
+.group-header:first-child{margin-top:0}
+.group-title{font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.group-line{flex:1;height:1px;background:var(--border)}
+.group-count{font-size:0.62rem;color:var(--text3);font-weight:600}
+.group-block{margin-bottom:6px}
+.view-toggle-btn:active{opacity:0.75}
+.view-toggle-btn .vt-icon{font-size:1rem}
+.view-dropdown{position:absolute;top:calc(100% + 4px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow);overflow:hidden;display:none;z-index:200;min-width:140px;animation:dropIn 0.18s ease}
+.view-dropdown.open{display:block}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px) scale(0.97)}to{opacity:1;transform:none}}
+.view-drop-item{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:0.82rem;font-weight:600;color:var(--text2);cursor:pointer;transition:background 0.12s;font-family:'DM Sans',sans-serif;border:none;background:none;width:100%;text-align:left}
+.view-drop-item:hover{background:var(--surface2)}
+.view-drop-item.active{color:var(--accent)}
+.view-drop-item .vdi-icon{font-size:1.05rem;width:20px;text-align:center}
+
+/* CONTAINER */
+.notes-container{padding:10px 12px 110px}
+.notes-count{font-size:0.7rem;color:var(--text3);padding:0 2px 8px}
+
+/* GRID */
+[data-view="grid"] .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px}
+@media(max-width:480px){[data-view="grid"] .notes-grid{grid-template-columns:1fr}}
+
+/* MASONRY */
+[data-view="masonry"] .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:start}
+@media(max-width:360px){[data-view="masonry"] .notes-grid{grid-template-columns:1fr}}
+
+/* LIST */
+[data-view="list"] .notes-grid{display:flex;flex-direction:column;gap:7px}
+
+/* COMPACT */
+[data-view="compact"] .notes-grid{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border2)}
+
+/* KART */
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.18s,box-shadow 0.18s,border-color 0.18s;animation:cardIn 0.28s ease both;position:relative;break-inside:avoid}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:none}}
+.note-card:active{transform:scale(0.98)}
+.note-card:hover{border-color:rgba(200,169,110,0.3);box-shadow:var(--shadow)}
+.note-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tag-color,transparent)}
+.note-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.note-img-ph{width:100%;aspect-ratio:16/9;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--text3)}
+[data-view="masonry"] .note-img{aspect-ratio:auto;max-height:200px}
+[data-view="masonry"] .note-img-ph{aspect-ratio:4/3}
+.note-body{padding:13px 14px 9px}
+.note-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.note-tag{font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 8px;border-radius:30px;border:1px solid currentColor;opacity:0.9}
+.note-title{font-family:'Playfair Display',serif;font-size:0.98rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.note-preview{font-size:0.79rem;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+[data-view="masonry"] .note-preview{-webkit-line-clamp:5}
+.note-card-num{font-family:monospace;font-size:0.76rem;color:var(--accent);letter-spacing:0.12em;margin-top:6px;font-weight:600}
+.note-link-chip{display:flex;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;background:var(--surface2);border-radius:8px;font-size:0.71rem;color:var(--blue);overflow:hidden}
+.note-link-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-footer{padding:7px 13px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border2)}
+.note-date{font-size:0.67rem;color:var(--text3)}
+.note-actions{display:flex;gap:5px}
+.note-action-btn{width:26px;height:26px;border-radius:7px;border:none;background:var(--surface2);color:var(--text3);cursor:pointer;font-size:0.78rem;display:flex;align-items:center;justify-content:center;transition:var(--trans)}
+.note-action-btn:hover{background:rgba(200,169,110,0.15);color:var(--accent)}
+.note-action-btn.del:hover{background:rgba(224,92,92,0.15);color:var(--red)}
+
+/* LIST GÖRÜNÜM */
+[data-view="list"] .note-card{border-radius:var(--r2);display:flex;align-items:stretch}
+[data-view="list"] .note-card::before{width:4px;height:100%;right:auto;bottom:0;top:0;border-radius:var(--r2) 0 0 var(--r2)}
+[data-view="list"] .note-img{width:78px;height:78px;aspect-ratio:1;flex-shrink:0;border-radius:var(--r2) 0 0 var(--r2)}
+[data-view="list"] .note-img-ph{width:72px;flex-shrink:0;aspect-ratio:1;border-radius:var(--r2) 0 0 var(--r2);font-size:1.5rem}
+[data-view="list"] .note-body{padding:10px 12px 8px;flex:1;min-width:0}
+[data-view="list"] .note-title{font-size:0.92rem;-webkit-line-clamp:1}
+[data-view="list"] .note-preview{-webkit-line-clamp:2}
+[data-view="list"] .note-footer{padding:0 12px 10px;border:none}
+[data-view="list"] .note-tags{margin-bottom:4px}
+
+/* COMPACT GÖRÜNÜM */
+[data-view="compact"] .note-card{border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border2);background:transparent;display:flex;align-items:center;padding:10px 13px;gap:0}
+[data-view="compact"] .note-card:hover{background:var(--surface2);box-shadow:none;border-color:var(--border2)}
+[data-view="compact"] .note-card::before{display:none}
+[data-view="compact"] .note-img,[data-view="compact"] .note-img-ph{display:none}
+[data-view="compact"] .note-body{padding:0;flex:1;min-width:0}
+[data-view="compact"] .note-title{font-size:0.87rem;-webkit-line-clamp:1;font-family:'DM Sans',sans-serif;font-weight:600;margin-bottom:2px}
+[data-view="compact"] .note-preview{-webkit-line-clamp:1;font-size:0.75rem}
+[data-view="compact"] .note-tags,[data-view="compact"] .note-card-num,[data-view="compact"] .note-link-chip{display:none}
+[data-view="compact"] .note-footer{border:none;padding:0 0 0 10px;flex-shrink:0}
+[data-view="compact"] .note-date{font-size:0.64rem}
+.compact-dot{width:7px;height:7px;border-radius:50%;background:var(--tag-color,var(--text3));flex-shrink:0;margin-right:10px;display:none}
+[data-view="compact"] .compact-dot{display:block}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:70px 20px;grid-column:1/-1}
+.empty-icon{font-size:3.5rem;margin-bottom:14px;opacity:0.35}
+.empty-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:0.8rem;color:var(--text3)}
+
+/* PANEL */
+.panel-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.55);backdrop-filter:blur(5px);display:none;align-items:flex-end}
+.panel-overlay.open{display:flex}
+.panel{width:100%;max-width:480px;margin:0 auto;background:var(--surface);border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border);border-bottom:none;padding:0 20px 44px;animation:slideUp 0.26s cubic-bezier(0.32,0.72,0,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.panel-handle{width:34px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 22px}
+.panel-section{margin-bottom:22px}
+.panel-label{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.theme-row{display:flex;gap:10px}
+.theme-btn{flex:1;padding:13px 8px;border-radius:var(--r2);border:2px solid var(--border);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;text-align:center;transition:var(--trans);background:var(--surface2);color:var(--text2)}
+.theme-btn.active{border-color:var(--accent);color:var(--text)}
+.theme-preview{width:28px;height:28px;border-radius:8px;margin:0 auto 7px;border:1px solid var(--border)}
+.view-option-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.view-option-btn{padding:12px 6px;border-radius:var(--r2);border:2px solid var(--border);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;text-align:center;transition:var(--trans);background:var(--surface2);color:var(--text2)}
+.view-option-btn.active{border-color:var(--accent);color:var(--text)}
+.view-icon{font-size:1.4rem;display:block;margin-bottom:5px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);display:none;align-items:flex-end}
+.modal-overlay.open{display:flex}
+.modal{width:100%;max-width:560px;margin:0 auto;background:var(--surface);border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border);border-bottom:none;max-height:92vh;display:flex;flex-direction:column;animation:slideUp 0.26s cubic-bezier(0.32,0.72,0,1)}
+.modal-handle{width:34px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0;flex-shrink:0}
+.modal-scroll{overflow-y:auto;padding:18px 20px 44px;flex:1;-webkit-overflow-scrolling:touch}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;color:var(--text);margin-bottom:18px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.15s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text3)}
+.field textarea{resize:vertical;min-height:88px;line-height:1.6}
+.field select{cursor:pointer}
+.field select option{background:var(--surface)}
+.type-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px}
+.type-btn{padding:9px 3px;border-radius:var(--r2);border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:1.1rem;text-align:center;transition:var(--trans);display:flex;flex-direction:column;align-items:center;gap:3px}
+.type-btn span{font-size:0.57rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em}
+.type-btn.active{border-color:var(--accent);background:rgba(200,169,110,0.1)}
+.type-btn.active span{color:var(--accent)}
+.color-row{display:flex;gap:7px;flex-wrap:wrap}
+.color-dot{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s}
+.color-dot.active{border-color:var(--text);transform:scale(1.22)}
+.img-upload-area{border:2px dashed var(--border);border-radius:var(--r2);padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s;position:relative}
+.img-upload-area:hover{border-color:var(--accent)}
+.img-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-upload-preview{width:100%;border-radius:8px;margin-top:10px;display:none}
+.img-hint{font-size:0.8rem;color:var(--text3)}
+.btn-row{display:flex;gap:8px;margin-top:18px}
+.btn{flex:1;padding:12px;border-radius:var(--r2);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.88rem;transition:var(--trans)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:active{opacity:0.85}
+.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-danger{background:rgba(224,92,92,0.12);color:var(--red);border:1px solid rgba(224,92,92,0.2)}
+
+/* DETAY */
+.detail-img{width:100%;max-height:260px;object-fit:cover;display:block;border-radius:var(--r) var(--r) 0 0}
+.detail-body{padding:18px 20px 8px}
+.detail-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;margin-bottom:12px;line-height:1.3}
+.detail-text{font-size:0.88rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.detail-card-box{font-family:monospace;font-size:1.05rem;color:var(--accent);letter-spacing:0.18em;padding:13px 14px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.copy-btn{padding:5px 11px;border-radius:8px;border:none;background:rgba(200,169,110,0.15);color:var(--accent);font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.detail-link-box{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;color:var(--blue);text-decoration:none;font-size:0.83rem;border:1px solid rgba(92,160,224,0.2);word-break:break-all}
+.detail-meta{font-size:0.68rem;color:var(--text3);margin-top:14px}
+.detail-actions{display:flex;gap:8px;padding:12px 20px 20px}
+.detail-actions .btn{padding:10px;font-size:0.82rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface);border:1px solid var(--border);border-radius:30px;padding:9px 18px;font-size:0.8rem;font-weight:600;box-shadow:var(--shadow);z-index:999;opacity:0;transition:all 0.22s ease;pointer-events:none;white-space:nowrap;color:var(--text)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:18px;z-index:150;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;cursor:pointer;font-size:1.5rem;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 20px rgba(200,169,110,0.45);transition:transform 0.15s;font-weight:900}
+.fab:active{transform:scale(0.92)}
+</style>
+</head>
+<body>
+<div class="version-bar">
+  <span>Pro 1.0.01</span>
+  <span class="vb-sep">|</span>
+  <span>©sebasmobil 2026</span>
+  <span class="vb-sep">|</span>
+  <a class="vb-link" href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
+</div>
+
+<div class="topbar">
+  <div class="topbar-title">✦ Notlarım</div>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()">
+  </div>
+  <div class="topbar-actions">
+    <button class="icon-btn" onclick="openPanel()" title="Tema & Görünüm">⚙</button>
+    <button class="icon-btn accent" onclick="openAdd()">+</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="filters">
+    <button class="filter-chip active" data-filter="all"      onclick="setFilter('all',this)">Tümü</button>
+    <button class="filter-chip" data-filter="metin"    onclick="setFilter('metin',this)">📝 Metin</button>
+    <button class="filter-chip" data-filter="fotograf" onclick="setFilter('fotograf',this)">📷 Fotoğraf</button>
+    <button class="filter-chip" data-filter="link"     onclick="setFilter('link',this)">🔗 Link</button>
+    <button class="filter-chip" data-filter="kart"     onclick="setFilter('kart',this)">💳 Kart</button>
+    <button class="filter-chip" data-filter="diger"    onclick="setFilter('diger',this)">📌 Diğer</button>
+  </div>
+  <div class="sort-wrap">
+    <button class="sort-btn" id="sortBtn" onclick="toggleSortDropdown()">
+      <span id="sortIcon">↕</span>
+      <span id="sortLabel">Sırala</span>
+      <span style="font-size:0.6rem;opacity:0.6">▾</span>
+    </button>
+    <div class="sort-dropdown" id="sortDropdown">
+      <div class="sort-section-label">Sıralama</div>
+      <button class="sort-drop-item active" data-sort="newest" onclick="setSort('newest',this)">🕐 Yeni → Eski<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-sort="oldest" onclick="setSort('oldest',this)">🕰 Eski → Yeni<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-sort="az" onclick="setSort('az',this)">🔤 A → Z<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-sort="za" onclick="setSort('za',this)">🔤 Z → A<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-sort="updated" onclick="setSort('updated',this)">✏️ Son Düzenleme<span class="sort-check">✓</span></button>
+      <div class="sort-divider"></div>
+      <div class="sort-section-label">Gruplandır</div>
+      <button class="sort-drop-item" data-group="none" onclick="setGroup('none',this)">— Gruplandırma Yok<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-group="tag" onclick="setGroup('tag',this)">🏷 Etikete Göre<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-group="type" onclick="setGroup('type',this)">📂 Türe Göre<span class="sort-check">✓</span></button>
+      <button class="sort-drop-item" data-group="date" onclick="setGroup('date',this)">📅 Tarihe Göre<span class="sort-check">✓</span></button>
+    </div>
+  </div>
+  <div class="view-switcher">
+    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleViewDropdown()">
+      <span class="vt-icon" id="viewIcon">⊞</span>
+      <span id="viewLabel">Kart</span>
+      <span style="font-size:0.6rem;opacity:0.6">▾</span>
+    </button>
+    <div class="view-dropdown" id="viewDropdown">
+      <button class="view-drop-item active" data-view="grid"    onclick="setView('grid',this)"><span class="vdi-icon">⊞</span>Kart</button>
+      <button class="view-drop-item"        data-view="masonry" onclick="setView('masonry',this)"><span class="vdi-icon">⊟</span>Masonry</button>
+      <button class="view-drop-item"        data-view="list"    onclick="setView('list',this)"><span class="vdi-icon">☰</span>Liste</button>
+      <button class="view-drop-item"        data-view="compact" onclick="setView('compact',this)"><span class="vdi-icon">≡</span>Kompakt</button>
+    </div>
+  </div>
+</div>
+
+<div class="notes-container">
+  <div class="notes-count" id="notesCount"></div>
+  <div class="notes-grid" id="notesGrid"></div>
+</div>
+
+<button class="fab" onclick="openAdd()">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- PANEL -->
+<div class="panel-overlay" id="settingsPanel" onclick="if(event.target===this)closePanel()">
+  <div class="panel">
+    <div class="panel-handle"></div>
+    <div class="panel-section">
+      <div class="panel-label">🎨 Tema</div>
+      <div class="theme-row">
+        <button class="theme-btn active" data-theme="dark"  onclick="setTheme('dark',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#0f0f13,#1f1f2a)"></div>Karanlık</button>
+        <button class="theme-btn"        data-theme="light" onclick="setTheme('light',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#f4f3ef,#ffffff);border-color:rgba(0,0,0,0.1)"></div>Aydınlık</button>
+        <button class="theme-btn"        data-theme="sepia" onclick="setTheme('sepia',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#f5ede0,#fdf6ec);border-color:rgba(120,80,30,0.15)"></div>Sepia</button>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">📐 Görünüm</div>
+      <div class="view-option-row">
+        <button class="view-option-btn active" data-view="grid"    onclick="setViewP('grid',this)"><span class="view-icon">⊞</span>Kart</button>
+        <button class="view-option-btn"        data-view="masonry" onclick="setViewP('masonry',this)"><span class="view-icon">⊟</span>Masonry</button>
+        <button class="view-option-btn"        data-view="list"    onclick="setViewP('list',this)"><span class="view-icon">☰</span>Liste</button>
+        <button class="view-option-btn"        data-view="compact" onclick="setViewP('compact',this)"><span class="view-icon">≡</span>Kompakt</button>
+      </div>
+    </div>
+    <div class="panel-section" style="margin-bottom:0">
+      <div class="panel-label">💾 Yedek</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" style="font-size:0.8rem;padding:10px" onclick="exportNotes()">⬇️ Yedek Al</button>
+        <label class="btn btn-secondary" style="font-size:0.8rem;padding:10px;cursor:pointer;text-align:center">⬆️ Geri Yükle<input type="file" accept=".json" onchange="importNotes(event)" style="display:none"></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EKLE/DÜZENLE MODAL -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll">
+      <div class="modal-title" id="editModalTitle">Yeni Not</div>
+      <div class="type-grid">
+        <div class="type-btn active" data-type="metin"    onclick="setType('metin',this)">📝<span>Metin</span></div>
+        <div class="type-btn"        data-type="fotograf"  onclick="setType('fotograf',this)">📷<span>Fotoğraf</span></div>
+        <div class="type-btn"        data-type="link"      onclick="setType('link',this)">🔗<span>Link</span></div>
+        <div class="type-btn"        data-type="kart"      onclick="setType('kart',this)">💳<span>Kart</span></div>
+        <div class="type-btn"        data-type="diger"     onclick="setType('diger',this)">📌<span>Diğer</span></div>
+      </div>
+      <div class="field"><label>Başlık</label><input type="text" id="f-title" placeholder="Başlık ekle…"></div>
+      <div class="field" id="field-img" style="display:none">
+        <label>Fotoğraf / Ekran Görüntüsü</label>
+        <div class="img-upload-area"><input type="file" accept="image/*" id="f-img" onchange="handleImg(event)"><div class="img-hint" id="imgHint">📷 Fotoğraf seç veya ekran görüntüsü yükle</div><img class="img-upload-preview" id="imgPreview"></div>
+      </div>
+      <div class="field"><label id="textLabel">Not</label><textarea id="f-text" placeholder="Buraya yaz…"></textarea></div>
+      <div class="field" id="field-link" style="display:none"><label>Web Adresi</label><input type="url" id="f-link" placeholder="https://…"></div>
+      <div class="field" id="field-card" style="display:none">
+        <label>Kart Numarası / Kod</label>
+        <input type="text" id="f-card" placeholder="1234 5678 9012 3456" maxlength="60" style="font-family:monospace;letter-spacing:0.1em">
+        <div style="margin-top:5px;font-size:0.69rem;color:var(--text3)">⚠️ Cihazınızda localStorage'da saklanır</div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div class="field" style="flex:1"><label>Etiket</label>
+          <select id="f-tag">
+            <option value="">— Seç —</option>
+            <option value="kişisel">👤 Kişisel</option>
+            <option value="iş">💼 İş</option>
+            <option value="alışveriş">🛒 Alışveriş</option>
+            <option value="seyahat">✈️ Seyahat</option>
+            <option value="finans">💰 Finans</option>
+            <option value="fikir">💡 Fikir</option>
+            <option value="önemli">⭐ Önemli</option>
+          </select>
+        </div>
+        <div class="field" style="flex:0 0 auto"><label>Renk</label>
+          <div class="color-row">
+            <div class="color-dot active" style="background:#c8a96e" data-color="#c8a96e" onclick="setColor('#c8a96e',this)"></div>
+            <div class="color-dot" style="background:#5ce07a" data-color="#5ce07a" onclick="setColor('#5ce07a',this)"></div>
+            <div class="color-dot" style="background:#5ca0e0" data-color="#5ca0e0" onclick="setColor('#5ca0e0',this)"></div>
+            <div class="color-dot" style="background:#e05c5c" data-color="#e05c5c" onclick="setColor('#e05c5c',this)"></div>
+            <div class="color-dot" style="background:#a06ce0" data-color="#a06ce0" onclick="setColor('#a06ce0',this)"></div>
+            <div class="color-dot" style="background:#5a5a72" data-color="#5a5a72" onclick="setColor('#5a5a72',this)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('editModal')">İptal</button>
+        <button class="btn btn-primary" onclick="saveNote()">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAY MODAL -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal('detailModal')">
+  <div class="modal" style="border-radius:var(--r)">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll" style="padding:0 0 4px">
+      <div id="detailContent"></div>
+      <div class="detail-actions">
+        <button class="btn btn-secondary" onclick="editCurrentNote()">✏️ Düzenle</button>
+        <button class="btn btn-danger" onclick="deleteCurrentNote()">🗑 Sil</button>
+        <button class="btn btn-secondary" onclick="closeModal('detailModal')">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let notes=[],editId=null,detailId=null,currentFilter='all',currentType='metin',currentColor='#c8a96e',currentTheme='dark',currentView='grid';
+const SK='notlarim_v3',PK='notlarim_prefs';
+const TC={kişisel:'#c8a96e',iş:'#5ca0e0',alışveriş:'#5ce07a',seyahat:'#a06ce0',finans:'#e05c5c',fikir:'#e07a5c',önemli:'#e8c98e'};
+const TE={kişisel:'👤',iş:'💼',alışveriş:'🛒',seyahat:'✈️',finans:'💰',fikir:'💡',önemli:'⭐'};
+const TYE={metin:'📝',fotograf:'📷',link:'🔗',kart:'💳',diger:'📌'};
+
+function save(){try{localStorage.setItem(SK,JSON.stringify(notes))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView}))}catch(e){}}
+function load(){
+  try{const d=localStorage.getItem(SK);if(d)notes=JSON.parse(d)}catch(e){notes=[]}
+  try{const p=localStorage.getItem(PK);if(p){const j=JSON.parse(p);currentTheme=j.theme||'dark';currentView=j.view||'grid'}}catch(e){}
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function setTheme(t,el){
+  currentTheme=t;
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
+  savePrefs();
+}
+const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
+function toggleViewDropdown(){const d=document.getElementById('viewDropdown');d.classList.toggle('open')}
+function closeViewDropdown(){const d=document.getElementById('viewDropdown');if(d)d.classList.remove('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('.view-switcher'))closeViewDropdown()});
+function setView(v,el){
+  currentView=v;
+  document.documentElement.setAttribute('data-view',v);
+  // toggle butonunu güncelle
+  const m=VIEW_META[v]||{icon:'⊞',label:'Kart'};
+  const icon=document.getElementById('viewIcon');const label=document.getElementById('viewLabel');
+  if(icon)icon.textContent=m.icon;if(label)label.textContent=m.label;
+  // dropdown item aktif
+  document.querySelectorAll('.view-drop-item').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  // panel butonları
+  document.querySelectorAll('.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  closeViewDropdown();
+  savePrefs();renderNotes();
+}
+function setViewP(v,el){setView(v,el)}
+let currentSort='newest', currentGroup='none';
+const SORT_LABELS={newest:'Yeni→Eski',oldest:'Eski→Yeni',az:'A→Z',za:'Z→A',updated:'Düzenleme'};
+const GROUP_LABELS={none:'Gruplandırma Yok',tag:'Etikete Göre',type:'Türe Göre',date:'Tarihe Göre'};
+
+function toggleSortDropdown(){document.getElementById('sortDropdown').classList.toggle('open')}
+function closeSortDropdown(){const d=document.getElementById('sortDropdown');if(d)d.classList.remove('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('.sort-wrap'))closeSortDropdown()});
+
+function setSort(s,el){
+  currentSort=s;
+  document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===s));
+  const lbl=document.getElementById('sortLabel');if(lbl)lbl.textContent=SORT_LABELS[s]||'Sırala';
+  const btn=document.getElementById('sortBtn');if(btn)btn.classList.add('has-sort');
+  updateSortBtnState();
+  renderNotes();
+}
+function setGroup(g,el){
+  currentGroup=g;
+  document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===g));
+  updateSortBtnState();
+  renderNotes();
+}
+function updateSortBtnState(){
+  const btn=document.getElementById('sortBtn');
+  const lbl=document.getElementById('sortLabel');
+  const icon=document.getElementById('sortIcon');
+  if(!btn)return;
+  const hasCustom=(currentSort!=='newest'||currentGroup!=='none');
+  btn.classList.toggle('has-sort',hasCustom);
+  if(currentGroup!=='none'){
+    if(lbl)lbl.textContent=GROUP_LABELS[currentGroup];
+    if(icon)icon.textContent='⊛';
+  } else {
+    if(lbl)lbl.textContent=SORT_LABELS[currentSort]||'Sırala';
+    if(icon)icon.textContent='↕';
+  }
+}
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderNotes()}
+function setType(t,el){
+  currentType=t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+  document.getElementById('field-img').style.display=t==='fotograf'?'':'none';
+  document.getElementById('field-link').style.display=t==='link'?'':'none';
+  document.getElementById('field-card').style.display=t==='kart'?'':'none';
+  document.getElementById('textLabel').textContent=t==='kart'?'Not (opsiyonel)':t==='link'?'Açıklama':t==='fotograf'?'Açıklama':'Not';
+}
+function setColor(c,el){currentColor=c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===c))}
+function handleImg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const p=document.getElementById('imgPreview');p.src=ev.target.result;p.style.display='block';document.getElementById('imgHint').style.display='none'};r.readAsDataURL(f)}
+
+function openAdd(){editId=null;document.getElementById('editModalTitle').textContent='Yeni Not';resetForm();openModal('editModal')}
+function resetForm(){
+  ['f-title','f-text','f-link','f-card'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-tag').value='';
+  document.getElementById('imgPreview').style.display='none';
+  document.getElementById('imgHint').style.display='';
+  document.getElementById('f-img').value='';
+  currentType='metin';currentColor='#c8a96e';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='metin'));
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color==='#c8a96e'));
+  setType('metin',null);
+}
+function populateForm(n){
+  document.getElementById('f-title').value=n.title||'';
+  document.getElementById('f-text').value=n.text||'';
+  document.getElementById('f-link').value=n.link||'';
+  document.getElementById('f-card').value=n.card||'';
+  document.getElementById('f-tag').value=n.tag||'';
+  currentType=n.type||'metin';currentColor=n.color||'#c8a96e';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===currentColor));
+  setType(currentType,null);
+  if(n.img){const p=document.getElementById('imgPreview');p.src=n.img;p.style.display='block';document.getElementById('imgHint').style.display='none'}
+}
+function saveNote(){
+  const title=document.getElementById('f-title').value.trim();
+  const text=document.getElementById('f-text').value.trim();
+  const link=document.getElementById('f-link').value.trim();
+  const card=document.getElementById('f-card').value.trim();
+  const tag=document.getElementById('f-tag').value;
+  const ip=document.getElementById('imgPreview');
+  const img=(ip.style.display!=='none'&&ip.src.startsWith('data:'))?ip.src:(editId?(notes.find(n=>n.id===editId)||{}).img||'':'');
+  if(!title&&!text&&!link&&!card&&!img){showToast('⚠️ En az bir alan doldur');return}
+  if(editId){const i=notes.findIndex(n=>n.id===editId);if(i>-1)notes[i]={...notes[i],title,text,link,card,tag,img,type:currentType,color:currentColor,updatedAt:Date.now()};showToast('✅ Güncellendi')}
+  else{notes.unshift({id:uid(),title,text,link,card,tag,img,type:currentType,color:currentColor,createdAt:Date.now(),updatedAt:Date.now()});showToast('✅ Kaydedildi')}
+  save();closeModal('editModal');renderNotes();
+}
+function editNote(id){const n=notes.find(n=>n.id===id);if(!n)return;editId=n.id;document.getElementById('editModalTitle').textContent='Notu Düzenle';populateForm(n);openModal('editModal')}
+function editCurrentNote(){closeModal('detailModal');setTimeout(()=>editNote(detailId),120)}
+function deleteNote(id,e){if(e)e.stopPropagation();if(!confirm('Bu not silinsin mi?'))return;notes=notes.filter(n=>n.id!==id);save();renderNotes();showToast('🗑 Silindi')}
+function deleteCurrentNote(){if(!detailId)return;if(!confirm('Bu not silinsin mi?'))return;notes=notes.filter(n=>n.id!==detailId);save();closeModal('detailModal');renderNotes();showToast('🗑 Silindi')}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function maskCard(s){const c=s.replace(/\s/g,'');return c.length>4?'•••• •••• •••• '+c.slice(-4):s}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('📋 Kopyalandı!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 Kopyalandı!')})}
+
+function openDetail(id){
+  const n=notes.find(n=>n.id===id);if(!n)return;
+  detailId=id;
+  const tc=TC[n.tag]||'var(--text3)';
+  let html='';
+  if(n.img)html+=`<img class="detail-img" src="${esc(n.img)}" alt="">`;
+  html+=`<div class="detail-body">`;
+  if(n.tag)html+=`<div style="margin-bottom:10px"><span style="color:${tc};border:1px solid ${tc};font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 10px;border-radius:30px">${TE[n.tag]||''} ${n.tag}</span></div>`;
+  if(n.title)html+=`<div class="detail-title">${esc(n.title)}</div>`;
+  if(n.card)html+=`<div class="detail-card-box"><span>${maskCard(n.card)}</span><button class="copy-btn" onclick="copyText('${n.card.replace(/'/g,"\\'")}')">📋 Kopyala</button></div>`;
+  if(n.link)html+=`<a class="detail-link-box" href="${esc(n.link)}" target="_blank" rel="noopener">🔗 <span>${esc(n.link)}</span></a>`;
+  if(n.text)html+=`<div class="detail-text">${esc(n.text)}</div>`;
+  const d=new Date(n.createdAt);
+  html+=`<div class="detail-meta">${TYE[n.type]||''} ${d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>`;
+  document.getElementById('detailContent').innerHTML=html;
+  openModal('detailModal');
+}
+
+function sortNotes(arr){
+  return [...arr].sort((a,b)=>{
+    if(currentSort==='newest') return (b.createdAt||0)-(a.createdAt||0);
+    if(currentSort==='oldest') return (a.createdAt||0)-(b.createdAt||0);
+    if(currentSort==='az') return (a.title||a.text||'').localeCompare(b.title||b.text||'','tr');
+    if(currentSort==='za') return (b.title||b.text||'').localeCompare(a.title||a.text||'','tr');
+    if(currentSort==='updated') return (b.updatedAt||0)-(a.updatedAt||0);
+    return 0;
+  });
+}
+
+function groupNotes(arr){
+  if(currentGroup==='none') return [{key:'',label:'',items:arr}];
+  const groups={};
+  arr.forEach(n=>{
+    let key='';
+    if(currentGroup==='tag')      key=n.tag||'__etiket_yok__';
+    else if(currentGroup==='type') key=n.type||'metin';
+    else if(currentGroup==='date'){
+      const d=new Date(n.createdAt||0);
+      const now=new Date(); const diff=Math.floor((now-d)/86400000);
+      key=diff===0?'__bugun__':diff===1?'__dun__':diff<=7?'__bu_hafta__':diff<=30?'__bu_ay__':d.getFullYear().toString();
+    }
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(n);
+  });
+  const groupLabels={
+    '__etiket_yok__':'🏷 Etiketsiz',
+    '__bugun__':'📅 Bugün','__dun__':'📅 Dün','__bu_hafta__':'📅 Bu Hafta','__bu_ay__':'📅 Bu Ay',
+    metin:'📝 Metin',fotograf:'📷 Fotoğraf',link:'🔗 Link',kart:'💳 Kart',diger:'📌 Diğer',
+    kişisel:'👤 Kişisel',iş:'💼 İş',alışveriş:'🛒 Alışveriş',seyahat:'✈️ Seyahat',finans:'💰 Finans',fikir:'💡 Fikir',önemli:'⭐ Önemli'
+  };
+  return Object.entries(groups).map(([key,items])=>({
+    key, label:groupLabels[key]||(key.match(/^\d{4}$/)?'📅 '+key:key), items
+  })).sort((a,b)=>{
+    const order=['__bugun__','__dun__','__bu_hafta__','__bu_ay__'];
+    const ai=order.indexOf(a.key), bi=order.indexOf(b.key);
+    if(ai>-1&&bi>-1)return ai-bi; if(ai>-1)return-1; if(bi>-1)return 1;
+    return a.label.localeCompare(b.label,'tr');
+  });
+}
+
+function noteCardHtml(n,i){
+  const isCompact=currentView==='compact';
+  const tc=TC[n.tag]||'var(--border)';
+  const d=new Date(n.updatedAt||n.createdAt);
+  const ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
+  const delay=Math.min(i*0.03,0.22);
+  let top='';
+  if(!isCompact){if(n.img)top=`<img class="note-img" src="${esc(n.img)}" alt="" loading="lazy">`;else if(n.type==='fotograf')top=`<div class="note-img-ph">${TYE[n.type]}</div>`}
+  let extras='';
+  if(!isCompact){if(n.card)extras+=`<div class="note-card-num">${maskCard(n.card)}</div>`;if(n.link)extras+=`<div class="note-link-chip">🔗<span>${esc(n.link)}</span></div>`}
+  const tagHtml=(!isCompact&&n.tag&&currentGroup!=='tag')?`<div class="note-tags"><span class="note-tag" style="color:${tc};border-color:${tc}">${TE[n.tag]||''} ${n.tag}</span></div>`:'';
+  return`<div class="note-card" onclick="openDetail('${n.id}')" style="--tag-color:${tc};animation-delay:${delay}s">
+    ${top}<div class="compact-dot" style="--tag-color:${TC[n.tag]||'var(--text3)'}"></div>
+    <div class="note-body">${tagHtml}${n.title?`<div class="note-title">${esc(n.title)}</div>`:''}${n.text?`<div class="note-preview">${esc(n.text)}</div>`:''}${extras}</div>
+    <div class="note-footer">
+      <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}</span>
+      <div class="note-actions">
+        <button class="note-action-btn" onclick="event.stopPropagation();editNote('${n.id}')">✏️</button>
+        <button class="note-action-btn del" onclick="deleteNote('${n.id}',event)">🗑</button>
+      </div>
+    </div></div>`;
+}
+
+function renderNotes(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const grid=document.getElementById('notesGrid');
+  let filtered=notes.filter(n=>{
+    if(currentFilter!=='all'&&n.type!==currentFilter)return false;
+    if(!q)return true;
+    return(n.title||'').toLowerCase().includes(q)||(n.text||'').toLowerCase().includes(q)||(n.link||'').toLowerCase().includes(q)||(n.tag||'').toLowerCase().includes(q);
+  });
+  document.getElementById('notesCount').textContent=filtered.length?`${filtered.length} not`:'';
+  if(!filtered.length){
+    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">${q?'🔍':'📋'}</div><div class="empty-title">${q?'Sonuç bulunamadı':'Henüz not yok'}</div><div class="empty-sub">${q?'"'+q+'" için eşleşme yok':'+  butonuna dokun'}</div></div>`;
+    return;
+  }
+  const sorted=sortNotes(filtered);
+  const groups=groupNotes(sorted);
+  const hasGroups=currentGroup!=='none';
+
+  if(!hasGroups){
+    grid.innerHTML=sorted.map((n,i)=>noteCardHtml(n,i)).join('');
+  } else {
+    // Gruplu: her grup için başlık + grid
+    grid.innerHTML=groups.map(g=>{
+      const cards=g.items.map((n,i)=>noteCardHtml(n,i)).join('');
+      return`<div class="group-block" style="grid-column:1/-1">
+        <div class="group-header"><div class="group-title">${g.label}</div><div class="group-line"></div><div class="group-count">${g.items.length}</div></div>
+        <div class="group-inner-grid">${cards}</div>
+      </div>`;
+    }).join('');
+    // Grup içi grid'leri mevcut görünüme göre stillendir
+    setTimeout(()=>{
+      document.querySelectorAll('.group-inner-grid').forEach(el=>{
+        if(currentView==='grid')         el.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px';
+        else if(currentView==='masonry') el.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:start';
+        else if(currentView==='list')    el.style.cssText='display:flex;flex-direction:column;gap:7px';
+        else if(currentView==='compact') el.style.cssText='display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)';
+      });
+      if(window.innerWidth<=480){
+        document.querySelectorAll('.group-inner-grid').forEach(el=>{
+          if(currentView==='grid'||currentView==='masonry') el.style.gridTemplateColumns='1fr';
+        });
+      }
+    },0);
+  }
+}
+
+function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden'}
+function closePanel(){document.getElementById('settingsPanel').classList.remove('open');document.body.style.overflow=''}
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('editModal');closeModal('detailModal');closePanel()}});
+
+let toastT;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
+
+function exportNotes(){const blob=new Blob([JSON.stringify({version:'notlarim_v3',date:new Date().toISOString(),notes},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`notlarim-${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.json`;a.click();URL.revokeObjectURL(a.href);showToast('✅ Yedek indirildi')}
+function importNotes(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);const imp=d.notes||d;if(!Array.isArray(imp))throw new Error('Geçersiz format');if(!confirm(`${imp.length} not geri yüklensin mi?`))return;notes=imp;save();closePanel();renderNotes();showToast(`✅ ${imp.length} not yüklendi`)}catch(err){showToast('❌ '+err.message)}};r.readAsText(f);e.target.value=''}
+
+// ══ PWA SETUP ══
+function generateIcon(size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const s = size;
+
+  // Arka plan — koyu gradient
+  const bg = ctx.createLinearGradient(0, 0, s, s);
+  bg.addColorStop(0, '#0f0f13');
+  bg.addColorStop(1, '#1f1f2a');
+  ctx.fillStyle = bg;
+  // Yuvarlak köşe
+  const rad = s * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(rad, 0); ctx.lineTo(s - rad, 0);
+  ctx.quadraticCurveTo(s, 0, s, rad);
+  ctx.lineTo(s, s - rad);
+  ctx.quadraticCurveTo(s, s, s - rad, s);
+  ctx.lineTo(rad, s);
+  ctx.quadraticCurveTo(0, s, 0, s - rad);
+  ctx.lineTo(0, rad);
+  ctx.quadraticCurveTo(0, 0, rad, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Altın halka
+  const ringR = s * 0.38;
+  const cx = s / 2, cy = s / 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+  const ringGrad = ctx.createLinearGradient(cx - ringR, cy - ringR, cx + ringR, cy + ringR);
+  ringGrad.addColorStop(0, 'rgba(200,169,110,0.15)');
+  ringGrad.addColorStop(1, 'rgba(232,201,142,0.05)');
+  ctx.fillStyle = ringGrad;
+  ctx.fill();
+
+  // ✦ yıldız — 4 köşeli
+  const drawStar4 = (x, y, r1, r2) => {
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4 - Math.PI / 2;
+      const r = i % 2 === 0 ? r1 : r2;
+      const px = x + Math.cos(angle) * r;
+      const py = y + Math.sin(angle) * r;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  };
+
+  // Ana yıldız glow
+  ctx.save();
+  ctx.shadowColor = 'rgba(200,169,110,0.8)';
+  ctx.shadowBlur = s * 0.08;
+  const starGrad = ctx.createLinearGradient(cx, cy - s*0.28, cx, cy + s*0.28);
+  starGrad.addColorStop(0, '#e8c98e');
+  starGrad.addColorStop(0.5, '#c8a96e');
+  starGrad.addColorStop(1, '#a07840');
+  ctx.fillStyle = starGrad;
+  drawStar4(cx, cy, s * 0.28, s * 0.1);
+  ctx.fill();
+  ctx.restore();
+
+  // Küçük yıldız üst sağ
+  ctx.save();
+  ctx.globalAlpha = 0.6;
+  ctx.fillStyle = '#e8c98e';
+  drawStar4(cx + s*0.24, cy - s*0.24, s*0.055, s*0.02);
+  ctx.fill();
+  ctx.restore();
+
+  // Nokta sol alt
+  ctx.beginPath();
+  ctx.arc(cx - s*0.26, cy + s*0.26, s*0.025, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(200,169,110,0.5)';
+  ctx.fill();
+
+  return c.toDataURL('image/png');
+}
+
+function setupPWA() {
+  // İkon üret
+  const icon192 = generateIcon(192);
+  const icon512 = generateIcon(512);
+  const icon180 = generateIcon(180); // Apple touch
+
+  // Apple touch icon
+  document.getElementById('apple-touch-icon').href = icon180;
+
+  // Favicon
+  document.getElementById('favicon').href = generateIcon(32);
+
+  // Manifest blob
+  const manifest = {
+    name: 'Notlarım',
+    short_name: 'Notlarım',
+    description: 'Kişisel not uygulaması',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#0f0f13',
+    theme_color: '#0f0f13',
+    orientation: 'portrait',
+    lang: 'tr',
+    icons: [
+      { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      { src: icon180, sizes: '180x180', type: 'image/png', purpose: 'apple touch icon' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestUrl = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = manifestUrl;
+
+  // Service Worker — offline cache
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'notlarim-v1';
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('Offline'))));
+});`;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  }
+}
+
+// INIT
+load();
+document.documentElement.setAttribute('data-theme',currentTheme);
+document.documentElement.setAttribute('data-view',currentView);
+document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
+document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');const _vl=document.getElementById('viewLabel');if(_vi)_vi.textContent=_vm.icon;if(_vl)_vl.textContent=_vm.label;
+renderNotes();
+setupPWA();
+</script>
+</body>
+</html>
