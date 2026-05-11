@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.10
+  Version : Pro 1.0.16
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -39,9 +39,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease}
-[data-theme="dark"]{--bg:#0f0f13;--surface:#18181f;--surface2:#1f1f2a;--surface3:#252532;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);--text:#f0f0f5;--text2:#9090a8;--text3:#5a5a72;--shadow:0 8px 32px rgba(0,0,0,0.55);--topbar-bg:rgba(15,15,19,0.93)}
-[data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.04);--text:#1a1916;--text2:#5a5850;--text3:#9a9890;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
-[data-theme="sepia"]{--bg:#f5ede0;--surface:#fdf6ec;--surface2:#f0e4d0;--surface3:#e8d8c0;--border:rgba(120,80,30,0.12);--border2:rgba(120,80,30,0.06);--text:#3a2a18;--text2:#7a6048;--text3:#b09070;--shadow:0 4px 24px rgba(80,40,0,0.12);--topbar-bg:rgba(245,237,224,0.93);--accent:#9a6030;--accent2:#c08050}
+[data-theme="dark"]{--bg:#0f0f13;--surface:#1c1c24;--surface2:#252530;--surface3:#2e2e3c;--border:rgba(255,255,255,0.13);--border2:rgba(255,255,255,0.07);--text:#ffffff;--text2:#d0d0e0;--text3:#9898b0;--shadow:0 8px 32px rgba(0,0,0,0.55);--topbar-bg:rgba(15,15,19,0.95)}
+[data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.10);--border2:rgba(0,0,0,0.05);--text:#111110;--text2:#3a3830;--text3:#7a7870;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
 
 /* LİGHTBOX */
@@ -323,7 +322,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.10</span>
+  <span>Pro 1.0.16</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -334,12 +333,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="topbar-title">✦ Notlarım</div>
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
-    <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()">
+    <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()" onclick="this.select()">
   </div>
   <div class="topbar-actions">
     <button class="icon-btn" onclick="openStatsModal()" title="İstatistikler">📊</button>
-    <button class="icon-btn" onclick="openPanel()" title="Tema & Görünüm">⚙</button>
-    <button class="icon-btn accent" onclick="openAdd()">+</button>
+    <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Tema değiştir">🌙</button>
+    <button class="icon-btn" onclick="openPanel()" title="Ayarlar">⚙</button>
   </div>
 </div>
 
@@ -353,9 +352,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="filter-chip" data-filter="diger"    onclick="setFilter('diger',this)">📌 Diğer</button>
   </div>
   <div class="sort-wrap">
-    <button class="sort-btn" id="sortBtn" onclick="toggleSortDropdown()">
+    <button class="sort-btn" id="sortBtn" onclick="toggleSortDropdown()" title="Sırala / Grupla">
       <span id="sortIcon">↕</span>
-      <span id="sortLabel">Sırala</span>
       <span style="font-size:0.6rem;opacity:0.6">▾</span>
     </button>
     <div class="sort-dropdown" id="sortDropdown">
@@ -374,9 +372,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
   </div>
   <div class="view-switcher">
-    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleViewDropdown()">
+    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleViewDropdown()" title="Görünüm">
       <span class="vt-icon" id="viewIcon">⊞</span>
-      <span id="viewLabel">Kart</span>
       <span style="font-size:0.6rem;opacity:0.6">▾</span>
     </button>
     <div class="view-dropdown" id="viewDropdown">
@@ -401,21 +398,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="panel">
     <div class="panel-handle"></div>
     <div class="panel-section">
-      <div class="panel-label">🎨 Tema</div>
-      <div class="theme-row">
-        <button class="theme-btn active" data-theme="dark"  onclick="setTheme('dark',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#0f0f13,#1f1f2a)"></div>Karanlık</button>
-        <button class="theme-btn"        data-theme="light" onclick="setTheme('light',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#f4f3ef,#ffffff);border-color:rgba(0,0,0,0.1)"></div>Aydınlık</button>
-        <button class="theme-btn"        data-theme="sepia" onclick="setTheme('sepia',this)"><div class="theme-preview" style="background:linear-gradient(135deg,#f5ede0,#fdf6ec);border-color:rgba(120,80,30,0.15)"></div>Sepia</button>
+      <div class="panel-label">🔐 Güvenlik</div>
+      <div id="biometricSettingWrap" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="biometricLabel">Face ID / Touch ID</div>
+            <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">PIN kilitli notlar için</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0">
+            <input type="checkbox" id="biometricToggle" onchange="toggleBiometric(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+            <span id="biometricSlider" style="position:absolute;inset:0;background:var(--surface3);border-radius:13px;cursor:pointer;transition:0.2s;border:1px solid var(--border)">
+              <span style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)" id="biometricKnob"></span>
+            </span>
+          </label>
+        </div>
+        <div id="biometricStatus" style="font-size:0.7rem;color:var(--text3);margin-top:6px;padding:0 2px"></div>
       </div>
-    </div>
-    <div class="panel-section">
-      <div class="panel-label">📐 Görünüm</div>
-      <div class="view-option-row">
-        <button class="view-option-btn active" data-view="grid"    onclick="setViewP('grid',this)"><span class="view-icon">⊞</span>Kart</button>
-        <button class="view-option-btn"        data-view="masonry" onclick="setViewP('masonry',this)"><span class="view-icon">⊟</span>Masonry</button>
-        <button class="view-option-btn"        data-view="list"    onclick="setViewP('list',this)"><span class="view-icon">☰</span>Liste</button>
-        <button class="view-option-btn"        data-view="compact" onclick="setViewP('compact',this)"><span class="view-icon">≡</span>Kompakt</button>
-      </div>
+      <div id="biometricUnsupported" style="display:none;font-size:0.78rem;color:var(--text3);padding:10px 14px;background:var(--surface2);border-radius:var(--r2)">Bu cihaz/tarayıcı biyometrik doğrulamayı desteklemiyor.</div>
     </div>
     <div class="panel-section" style="margin-bottom:0">
       <div class="panel-label">💾 Yedek</div>
@@ -572,6 +571,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <button class="pin-key del" onclick="pinDel()">⌫</button>
         </div>
         <button class="btn btn-secondary" onclick="pinCancel()" style="width:100%;margin-top:8px">İptal</button>
+        <button id="biometricPinBtn" onclick="doBiometricVerify()" style="display:none;width:100%;margin-top:8px;padding:12px;border-radius:var(--r2);border:1px solid var(--accent);background:rgba(200,169,110,0.1);color:var(--accent);font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer">
+          <span id="biometricPinIcon">🔒</span> Face ID / Touch ID ile Aç
+        </button>
       </div>
     </div>
   </div>
@@ -622,10 +624,18 @@ function load(){
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
-function setTheme(t,el){
+function updateThemeIcon(){
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent=currentTheme==='dark'?'🌙':'☀️';
+}
+function toggleTheme(){
+  setTheme(currentTheme==='dark'?'light':'dark');
+}
+function setTheme(t){
   currentTheme=t;
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
+  updateThemeIcon();
   savePrefs();
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
@@ -635,10 +645,9 @@ document.addEventListener('click',e=>{if(!e.target.closest('.view-switcher'))clo
 function setView(v,el){
   currentView=v;
   document.documentElement.setAttribute('data-view',v);
-  // toggle butonunu güncelle
   const m=VIEW_META[v]||{icon:'⊞',label:'Kart'};
-  const icon=document.getElementById('viewIcon');const label=document.getElementById('viewLabel');
-  if(icon)icon.textContent=m.icon;if(label)label.textContent=m.label;
+  const icon=document.getElementById('viewIcon');
+  if(icon)icon.textContent=m.icon;
   // dropdown item aktif
   document.querySelectorAll('.view-drop-item').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   // panel butonları
@@ -657,7 +666,6 @@ document.addEventListener('click',e=>{if(!e.target.closest('.sort-wrap'))closeSo
 function setSort(s,el){
   currentSort=s;
   document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===s));
-  const lbl=document.getElementById('sortLabel');if(lbl)lbl.textContent=SORT_LABELS[s]||'Sırala';
   const btn=document.getElementById('sortBtn');if(btn)btn.classList.add('has-sort');
   updateSortBtnState();
   savePrefs();
@@ -672,16 +680,13 @@ function setGroup(g,el){
 }
 function updateSortBtnState(){
   const btn=document.getElementById('sortBtn');
-  const lbl=document.getElementById('sortLabel');
   const icon=document.getElementById('sortIcon');
   if(!btn)return;
   const hasCustom=(currentSort!=='newest'||currentGroup!=='none');
   btn.classList.toggle('has-sort',hasCustom);
   if(currentGroup!=='none'){
-    if(lbl)lbl.textContent=GROUP_LABELS[currentGroup];
     if(icon)icon.textContent='⊛';
   } else {
-    if(lbl)lbl.textContent=SORT_LABELS[currentSort]||'Sırala';
     if(icon)icon.textContent='↕';
   }
 }
@@ -978,7 +983,6 @@ function noteCardHtml(n,i){
   const ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
   const delay=Math.min(i*0.03,0.22);
   const q=document.getElementById('searchInput').value.trim();
-
   // 3. Kart arka plan renk tonu
   let cardStyle=`--tag-color:${tc};animation-delay:${delay}s;`;
   let cardClass='note-card';
@@ -1023,13 +1027,24 @@ function noteCardHtml(n,i){
     </div></div>`;
 }
 
+// Türkçe büyük/küçük harf duyarsız normalize
+function trLower(s){
+  return String(s||'')
+    .replace(/İ/g,'i').replace(/I/g,'ı')
+    .replace(/Ğ/g,'ğ').replace(/Ü/g,'ü')
+    .replace(/Ş/g,'ş').replace(/Ö/g,'ö')
+    .replace(/Ç/g,'ç')
+    .toLowerCase();
+}
+
 function renderNotes(){
-  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const raw=document.getElementById('searchInput').value.trim();
+  const q=trLower(raw);
   const grid=document.getElementById('notesGrid');
   let filtered=notes.filter(n=>{
     if(currentFilter!=='all'&&n.type!==currentFilter)return false;
     if(!q)return true;
-    return(n.title||'').toLowerCase().includes(q)||(n.text||'').toLowerCase().includes(q)||(n.link||'').toLowerCase().includes(q)||(n.tag||'').toLowerCase().includes(q);
+    return trLower(n.title).includes(q)||trLower(n.text).includes(q)||trLower(n.link).includes(q)||trLower(n.tag).includes(q)||trLower(n.card).includes(q);
   });
   document.getElementById('notesCount').textContent=filtered.length?`${filtered.length} not`:'';
   if(!filtered.length){
@@ -1124,8 +1139,171 @@ function askPin(mode, hint) {
     if(t) t.textContent = mode==='set'?'🔐 PIN Belirle':'🔐 PIN Gir';
     if(h) h.textContent = hint||'PIN girin';
     if(err) err.textContent='';
+    // Biyometrik buton — sadece verify modunda ve kayıtlıysa göster
+    const bioBtn=document.getElementById('biometricPinBtn');
+    if(bioBtn) bioBtn.style.display=(mode==='verify'&&isBiometricRegistered())?'block':'none';
     openModal('pinModal');
+    // Verify modunda biyometrik varsa otomatik dene
+    if(mode==='verify' && isBiometricRegistered()){
+      setTimeout(()=>doBiometricVerify(),400);
+    }
   });
+}
+
+// ══════════════════════════════════════════════════
+// BİYOMETRİK (WebAuthn)
+// ══════════════════════════════════════════════════
+const BIO_KEY='notlarim_bio_cred'; // credentialId base64 olarak saklanır
+
+function isBiometricSupported(){
+  return !!(window.PublicKeyCredential && navigator.credentials);
+}
+function isBiometricRegistered(){
+  try{ return !!localStorage.getItem(BIO_KEY); }catch(e){return false;}
+}
+function getBioCredId(){
+  try{
+    const s=localStorage.getItem(BIO_KEY);
+    if(!s) return null;
+    const bin=atob(s);
+    const arr=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    return arr.buffer;
+  }catch(e){return null;}
+}
+function saveBioCredId(buf){
+  try{
+    const arr=new Uint8Array(buf);
+    let s='';for(let i=0;i<arr.length;i++)s+=String.fromCharCode(arr[i]);
+    localStorage.setItem(BIO_KEY,btoa(s));
+  }catch(e){}
+}
+function clearBioCredId(){
+  try{localStorage.removeItem(BIO_KEY);}catch(e){}
+}
+
+async function registerBiometric(){
+  if(!isBiometricSupported()) return false;
+  try{
+    const challenge=new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+    const userId=new Uint8Array(16);
+    crypto.getRandomValues(userId);
+    const cred=await navigator.credentials.create({
+      publicKey:{
+        challenge,
+        rp:{name:'Notlarım'},
+        user:{id:userId,name:'notlarim_user',displayName:'Notlarım'},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{
+          authenticatorAttachment:'platform',
+          userVerification:'required',
+          requireResidentKey:false
+        },
+        timeout:60000,
+        attestation:'none'
+      }
+    });
+    saveBioCredId(cred.rawId);
+    return true;
+  }catch(e){
+    console.log('WebAuthn kayıt hatası:',e);
+    return false;
+  }
+}
+
+async function verifyBiometric(){
+  if(!isBiometricSupported()||!isBiometricRegistered()) return false;
+  const credId=getBioCredId();
+  if(!credId) return false;
+  try{
+    const challenge=new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+    const assertion=await navigator.credentials.get({
+      publicKey:{
+        challenge,
+        allowCredentials:[{type:'public-key',id:credId}],
+        userVerification:'required',
+        timeout:60000
+      }
+    });
+    return !!assertion;
+  }catch(e){
+    console.log('WebAuthn doğrulama hatası:',e);
+    return false;
+  }
+}
+
+async function doBiometricVerify(){
+  const btn=document.getElementById('biometricPinBtn');
+  const icon=document.getElementById('biometricPinIcon');
+  if(btn) btn.disabled=true;
+  if(icon) icon.textContent='⏳';
+  const ok=await verifyBiometric();
+  if(ok){
+    pinResolve&&pinResolve(true); pinResolve=null;
+    closeModal('pinModal');
+  } else {
+    if(btn){btn.disabled=false;}
+    if(icon) icon.textContent='🔒';
+    const err=document.getElementById('pinError');
+    if(err){err.textContent='Biyometrik başarısız — PIN ile deneyin';setTimeout(()=>err.textContent='',2500);}
+  }
+}
+
+async function toggleBiometric(enabled){
+  const status=document.getElementById('biometricStatus');
+  const toggle=document.getElementById('biometricToggle');
+  const knob=document.getElementById('biometricKnob');
+  const slider=document.getElementById('biometricSlider');
+  if(enabled){
+    if(status) status.textContent='Face ID / Touch ID kaydediliyor…';
+    const ok=await registerBiometric();
+    if(ok){
+      if(status) status.textContent='✅ Etkin — PIN kilitli notlar Face ID / Touch ID ile açılır';
+      updateBiometricSlider(true);
+    } else {
+      if(status) status.textContent='❌ Kayıt başarısız. Cihaz ayarlarını kontrol edin.';
+      if(toggle) toggle.checked=false;
+      updateBiometricSlider(false);
+    }
+  } else {
+    clearBioCredId();
+    if(status) status.textContent='';
+    updateBiometricSlider(false);
+  }
+}
+
+function updateBiometricSlider(on){
+  const knob=document.getElementById('biometricKnob');
+  const slider=document.getElementById('biometricSlider');
+  const toggle=document.getElementById('biometricToggle');
+  if(knob) knob.style.transform=on?'translateX(18px)':'translateX(0)';
+  if(slider) slider.style.background=on?'var(--accent)':'var(--surface3)';
+  if(toggle) toggle.checked=on;
+}
+
+function initBiometricUI(){
+  const wrap=document.getElementById('biometricSettingWrap');
+  const unsupported=document.getElementById('biometricUnsupported');
+  if(!isBiometricSupported()){
+    if(unsupported) unsupported.style.display='block';
+    return;
+  }
+  if(wrap) wrap.style.display='block';
+  // Mevcut durumu yansıt
+  const registered=isBiometricRegistered();
+  updateBiometricSlider(registered);
+  const status=document.getElementById('biometricStatus');
+  if(registered && status) status.textContent='✅ Etkin — PIN kilitli notlar Face ID / Touch ID ile açılır';
+  // Label — Face ID mi Touch ID mi? (heuristic)
+  const label=document.getElementById('biometricLabel');
+  if(label){
+    const ua=navigator.userAgent;
+    if(/iPhone|iPad/.test(ua)) label.textContent='Face ID / Touch ID';
+    else if(/Mac/.test(ua)) label.textContent='Touch ID';
+    else label.textContent='Biyometrik Kilit';
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -1158,9 +1336,16 @@ async function requestNotifPerm() {
 // ══════════════════════════════════════════════════
 function highlight(str, q) {
   if(!q||!str) return escPure(str||'');
-  const safe = escPure(str);
-  const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return safe.replace(new RegExp('('+safeQ+')', 'gi'), '<span class="hl">$1</span>');
+  // Türkçe karakterleri regex pattern'e çevir
+  const trMap={'i':'[iİ]','ı':'[ıI]','ğ':'[ğĞ]','ü':'[üÜ]','ş':'[şŞ]','ö':'[öÖ]','ç':'[çÇ]',
+               'İ':'[iİ]','I':'[ıI]','Ğ':'[ğĞ]','Ü':'[üÜ]','Ş':'[şŞ]','Ö':'[öÖ]','Ç':'[çÇ]'};
+  const pattern=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')
+                  .split('').map(c=>trMap[c]||c).join('');
+  const safe=escPure(str);
+  // escPure sonrası eşleştir
+  try {
+    return safe.replace(new RegExp('('+pattern+')', 'gi'), '<span class="hl">$1</span>');
+  } catch(e) { return safe; }
 }
 function escPure(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -1274,7 +1459,7 @@ function clearLinkNote() {
   prev.style.display='none'; prev.innerHTML='';
 }
 
-function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden'}
+function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden';initBiometricUI();}
 function closePanel(){document.getElementById('settingsPanel').classList.remove('open');document.body.style.overflow=''}
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
@@ -1330,8 +1515,8 @@ function importNotes(e){
         document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
         document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
         const vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};
-        const vi=document.getElementById('viewIcon');const vl=document.getElementById('viewLabel');
-        if(vi)vi.textContent=vm.icon;if(vl)vl.textContent=vm.label;
+        const vi=document.getElementById('viewIcon');
+        if(vi)vi.textContent=vm.icon;
         document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
         document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
         document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
@@ -1492,8 +1677,9 @@ load();
 document.documentElement.setAttribute('data-theme',currentTheme);
 document.documentElement.setAttribute('data-view',currentView);
 document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
+updateThemeIcon();
 document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
-const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');const _vl=document.getElementById('viewLabel');if(_vi)_vi.textContent=_vm.icon;if(_vl)_vl.textContent=_vm.label;
+const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');if(_vi)_vi.textContent=_vm.icon;
 // Sıralama & grup UI'ı yükle
 document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
 document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
