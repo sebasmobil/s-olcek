@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.01
+  Version : Pro 1.0.02
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -43,6 +43,14 @@
 [data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.04);--text:#1a1916;--text2:#5a5850;--text3:#9a9890;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
 [data-theme="sepia"]{--bg:#f5ede0;--surface:#fdf6ec;--surface2:#f0e4d0;--surface3:#e8d8c0;--border:rgba(120,80,30,0.12);--border2:rgba(120,80,30,0.06);--text:#3a2a18;--text2:#7a6048;--text3:#b09070;--shadow:0 4px 24px rgba(80,40,0,0.12);--topbar-bg:rgba(245,237,224,0.93);--accent:#9a6030;--accent2:#c08050}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
+
+/* LİGHTBOX */
+.lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox-inner{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain;touch-action:pinch-zoom;cursor:default;transition:transform 0.2s;user-select:none;-webkit-user-select:none}
+.lightbox-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);z-index:2}
+.lightbox-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:0.7rem;color:rgba(255,255,255,0.4);pointer-events:none;white-space:nowrap}
 
 /* VERSİYON BARI */
 .version-bar{
@@ -268,7 +276,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.01</span>
+  <span>Pro 1.0.02</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -443,6 +451,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- LİGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="" draggable="false">
+    <div class="lightbox-hint">Kapatmak için dokun · Yakınlaştırmak için iki parmak</div>
+  </div>
+</div>
+
 <script>
 let notes=[],editId=null,detailId=null,currentFilter='all',currentType='metin',currentColor='#c8a96e',currentTheme='dark',currentView='grid';
 const SK='notlarim_v3',PK='notlarim_prefs';
@@ -578,12 +595,27 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function maskCard(s){const c=s.replace(/\s/g,'');return c.length>4?'•••• •••• •••• '+c.slice(-4):s}
 function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('📋 Kopyalandı!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 Kopyalandı!')})}
 
+function openLightbox(src){
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  img.src = src;
+  img.style.transform = 'scale(1)';
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e){
+  if(e && e.target === document.getElementById('lightboxImg')) return; // resme tıklayınca kapanmasın
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
 function openDetail(id){
   const n=notes.find(n=>n.id===id);if(!n)return;
   detailId=id;
   const tc=TC[n.tag]||'var(--text3)';
   let html='';
-  if(n.img)html+=`<img class="detail-img" src="${esc(n.img)}" alt="">`;
+  if(n.img)html+=`<img class="detail-img" src="${esc(n.img)}" alt="" onclick="openLightbox('${esc(n.img).replace(/'/g,"\\'")}')" style="cursor:zoom-in" title="Tam ekran için dokun">`;
   html+=`<div class="detail-body">`;
   if(n.tag)html+=`<div style="margin-bottom:10px"><span style="color:${tc};border:1px solid ${tc};font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 10px;border-radius:30px">${TE[n.tag]||''} ${n.tag}</span></div>`;
   if(n.title)html+=`<div class="detail-title">${esc(n.title)}</div>`;
