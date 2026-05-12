@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.20
+  Version : Pro 1.0.22
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -38,10 +38,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease;--fs:1}
+html{font-size:16px}
+:root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease}
 [data-theme="dark"]{--bg:#0f0f13;--surface:#1c1c24;--surface2:#252530;--surface3:#2e2e3c;--border:rgba(255,255,255,0.13);--border2:rgba(255,255,255,0.07);--text:#ffffff;--text2:#d0d0e0;--text3:#9898b0;--shadow:0 8px 32px rgba(0,0,0,0.55);--topbar-bg:rgba(15,15,19,0.95)}
 [data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.10);--border2:rgba(0,0,0,0.05);--text:#111110;--text2:#3a3830;--text3:#7a7870;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s;font-size:calc(16px * var(--fs))}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
 
 /* LİGHTBOX */
 .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;cursor:zoom-out}
@@ -339,7 +340,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.20</span>
+  <span>Pro 1.0.22</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -448,23 +449,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </label>
         </div>
       </div>
-      <!-- Not bazlı PIN (mevcut) -->
-      <div id="biometricSettingWrap" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
-          <div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="biometricLabel">Face ID / Touch ID</div>
-            <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">PIN kilitli notlar için</div>
-          </div>
-          <label style="position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0">
-            <input type="checkbox" id="biometricToggle" onchange="toggleBiometric(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
-            <span id="biometricSlider" style="position:absolute;inset:0;background:var(--surface3);border-radius:13px;cursor:pointer;transition:0.2s;border:1px solid var(--border)">
-              <span style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)" id="biometricKnob"></span>
-            </span>
-          </label>
-        </div>
-        <div id="biometricStatus" style="font-size:0.7rem;color:var(--text3);margin-top:6px;padding:0 2px"></div>
-      </div>
-      <div id="biometricUnsupported" style="display:none;font-size:0.78rem;color:var(--text3);padding:10px 14px;background:var(--surface2);border-radius:var(--r2)">Bu cihaz/tarayıcı biyometrik doğrulamayı desteklemiyor.</div>
+      <!-- Not bazlı PIN biyometrik kaldırıldı -->
+      <div id="biometricUnsupported" style="display:none"></div>
     </div>
     <div class="panel-section" style="margin-bottom:0">
       <div class="panel-label">💾 Yedek</div>
@@ -679,8 +665,9 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 
 // ── METIN BOYUTU ──
 function applyFontSize(step){
-  const scale=FS_STEPS[step-1]||1;
-  document.documentElement.style.setProperty('--fs',scale);
+  const sizes=[13,14.5,16,18,20]; // px — html font-size
+  const px = sizes[step-1] || 16;
+  document.documentElement.style.fontSize = px + 'px';
   updateFontSizeUI(step);
 }
 function updateFontSizeUI(step){
