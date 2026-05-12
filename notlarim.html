@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.29
+  Version : Pro 1.0.30
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -321,6 +321,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .pin-key:active{background:var(--accent);color:#fff;transform:scale(0.94)}
 .pin-key.empty{background:transparent;border:none;cursor:default}
 .pin-key.del{font-size:1rem}
+/* Tarih/saat native placeholder gizle */
+input[type=date]::-webkit-datetime-edit-text,
+input[type=date]::-webkit-datetime-edit-month-field,
+input[type=date]::-webkit-datetime-edit-day-field,
+input[type=date]::-webkit-datetime-edit-year-field,
+input[type=time]::-webkit-datetime-edit-text,
+input[type=time]::-webkit-datetime-edit-hour-field,
+input[type=time]::-webkit-datetime-edit-minute-field,
+input[type=time]::-webkit-datetime-edit-ampm-field{color:transparent}
+input[type=date]:focus::-webkit-datetime-edit-text,
+input[type=date]:focus::-webkit-datetime-edit-month-field,
+input[type=date]:focus::-webkit-datetime-edit-day-field,
+input[type=date]:focus::-webkit-datetime-edit-year-field,
+input[type=time]:focus::-webkit-datetime-edit-text,
+input[type=time]:focus::-webkit-datetime-edit-hour-field,
+input[type=time]:focus::-webkit-datetime-edit-minute-field,
+input[type=time]:focus::-webkit-datetime-edit-ampm-field,
+input[type=date].has-value::-webkit-datetime-edit-text,
+input[type=date].has-value::-webkit-datetime-edit-month-field,
+input[type=date].has-value::-webkit-datetime-edit-day-field,
+input[type=date].has-value::-webkit-datetime-edit-year-field,
+input[type=time].has-value::-webkit-datetime-edit-text,
+input[type=time].has-value::-webkit-datetime-edit-hour-field,
+input[type=time].has-value::-webkit-datetime-edit-minute-field,
+input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 </style>
 </head>
 <body>
@@ -341,7 +366,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.29</span>
+  <span>Pro 1.0.30</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -571,8 +596,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="field" id="field-reminder">
         <label>🔔 Hatırlatıcı (opsiyonel)</label>
         <div style="display:flex;gap:8px">
-          <input type="date" id="f-reminder-date" style="flex:1;min-width:0;box-sizing:border-box;-webkit-appearance:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none" onchange="syncReminder()">
-          <input type="time" id="f-reminder-time" style="flex:0 0 110px;min-width:0;box-sizing:border-box;-webkit-appearance:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none" onchange="syncReminder()">
+          <div style="flex:1;position:relative">
+            <input type="date" id="f-reminder-date" style="flex:1;width:100%;box-sizing:border-box;-webkit-appearance:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;min-height:50px" onchange="syncReminder();updateDatePlaceholder()">
+            <span id="date-ph" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;font-size:0.82rem;color:var(--text3);pointer-events:none">📅 Tarih</span>
+          </div>
+          <div style="flex:0 0 115px;position:relative">
+            <input type="time" id="f-reminder-time" style="width:100%;box-sizing:border-box;-webkit-appearance:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;min-height:50px" onchange="syncReminder();updateTimePlaceholder()">
+            <span id="time-ph" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;font-size:0.82rem;color:var(--text3);pointer-events:none">🕐 Saat</span>
+          </div>
         </div>
         <input type="hidden" id="f-reminder">
         <div style="font-size:0.68rem;color:var(--text3);margin-top:4px">Tarayıcı bildirimi gönderilir</div>
@@ -1036,8 +1067,8 @@ function resetForm(){
   document.getElementById('f-pin').checked=false;
   document.getElementById('f-pinProtect').checked=false;
   document.getElementById('f-reminder').value='';
-  const rdEl=document.getElementById('f-reminder-date');if(rdEl)rdEl.value='';
-  const rtEl=document.getElementById('f-reminder-time');if(rtEl)rtEl.value='';
+  const rdEl=document.getElementById('f-reminder-date');if(rdEl){rdEl.value='';updateDatePlaceholder();}
+  const rtEl=document.getElementById('f-reminder-time');if(rtEl){rtEl.value='';updateTimePlaceholder();}
   document.getElementById('imgPreview').style.display='none';
   document.getElementById('imgHint').style.display='';
   document.getElementById('f-img').value='';
@@ -1062,8 +1093,8 @@ function populateForm(n){
   document.getElementById('f-pinProtect').checked=!!n.pinProtect;
   const reminderStr=n.reminder?n.reminder.slice(0,16):'';
   document.getElementById('f-reminder').value=reminderStr;
-  const rdEl=document.getElementById('f-reminder-date');if(rdEl)rdEl.value=reminderStr?reminderStr.slice(0,10):'';
-  const rtEl=document.getElementById('f-reminder-time');if(rtEl)rtEl.value=reminderStr?reminderStr.slice(11,16):'';
+  const rdEl=document.getElementById('f-reminder-date');if(rdEl){rdEl.value=reminderStr?reminderStr.slice(0,10):'';updateDatePlaceholder();}
+  const rtEl=document.getElementById('f-reminder-time');if(rtEl){rtEl.value=reminderStr?reminderStr.slice(11,16):'';updateTimePlaceholder();}
   currentType=n.type||'metin';currentColor=n.color||null;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));
   const activeColorKey=currentColor||'none';
@@ -2147,11 +2178,14 @@ notes.forEach(n=>{ if(n.reminder) scheduleReminder(n); });
 // Hatırlatıcı alanı değişince izin iste
 const remEl=document.getElementById('f-reminder');
 if(remEl) remEl.addEventListener('change',()=>{ if(remEl.value) requestNotifPerm(); });
+function updateDatePlaceholder(){const el=document.getElementById('f-reminder-date');if(!el)return;const v=el.value;const ph=document.getElementById('date-ph');if(ph)ph.style.display=v?'none':'flex';el.classList.toggle('has-value',!!v);}
+function updateTimePlaceholder(){const el=document.getElementById('f-reminder-time');if(!el)return;const v=el.value;const ph=document.getElementById('time-ph');if(ph)ph.style.display=v?'none':'flex';el.classList.toggle('has-value',!!v);}
 function syncReminder(){
   const d=document.getElementById('f-reminder-date').value;
   const t=document.getElementById('f-reminder-time').value||'00:00';
   const combined=d?(d+'T'+t):'';
   document.getElementById('f-reminder').value=combined;
+  updateDatePlaceholder();updateTimePlaceholder();
   if(combined) requestNotifPerm();
 }
 </script>
