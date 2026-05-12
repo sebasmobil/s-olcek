@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.24
+  Version : Pro 1.0.25
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -55,7 +55,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* VERSİYON BARI */
 .version-bar{
   width:100%;
-  background:transparent;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
   padding:5px 16px;
   display:flex;align-items:center;justify-content:center;
   gap:8px;
@@ -65,31 +66,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   color:var(--text3);
   user-select:none;
   -webkit-user-select:none;
-  border-bottom:none;
 }
 .vb-sep{opacity:0.35;font-size:0.55rem}
-.vb-link{color:var(--text3);text-decoration:none;cursor:pointer;transition:color 0.15s}
+.vb-link{
+  color:var(--text3);
+  text-decoration:none;
+  cursor:pointer;
+  transition:color 0.15s;
+}
 .vb-link:hover{color:var(--accent)}
 
-/* STICKY HEADER — fixed, status bar dahil, tema anlık yansır */
-#stickyHeader{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:100;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  transition:background 0.3s;
-  /* iOS status bar alanı */
-  padding-top:env(safe-area-inset-top);
-}
-
-/* İçerik header yüksekliği kadar aşağıdan başlar — JS ile ayarlanır */
-#appContent{padding-top:0}
-
 /* TOPBAR */
-.topbar{padding:0 14px;height:56px;display:flex;align-items:center;gap:10px;}
+.topbar{z-index:100;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
 .topbar-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
 .search-wrap{flex:1;position:relative}
 .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:8px 14px 8px 34px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none}
@@ -100,8 +88,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:1rem;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:var(--trans);flex-shrink:0}
 .icon-btn.accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-size:1.2rem;font-weight:900;box-shadow:0 3px 12px rgba(200,169,110,0.3)}
 
-/* TOOLBAR — JS ile fixed konumlandırılır */
-.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);transition:background 0.3s;}
+/* TOOLBAR — stickyHeader'ın altına yapışık, top JS ile ayarlanır */
+.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:99}
 .filters{flex:1;display:flex;gap:6px;padding:9px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filter-chip{padding:5px 12px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);font-family:'DM Sans',sans-serif;flex-shrink:0}
@@ -274,7 +262,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .detail-text{font-size:0.88rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-word}
 .detail-card-box{font-family:monospace;font-size:1.05rem;color:var(--accent);letter-spacing:0.18em;padding:13px 14px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .copy-btn{padding:5px 11px;border-radius:8px;border:none;background:rgba(200,169,110,0.15);color:var(--accent);font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.detail-link-box{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;color:var(--blue);text-decoration:none;font-size:0.83rem;border:1px solid rgba(92,160,224,0.2);word-break:break-all}
+.detail-link-box{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;color:var(--blue);font-size:0.83rem;border:1px solid rgba(92,160,224,0.2);word-break:break-all;cursor:pointer;transition:border-color 0.15s}
+.detail-link-box:active{border-color:var(--blue)}
 .detail-meta{font-size:0.68rem;color:var(--text3);margin-top:14px}
 .detail-actions{display:flex;gap:8px;padding:12px 20px 20px}
 .detail-actions .btn{padding:10px;font-size:0.82rem}
@@ -350,9 +339,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- UYGULAMA İÇERİĞİ -->
 <div id="appContent" style="display:none">
 
-<div id="stickyHeader">
+<div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.24</span>
+  <span>Pro 1.0.25</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -469,6 +458,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary" style="font-size:0.8rem;padding:10px" onclick="exportNotes()">⬇️ Yedek Al</button>
         <label class="btn btn-secondary" style="font-size:0.8rem;padding:10px;cursor:pointer;text-align:center">⬆️ Geri Yükle<input type="file" accept=".json" onchange="importNotes(event)" style="display:none"></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LİNK ONAY MODAL -->
+<div class="modal-overlay" id="linkConfirmModal" onclick="if(event.target===this)closeModal('linkConfirmModal')">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-handle"></div>
+    <div style="padding:8px 20px 24px">
+      <div style="font-size:1.3rem;text-align:center;margin-bottom:8px">🔗</div>
+      <div style="font-size:0.88rem;font-weight:700;color:var(--text);text-align:center;margin-bottom:10px">Bağlantıyı Aç</div>
+      <div id="linkConfirmUrl" style="font-size:0.75rem;color:var(--blue);text-align:center;word-break:break-all;background:var(--surface2);border-radius:var(--r2);padding:10px 12px;margin-bottom:20px;line-height:1.5"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeModal('linkConfirmModal')">← Geri</button>
+        <button class="btn btn-primary" style="flex:1" onclick="confirmOpenLink()">Tarayıcıda Aç</button>
       </div>
     </div>
   </div>
@@ -717,11 +722,7 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
-  const color=t==='dark'?'#0f0f13':'#f4f3ef';
-  const mc=document.querySelector('meta[name="theme-color"]');
-  if(mc) mc.setAttribute('content',color);
   savePrefs();
-  setTimeout(fixToolbarTop, 50);
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
 function toggleViewDropdown(){const d=document.getElementById('viewDropdown');d.classList.toggle('open')}
@@ -963,6 +964,18 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function maskCard(s){const c=s.replace(/\s/g,'');return c.length>4?'•••• •••• •••• '+c.slice(-4):s}
 function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('📋 Kopyalandı!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 Kopyalandı!')})}
 
+var _pendingLink='';
+function openLinkConfirm(url){
+  _pendingLink=url;
+  var el=document.getElementById('linkConfirmUrl');
+  if(el) el.textContent=url;
+  openModal('linkConfirmModal');
+}
+function confirmOpenLink(){
+  if(_pendingLink){ window.open(_pendingLink,'_blank'); _pendingLink=''; }
+  closeModal('linkConfirmModal');
+}
+
 function openLightbox(src){
   const lb = document.getElementById('lightbox');
   const img = document.getElementById('lightboxImg');
@@ -1007,7 +1020,7 @@ async function openDetail(id){
   else if(n.pinned)html+=`<div style="margin-bottom:10px;font-size:0.9rem">📌 Sabitlenmiş</div>`;
   if(n.title)html+=`<div class="detail-title">${esc(n.title)}</div>`;
   if(n.card)html+=`<div class="detail-card-box"><span>${maskCard(n.card)}</span><button class="copy-btn" onclick="copyText('${n.card.replace(/'/g,"\\'")}')">📋 Kopyala</button></div>`;
-  if(n.link)html+=`<a class="detail-link-box" href="${esc(n.link)}" target="_blank" rel="noopener">🔗 <span>${esc(n.link)}</span></a>`;
+  if(n.link)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.link)}">🔗 <span>${esc(n.link)}</span><span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;
   if(n.text)html+=`<div class="detail-text">${esc(n.text)}</div>`;
   // 4. Hatırlatıcı
   if(n.reminder){const rd=new Date(n.reminder);html+=`<div style="margin-top:10px;font-size:0.75rem;color:var(--text3);background:var(--surface2);border-radius:8px;padding:6px 10px">🔔 ${rd.toLocaleString('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>`;}
@@ -1939,23 +1952,8 @@ function showInstallBanner(){
 function fixToolbarTop(){
   const header = document.getElementById('stickyHeader');
   const toolbar = document.getElementById('toolbar');
-  const grid = document.getElementById('notesGrid');
-  if(!header) return;
-  const h = header.offsetHeight;
-  if(toolbar){
-    toolbar.style.position = 'fixed';
-    toolbar.style.top = h + 'px';
-    toolbar.style.left = '0';
-    toolbar.style.right = '0';
-    toolbar.style.zIndex = '99';
-  }
-  // İçeriğin header + toolbar altından başlaması için
-  const tb = toolbar ? toolbar.offsetHeight : 0;
-  const mainContent = document.querySelector('.main-content') || document.getElementById('notesGrid')?.parentElement;
-  // notesGrid'in wrapper'ını bul
-  const wrap = document.getElementById('notesGrid');
-  if(wrap && wrap.parentElement){
-    wrap.parentElement.style.paddingTop = (h + tb + 8) + 'px';
+  if(header && toolbar){
+    toolbar.style.top = header.offsetHeight + 'px';
   }
 }
 
@@ -1963,9 +1961,6 @@ function fixToolbarTop(){
 load();
 document.documentElement.setAttribute('data-theme',currentTheme);
 document.documentElement.setAttribute('data-view',currentView);
-// Status bar rengi
-const _mc=document.querySelector('meta[name="theme-color"]');
-if(_mc) _mc.setAttribute('content', currentTheme==='dark'?'#0f0f13':'#f4f3ef');
 document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
 updateThemeIcon();
 applyFontSize(currentFontSize);
