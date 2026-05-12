@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.22
+  Version : Pro 1.0.23
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -55,8 +55,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* VERSİYON BARI */
 .version-bar{
   width:100%;
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
+  background:transparent;
   padding:5px 16px;
   display:flex;align-items:center;justify-content:center;
   gap:8px;
@@ -66,18 +65,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   color:var(--text3);
   user-select:none;
   -webkit-user-select:none;
+  border-bottom:none;
 }
 .vb-sep{opacity:0.35;font-size:0.55rem}
-.vb-link{
-  color:var(--text3);
-  text-decoration:none;
-  cursor:pointer;
-  transition:color 0.15s;
-}
+.vb-link{color:var(--text3);text-decoration:none;cursor:pointer;transition:color 0.15s}
 .vb-link:hover{color:var(--accent)}
 
+/* STICKY HEADER — status bar dahil */
+#stickyHeader{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:var(--topbar-bg);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  /* iOS status bar alanı */
+  padding-top:env(safe-area-inset-top);
+}
+
 /* TOPBAR */
-.topbar{z-index:100;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.topbar{z-index:100;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;}
 .topbar-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
 .search-wrap{flex:1;position:relative}
 .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:8px 14px 8px 34px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none}
@@ -338,9 +346,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- UYGULAMA İÇERİĞİ -->
 <div id="appContent" style="display:none">
 
-<div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+<div id="stickyHeader">
 <div class="version-bar">
-  <span>Pro 1.0.22</span>
+  <span>Pro 1.0.23</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -705,6 +713,9 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
+  const color=t==='dark'?'#0f0f13':'#f4f3ef';
+  const mc=document.querySelector('meta[name="theme-color"]');
+  if(mc) mc.setAttribute('content',color);
   savePrefs();
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
@@ -1932,6 +1943,9 @@ function fixToolbarTop(){
 load();
 document.documentElement.setAttribute('data-theme',currentTheme);
 document.documentElement.setAttribute('data-view',currentView);
+// Status bar rengi
+const _mc=document.querySelector('meta[name="theme-color"]');
+if(_mc) _mc.setAttribute('content', currentTheme==='dark'?'#0f0f13':'#f4f3ef');
 document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
 updateThemeIcon();
 applyFontSize(currentFontSize);
