@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.16
+  Version : Pro 1.0.19
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -38,10 +38,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease}
+:root{--accent:#c8a96e;--accent2:#e8c98e;--red:#e05c5c;--green:#5ce07a;--blue:#5ca0e0;--purple:#a06ce0;--r:18px;--r2:12px;--trans:0.22s ease;--fs:1}
 [data-theme="dark"]{--bg:#0f0f13;--surface:#1c1c24;--surface2:#252530;--surface3:#2e2e3c;--border:rgba(255,255,255,0.13);--border2:rgba(255,255,255,0.07);--text:#ffffff;--text2:#d0d0e0;--text3:#9898b0;--shadow:0 8px 32px rgba(0,0,0,0.55);--topbar-bg:rgba(15,15,19,0.95)}
 [data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--surface3:#e8e6de;--border:rgba(0,0,0,0.10);--border2:rgba(0,0,0,0.05);--text:#111110;--text2:#3a3830;--text3:#7a7870;--shadow:0 4px 24px rgba(0,0,0,0.10);--topbar-bg:rgba(244,243,239,0.93);--accent:#a07840;--accent2:#c09860}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s;font-size:calc(16px * var(--fs))}
 
 /* LİGHTBOX */
 .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;cursor:zoom-out}
@@ -273,6 +273,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* FAB */
 .fab{position:fixed;bottom:22px;right:18px;z-index:150;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;cursor:pointer;font-size:1.5rem;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 20px rgba(200,169,110,0.45);transition:transform 0.15s;font-weight:900}
 .fab:active{transform:scale(0.92)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 
 /* 1. SABİT NOT — pin rozeti */
 .pin-badge{position:absolute;top:7px;right:8px;font-size:0.85rem;line-height:1;z-index:2;transition:filter 0.18s,transform 0.18s}
@@ -321,8 +322,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </style>
 </head>
 <body>
+
+<!-- UYGULAMA KİLİT EKRANI -->
+<div id="appLockScreen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:24px">
+  <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--accent);letter-spacing:-0.02em">✦ Notlarım</div>
+  <div id="appLockIcon" style="font-size:4rem;line-height:1;transition:transform 0.3s">🔒</div>
+  <div id="appLockMsg" style="font-size:0.9rem;color:var(--text2);text-align:center;max-width:240px;line-height:1.5">Devam etmek için kimliğini doğrula</div>
+  <button id="appLockBtn" onclick="doAppUnlock()" style="padding:14px 36px;border-radius:30px;border:none;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 4px 20px rgba(200,169,110,0.4);transition:transform 0.15s,opacity 0.15s">
+    <span id="appLockBtnIcon">🔒</span> Kilidi Aç
+  </button>
+  <div id="appLockError" style="font-size:0.78rem;color:var(--red);min-height:18px;text-align:center"></div>
+</div>
+
+<!-- UYGULAMA İÇERİĞİ -->
+<div id="appContent" style="display:none">
+
 <div class="version-bar">
-  <span>Pro 1.0.16</span>
+  <span>Pro 1.0.19</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -398,7 +414,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="panel">
     <div class="panel-handle"></div>
     <div class="panel-section">
+      <div class="panel-label">🔤 Metin Boyutu</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="changeFontSize(-1)" style="width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">A−</button>
+        <div style="flex:1;position:relative;height:6px;background:var(--surface3);border-radius:3px;cursor:pointer" onclick="setFontSizeByClick(event,this)">
+          <div id="fsTrack" style="position:absolute;left:0;top:0;height:100%;background:var(--accent);border-radius:3px;transition:width 0.15s"></div>
+          <div id="fsThumb" style="position:absolute;top:50%;width:18px;height:18px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 1px 6px rgba(0,0,0,0.3);transition:left 0.15s"></div>
+        </div>
+        <button onclick="changeFontSize(+1)" style="width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">A+</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.65rem;color:var(--text3);padding:0 2px">
+        <span>Küçük</span>
+        <span id="fsSizeLabel" style="color:var(--accent);font-weight:700">Normal</span>
+        <span>Büyük</span>
+      </div>
+    </div>
+    <div class="panel-section">
       <div class="panel-label">🔐 Güvenlik</div>
+      <!-- Uygulama geneli kilit -->
+      <div id="appLockSettingWrap" style="display:none;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text)" id="appLockLabel">Uygulama Kilidi</div>
+            <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">Açılışta Face ID / Touch ID sor</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0">
+            <input type="checkbox" id="appLockToggle" onchange="toggleAppLock(this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+            <span id="appLockSlider" style="position:absolute;inset:0;background:var(--surface3);border-radius:13px;cursor:pointer;transition:0.2s;border:1px solid var(--border)">
+              <span style="position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)" id="appLockKnob"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <!-- Not bazlı PIN (mevcut) -->
       <div id="biometricSettingWrap" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border-radius:var(--r2);border:1px solid var(--border)">
           <div>
@@ -614,15 +662,47 @@ const TC={kişisel:'#c8a96e',iş:'#5ca0e0',alışveriş:'#5ce07a',seyahat:'#a06c
 const TE={kişisel:'👤',iş:'💼',alışveriş:'🛒',seyahat:'✈️',finans:'💰',fikir:'💡',önemli:'⭐'};
 const TYE={metin:'📝',fotograf:'📷',link:'🔗',kart:'💳',diger:'📌'};
 
-let currentSort='newest', currentGroup='none'; // HATA1 fix: load()'dan önce tanımla
+let currentSort='newest', currentGroup='none';
+let currentFontSize=3; // 1-5 arası: 1=çok küçük … 3=normal … 5=çok büyük
+const FS_STEPS=[0.78,0.88,1,1.14,1.3];
+const FS_LABELS=['Çok Küçük','Küçük','Normal','Büyük','Çok Büyük'];
 
 function save(){try{localStorage.setItem(SK,JSON.stringify(notes))}catch(e){}}
-function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter,fontSize:currentFontSize}))}catch(e){}}
 function load(){
   try{const d=localStorage.getItem(SK);if(d)notes=JSON.parse(d)}catch(e){notes=[]}
-  try{const p=localStorage.getItem(PK);if(p){const j=JSON.parse(p);currentTheme=j.theme||'dark';currentView=j.view||'grid';currentSort=j.sort||'newest';currentGroup=j.group||'none';currentFilter=j.filter||'all';}}catch(e){}
+  try{const p=localStorage.getItem(PK);if(p){const j=JSON.parse(p);currentTheme=j.theme||'dark';currentView=j.view||'grid';currentSort=j.sort||'newest';currentGroup=j.group||'none';currentFilter=j.filter||'all';currentFontSize=j.fontSize!=null?j.fontSize:3;}}catch(e){}
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+// ── METIN BOYUTU ──
+function applyFontSize(step){
+  const scale=FS_STEPS[step-1]||1;
+  document.documentElement.style.setProperty('--fs',scale);
+  updateFontSizeUI(step);
+}
+function updateFontSizeUI(step){
+  const pct=((step-1)/4)*100;
+  const track=document.getElementById('fsTrack');
+  const thumb=document.getElementById('fsThumb');
+  const label=document.getElementById('fsSizeLabel');
+  if(track) track.style.width=pct+'%';
+  if(thumb) thumb.style.left=pct+'%';
+  if(label) label.textContent=FS_LABELS[step-1]||'Normal';
+}
+function changeFontSize(delta){
+  currentFontSize=Math.max(1,Math.min(5,currentFontSize+delta));
+  applyFontSize(currentFontSize);
+  savePrefs();
+}
+function setFontSizeByClick(e,el){
+  const rect=el.getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  currentFontSize=Math.round(pct*4)+1;
+  currentFontSize=Math.max(1,Math.min(5,currentFontSize));
+  applyFontSize(currentFontSize);
+  savePrefs();
+}
 
 function updateThemeIcon(){
   const btn=document.getElementById('themeToggleBtn');
@@ -1151,7 +1231,112 @@ function askPin(mode, hint) {
 }
 
 // ══════════════════════════════════════════════════
-// BİYOMETRİK (WebAuthn)
+// UYGULAMA KİLİDİ
+// ══════════════════════════════════════════════════
+const APP_LOCK_KEY='notlarim_applock';
+
+function isAppLockEnabled(){
+  try{return localStorage.getItem(APP_LOCK_KEY)==='1';}catch(e){return false;}
+}
+function setAppLockEnabled(val){
+  try{localStorage.setItem(APP_LOCK_KEY,val?'1':'0');}catch(e){}
+}
+
+async function doAppUnlock(){
+  const btn=document.getElementById('appLockBtn');
+  const icon=document.getElementById('appLockBtnIcon');
+  const msg=document.getElementById('appLockMsg');
+  const err=document.getElementById('appLockError');
+  if(btn) btn.disabled=true;
+  if(icon) icon.textContent='⏳';
+  if(err) err.textContent='';
+  const ok=await verifyBiometric();
+  if(ok){
+    showApp();
+  } else {
+    if(btn) btn.disabled=false;
+    if(icon) icon.textContent='🔒';
+    if(err) err.textContent='Doğrulama başarısız — tekrar dene';
+    setTimeout(()=>{if(err)err.textContent='';},2500);
+  }
+}
+
+function showApp(){
+  const lock=document.getElementById('appLockScreen');
+  const app=document.getElementById('appContent');
+  if(lock){lock.style.opacity='0';lock.style.transition='opacity 0.35s';setTimeout(()=>lock.style.display='none',350);}
+  if(app){app.style.display='block';}
+}
+
+async function initAppLock(){
+  const enabled=isAppLockEnabled();
+  if(!enabled){
+    showApp();
+    return;
+  }
+  // Biyometrik kayıtlı mı?
+  if(!isBiometricRegistered()){
+    // Kayıtlı değil — kilidi geç, direkt aç
+    showApp();
+    return;
+  }
+  // Kilit ekranını göster
+  const lock=document.getElementById('appLockScreen');
+  if(lock) lock.style.display='flex';
+  // Cihaz tipine göre ikon
+  const ua=navigator.userAgent;
+  const lockIcon=document.getElementById('appLockBtnIcon');
+  const lockLabel=document.getElementById('appLockLabel');
+  if(/iPhone|iPad/.test(ua)){
+    if(lockIcon) lockIcon.textContent='🔒';
+    if(lockLabel) lockLabel.textContent='Uygulama Kilidi (Face ID / Touch ID)';
+  } else if(/Mac/.test(ua)){
+    if(lockIcon) lockIcon.textContent='🔒';
+    if(lockLabel) lockLabel.textContent='Uygulama Kilidi (Touch ID)';
+  }
+  // Otomatik dene
+  setTimeout(()=>doAppUnlock(),300);
+}
+
+async function toggleAppLock(enabled){
+  if(enabled){
+    // Önce biyometrik kayıt gerekli
+    if(!isBiometricSupported()){
+      updateAppLockSlider(false);
+      const toggle=document.getElementById('appLockToggle');
+      if(toggle) toggle.checked=false;
+      showToast('❌ Bu cihaz biyometriği desteklemiyor');
+      return;
+    }
+    if(!isBiometricRegistered()){
+      showToast('⏳ Face ID / Touch ID kaydediliyor…');
+      const ok=await registerBiometric();
+      if(!ok){
+        updateAppLockSlider(false);
+        const toggle=document.getElementById('appLockToggle');
+        if(toggle) toggle.checked=false;
+        showToast('❌ Kayıt başarısız');
+        return;
+      }
+    }
+    setAppLockEnabled(true);
+    updateAppLockSlider(true);
+    showToast('✅ Uygulama kilidi etkin');
+  } else {
+    setAppLockEnabled(false);
+    updateAppLockSlider(false);
+    showToast('🔓 Uygulama kilidi kapatıldı');
+  }
+}
+
+function updateAppLockSlider(on){
+  const knob=document.getElementById('appLockKnob');
+  const slider=document.getElementById('appLockSlider');
+  const toggle=document.getElementById('appLockToggle');
+  if(knob) knob.style.transform=on?'translateX(18px)':'translateX(0)';
+  if(slider) slider.style.background=on?'var(--accent)':'var(--surface3)';
+  if(toggle) toggle.checked=on;
+}
 // ══════════════════════════════════════════════════
 const BIO_KEY='notlarim_bio_cred'; // credentialId base64 olarak saklanır
 
@@ -1286,23 +1471,24 @@ function updateBiometricSlider(on){
 function initBiometricUI(){
   const wrap=document.getElementById('biometricSettingWrap');
   const unsupported=document.getElementById('biometricUnsupported');
+  const appLockWrap=document.getElementById('appLockSettingWrap');
   if(!isBiometricSupported()){
     if(unsupported) unsupported.style.display='block';
     return;
   }
+  if(appLockWrap) appLockWrap.style.display='block';
+  updateAppLockSlider(isAppLockEnabled());
   if(wrap) wrap.style.display='block';
-  // Mevcut durumu yansıt
   const registered=isBiometricRegistered();
   updateBiometricSlider(registered);
   const status=document.getElementById('biometricStatus');
   if(registered && status) status.textContent='✅ Etkin — PIN kilitli notlar Face ID / Touch ID ile açılır';
-  // Label — Face ID mi Touch ID mi? (heuristic)
   const label=document.getElementById('biometricLabel');
   if(label){
     const ua=navigator.userAgent;
-    if(/iPhone|iPad/.test(ua)) label.textContent='Face ID / Touch ID';
-    else if(/Mac/.test(ua)) label.textContent='Touch ID';
-    else label.textContent='Biyometrik Kilit';
+    if(/iPhone|iPad/.test(ua)) label.textContent='Not PIN\'i için Face ID / Touch ID';
+    else if(/Mac/.test(ua)) label.textContent='Not PIN\'i için Touch ID';
+    else label.textContent='Not PIN\'i için Biyometrik';
   }
 }
 
@@ -1459,7 +1645,7 @@ function clearLinkNote() {
   prev.style.display='none'; prev.innerHTML='';
 }
 
-function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden';initBiometricUI();}
+function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden';initBiometricUI();updateFontSizeUI(currentFontSize);}
 function closePanel(){document.getElementById('settingsPanel').classList.remove('open');document.body.style.overflow=''}
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
@@ -1611,56 +1797,137 @@ function generateIcon(size) {
 }
 
 function setupPWA() {
-  // İkon üret
   const icon192 = generateIcon(192);
   const icon512 = generateIcon(512);
-  const icon180 = generateIcon(180); // Apple touch
+  const icon180 = generateIcon(180);
 
-  // Apple touch icon
+  // Apple touch icon ana
   document.getElementById('apple-touch-icon').href = icon180;
-
-  // Favicon
   document.getElementById('favicon').href = generateIcon(32);
 
-  // Manifest blob
+  // Tüm iOS ikon boyutları
+  [57,60,72,76,114,120,144,152,167,180].forEach(sz => {
+    const lnk = document.createElement('link');
+    lnk.rel = 'apple-touch-icon';
+    lnk.setAttribute('sizes', `${sz}x${sz}`);
+    lnk.href = generateIcon(sz);
+    document.head.appendChild(lnk);
+  });
+
+  // iOS Splash Screen — yaygın ekran boyutları (2x)
+  [
+    [2048,2732],[1668,2388],[1536,2048],[1242,2688],
+    [1125,2436],[1242,2208],[750,1334],[828,1792],[1170,2532]
+  ].forEach(([w,h]) => {
+    const splash = generateSplash(w, h);
+    const lnk = document.createElement('link');
+    lnk.rel = 'apple-touch-startup-image';
+    lnk.media = `(device-width:${Math.round(w/2)}px) and (device-height:${Math.round(h/2)}px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)`;
+    lnk.href = splash;
+    document.head.appendChild(lnk);
+  });
+
+  // Manifest
   const manifest = {
     name: 'Notlarım',
     short_name: 'Notlarım',
-    description: 'Kişisel not uygulaması',
-    start_url: '.',
+    description: 'Kişisel not uygulaması — metin, fotoğraf, link, kart',
+    start_url: './',
     display: 'standalone',
     background_color: '#0f0f13',
     theme_color: '#0f0f13',
-    orientation: 'portrait',
+    orientation: 'portrait-primary',
     lang: 'tr',
+    categories: ['productivity','utilities'],
     icons: [
-      { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-      { src: icon180, sizes: '180x180', type: 'image/png', purpose: 'apple touch icon' }
+      { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'maskable' }
     ]
   };
   const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-  const manifestUrl = URL.createObjectURL(blob);
-  document.getElementById('pwa-manifest').href = manifestUrl;
+  document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
 
-  // Service Worker — offline cache
+  // Service Worker — stale-while-revalidate offline cache
   if ('serviceWorker' in navigator) {
     const swCode = `
-const CACHE = 'notlarim-v1';
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+const CACHE='notlarim-v2';
+self.addEventListener('install',e=>self.skipWaiting());
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
   self.clients.claim();
 });
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('Offline'))));
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  e.respondWith(caches.open(CACHE).then(cache=>
+    cache.match(e.request).then(cached=>{
+      const net=fetch(e.request).then(res=>{
+        if(res&&res.status===200)cache.put(e.request,res.clone());
+        return res;
+      }).catch(()=>cached);
+      return cached||net;
+    })
+  ));
 });`;
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(() => {});
+    const swBlob = new Blob([swCode],{type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
   }
+
+  // iOS Safari "Ana Ekrana Ekle" banner
+  showInstallBanner();
+}
+
+function generateSplash(w, h) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0f0f13'; ctx.fillRect(0,0,w,h);
+  const sz = Math.min(w,h)*0.18;
+  const cx = w/2, cy = h/2 - sz*0.3;
+  // Altın daire
+  ctx.beginPath(); ctx.arc(cx,cy,sz*0.52,0,Math.PI*2);
+  const g=ctx.createRadialGradient(cx-sz*0.1,cy-sz*0.1,0,cx,cy,sz*0.52);
+  g.addColorStop(0,'#e8c98e'); g.addColorStop(1,'#a07840');
+  ctx.fillStyle=g; ctx.fill();
+  // ✦
+  ctx.font=`900 ${sz*0.46}px serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#0f0f13'; ctx.fillText('✦',cx,cy);
+  // İsim
+  ctx.font=`700 ${sz*0.34}px Georgia,serif`;
+  ctx.fillStyle='#c8a96e'; ctx.fillText('Notlarım',cx,cy+sz*0.88);
+  ctx.font=`400 ${sz*0.16}px sans-serif`;
+  ctx.fillStyle='rgba(200,169,110,0.45)'; ctx.fillText('Kişisel Not Uygulaması',cx,cy+sz*1.22);
+  return c.toDataURL('image/png');
+}
+
+function showInstallBanner(){
+  try{if(localStorage.getItem('notlarim_install_shown'))return;}catch(e){}
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isSafari=/Safari/.test(navigator.userAgent)&&!/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+  const isStandalone=navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;
+  if(!isIOS||!isSafari||isStandalone)return;
+  setTimeout(()=>{
+    const banner=document.createElement('div');
+    banner.id='installBanner';
+    banner.style.cssText='position:fixed;bottom:80px;left:16px;right:16px;z-index:8888;background:var(--surface);border:1px solid rgba(200,169,110,0.35);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.55)';
+    banner.innerHTML=`
+      <div style="font-size:2rem;flex-shrink:0">📲</div>
+      <div style="flex:1">
+        <div style="font-size:0.83rem;font-weight:700;color:var(--text);margin-bottom:3px">Ana Ekrana Ekle</div>
+        <div style="font-size:0.7rem;color:var(--text3);line-height:1.5">
+          Paylaş ⎙ butonuna dokun<br>→ <b style="color:var(--text2)">"Ana Ekrana Ekle"</b> seçeneğini seç
+        </div>
+      </div>
+      <button onclick="this.closest('#installBanner').remove();try{localStorage.setItem('notlarim_install_shown','1')}catch(e){}"
+        style="background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;padding:4px;flex-shrink:0;line-height:1">✕</button>`;
+    document.body.appendChild(banner);
+    setTimeout(()=>{
+      const b=document.getElementById('installBanner');
+      if(b){b.style.transition='opacity 0.4s';b.style.opacity='0';setTimeout(()=>b.remove(),400);}
+      try{localStorage.setItem('notlarim_install_shown','1')}catch(e){}
+    },9000);
+  },3000);
 }
 
 // ── HATA 2 fix: toolbar top'u dinamik ayarla ──
@@ -1678,6 +1945,8 @@ document.documentElement.setAttribute('data-theme',currentTheme);
 document.documentElement.setAttribute('data-view',currentView);
 document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
 updateThemeIcon();
+applyFontSize(currentFontSize);
+initAppLock();
 document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
 const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');if(_vi)_vi.textContent=_vm.icon;
 // Sıralama & grup UI'ı yükle
@@ -1696,5 +1965,6 @@ notes.forEach(n=>{ if(n.reminder) scheduleReminder(n); });
 const remEl=document.getElementById('f-reminder');
 if(remEl) remEl.addEventListener('change',()=>{ if(remEl.value) requestNotifPerm(); });
 </script>
+</div><!-- /appContent -->
 </body>
 </html>
