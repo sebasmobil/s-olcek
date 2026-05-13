@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.46
+  Version : Pro 1.0.48
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -57,15 +57,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   position:fixed;
   top:0;left:0;right:0;
   height:env(safe-area-inset-top);
-  background:var(--surface2);
+  background:#0f0f13;
   z-index:9999;
   pointer-events:none;
   transition:background 0.3s;
 }
-/* Light temada da overlay koyu kalır — black-translucent ile ikonlar (saat/pil) beyaz,
-   koyu arka plan üzerinde her zaman görünür */
 [data-theme="light"] #statusBarOverlay{
-  background:rgba(40,38,34,0.92);
+  background:#f4f3ef;
 }
 
 /* VERSİYON BARI */
@@ -384,13 +382,12 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.46</span>
+  <span>Pro 1.0.48</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
   <a class="vb-link" href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
-  <span class="vb-sep">|</span>
-  <span id="vbClock" style="font-variant-numeric:tabular-nums;letter-spacing:0.06em"></span>
+
 </div>
 
 <div class="topbar">
@@ -1032,25 +1029,11 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
-  // theme-color: tek meta, content güncelle
   var tc=document.getElementById('tc-meta');
   if(tc) tc.setAttribute('content', t==='dark'?'#0f0f13':'#f4f3ef');
   savePrefs();
 }
-// Sistem saati — version bar
-(function startClock(){
-  function tick(){
-    var el=document.getElementById('vbClock');
-    if(!el)return;
-    var now=new Date();
-    var h=String(now.getHours()).padStart(2,'0');
-    var mn=String(now.getMinutes()).padStart(2,'0');
-    var s=String(now.getSeconds()).padStart(2,'0');
-    el.textContent=h+':'+mn+':'+s;
-  }
-  tick();
-  setInterval(tick,1000);
-})();
+
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
 function toggleViewDropdown(){const d=document.getElementById('viewDropdown');d.classList.toggle('open')}
 function closeViewDropdown(){const d=document.getElementById('viewDropdown');if(d)d.classList.remove('open')}
