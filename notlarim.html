@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.38
+  Version : Pro 1.0.39
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -26,7 +26,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" id="statusBarStyleMeta">
 <meta name="apple-mobile-web-app-title" content="Notlarım">
 <meta name="application-name" content="Notlarım">
 <meta name="theme-color" content="#0f0f13" id="themeColorMeta">
@@ -368,7 +368,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.38</span>
+  <span>Pro 1.0.39</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1011,11 +1011,18 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
-  // theme-color meta — Safari adres çubuğu rengi
+  // theme-color — Safari adres çubuğu
   var colors={dark:'#0f0f13',light:'#f4f3ef'};
   var tc=document.getElementById('themeColorMeta');
   if(tc)tc.setAttribute('content',colors[t]||'#0f0f13');
-  // statusBarCover rengi zaten CSS var(--bg) ile anlık güncellenir
+  // Status bar style — eski tag'ı sil, yenisini ekle (anlık etki için)
+  var old=document.getElementById('statusBarStyleMeta');
+  if(old)old.parentNode.removeChild(old);
+  var m=document.createElement('meta');
+  m.name='apple-mobile-web-app-status-bar-style';
+  m.id='statusBarStyleMeta';
+  m.content=t==='dark'?'black-translucent':'default';
+  document.head.appendChild(m);
   savePrefs();
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
