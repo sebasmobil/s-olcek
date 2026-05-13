@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.40
+  Version : Pro 1.0.43
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -29,7 +29,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="statusBarStyleMeta">
 <meta name="apple-mobile-web-app-title" content="Notlarım">
 <meta name="application-name" content="Notlarım">
-<meta name="theme-color" content="#0f0f13" id="themeColorMeta">
+<meta name="theme-color" content="#0f0f13" id="tc-dark" media="all">
+<meta name="theme-color" content="#f4f3ef" id="tc-light" media="not all">
 <meta name="description" content="Kişisel not uygulaması — metin, fotoğraf, link, kart">
 <link rel="apple-touch-icon" id="apple-touch-icon" href="">
 <link rel="icon" type="image/png" id="favicon" href="">
@@ -366,11 +367,13 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.40</span>
+  <span>Pro 1.0.43</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
   <a class="vb-link" href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
+  <span class="vb-sep">|</span>
+  <span id="vbClock" style="font-variant-numeric:tabular-nums;letter-spacing:0.06em"></span>
 </div>
 
 <div class="topbar">
@@ -677,7 +680,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
               <span id="tag-display-text" style="flex:1;color:var(--text3)">— Seç —</span>
               <span style="font-size:0.6rem;opacity:0.5">▾</span>
             </div>
-            <div id="tag-dropdown" style="display:none;position:absolute;top:calc(100%+4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow);z-index:500;max-height:260px;overflow-y:auto;animation:dropIn 0.15s ease">
+            <div id="tag-dropdown" style="display:none;position:absolute;top:calc(100%+4px);left:0;min-width:260px;right:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow);z-index:500;max-height:260px;overflow-y:auto;animation:dropIn 0.15s ease">
               <!-- built-in tags populated by JS -->
             </div>
           </div>
@@ -841,8 +844,8 @@ const CTS_KEY='notlarim_custom_tags';
 let customTags={}; // {name: {emoji, color}}
 function loadCustomTags(){try{const d=localStorage.getItem(CTS_KEY);if(d)customTags=JSON.parse(d);}catch(e){customTags={};}}
 function saveCustomTags(){try{localStorage.setItem(CTS_KEY,JSON.stringify(customTags));}catch(e){}}
-function allTagEmojis(name){return TE[name]||((customTags[name]||{}).emoji)||'🏷';}
-function allTagColors(name){return TC[name]||((customTags[name]||{}).color)||'var(--text3)';}
+function allTagEmojis(name){if(!name)return'';return TE[name]||((customTags[name]||{}).emoji)||'🏷';}
+function allTagColors(name){if(!name)return'var(--text3)';return TC[name]||((customTags[name]||{}).color)||'var(--text3)';}
 
 const CT_EMOJIS=['🎯','🚀','💎','🔥','⚡','🌟','📚','🎮','🎵','🏠','🌿','🧪','🛠','🎨','📱','💻','🗺','🏋','🍕','☕','🐾','🌙','🏆','💡','🔑','📦','🎁','🧩'];
 let ctEditingTag=null; // null=yeni, string=düzenleniyor
@@ -888,16 +891,19 @@ function saveCustomTag(){
   saveCustomTags();
   closeModal('customTagModal');
   renderTagDropdown(document.getElementById('f-tag').value);
+  renderNotes(); // kartlardaki simgeyi anlık güncelle
   showToast('✅ Etiket kaydedildi');
 }
 function deleteCustomTag(name,e){
-  if(e)e.stopPropagation();
-  if(!confirm(`"${name}" etiketi silinsin mi?`))return;
-  delete customTags[name];
-  saveCustomTags();
-  if(document.getElementById('f-tag').value===name){setTagValue('');}
-  renderTagDropdown(document.getElementById('f-tag').value);
-  showToast('🗑 Etiket silindi');
+  if(e){e.stopPropagation();e.preventDefault();}
+  // confirm() PWA'da bazen çalışmaz — özel onay kullan
+  showConfirm(`"${name}" etiketi silinsin mi?`, function(){
+    delete customTags[name];
+    saveCustomTags();
+    try{if(document.getElementById('f-tag').value===name)setTagValue('');}catch(ex){}
+    renderTagDropdown(document.getElementById('f-tag').value);
+    showToast('🗑 Etiket silindi');
+  });
 }
 
 // ── ETİKET PICKER ──
@@ -1009,20 +1015,33 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
-  // theme-color — Safari adres çubuğu
-  var colors={dark:'#0f0f13',light:'#f4f3ef'};
-  var tc=document.getElementById('themeColorMeta');
-  if(tc)tc.setAttribute('content',colors[t]||'#0f0f13');
-  // Status bar style — eski tag'ı sil, yenisini ekle (anlık etki için)
-  var old=document.getElementById('statusBarStyleMeta');
-  if(old)old.parentNode.removeChild(old);
-  var m=document.createElement('meta');
-  m.name='apple-mobile-web-app-status-bar-style';
-  m.id='statusBarStyleMeta';
-  m.content=t==='dark'?'black-translucent':'default';
-  document.head.appendChild(m);
+  // iOS theme-color: iki ayrı meta + media toggle — bazı iOS sürümlerinde anlık çalışır
+  var isLight = (t === 'light');
+  var tcDark  = document.getElementById('tc-dark');
+  var tcLight = document.getElementById('tc-light');
+  if(tcDark)  { tcDark.setAttribute('media',  isLight ? 'not all' : 'all');
+                tcDark.setAttribute('name',   isLight ? '_theme-color' : 'theme-color'); }
+  if(tcLight) { tcLight.setAttribute('media', isLight ? 'all' : 'not all');
+                tcLight.setAttribute('name',  isLight ? 'theme-color' : '_theme-color'); }
+  // status-bar-style içeriğini sıfırla (bazı iOS için tetikleyici)
+  var sbm = document.getElementById('statusBarStyleMeta');
+  if(sbm) sbm.setAttribute('content', isLight ? 'default' : 'black-translucent');
   savePrefs();
 }
+// Sistem saati — version bar
+(function startClock(){
+  function tick(){
+    var el=document.getElementById('vbClock');
+    if(!el)return;
+    var now=new Date();
+    var h=String(now.getHours()).padStart(2,'0');
+    var mn=String(now.getMinutes()).padStart(2,'0');
+    var s=String(now.getSeconds()).padStart(2,'0');
+    el.textContent=h+':'+mn+':'+s;
+  }
+  tick();
+  setInterval(tick,1000);
+})();
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
 function toggleViewDropdown(){const d=document.getElementById('viewDropdown');d.classList.toggle('open')}
 function closeViewDropdown(){const d=document.getElementById('viewDropdown');if(d)d.classList.remove('open')}
@@ -2178,6 +2197,25 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('editMod
 
 let toastT;
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
+
+// PWA'da confirm() çalışmadığında kullanılır
+function showConfirm(msg, onOk){
+  var old=document.getElementById('_confirmOverlay');
+  if(old)old.remove();
+  var ov=document.createElement('div');
+  ov.id='_confirmOverlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+  ov.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;max-width:300px;width:100%;text-align:center;box-shadow:var(--shadow)">
+    <div style="font-size:1.5rem;margin-bottom:10px">🗑</div>
+    <div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:20px;line-height:1.5">${msg}</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('_confirmOverlay').remove()" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer">İptal</button>
+      <button id="_confirmOkBtn" style="flex:1;padding:11px;border-radius:12px;border:none;background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer">Sil</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_confirmOkBtn').onclick=function(){ov.remove();onOk();};
+}
 
 function exportNotes(){
   const APP_VER = ((document.querySelector('.version-bar span')||{}).textContent) || 'Pro 1.0.09';
