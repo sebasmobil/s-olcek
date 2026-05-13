@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.53
+  Version : Pro 1.0.54
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -296,6 +296,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* 1. SABİT NOT — pin rozeti */
 .pin-badge{position:absolute;top:7px;right:8px;font-size:0.85rem;line-height:1;z-index:2;transition:filter 0.18s,transform 0.18s}
 .pin-badge.pinned{filter:drop-shadow(0 0 3px rgba(200,169,110,0.9));transform:scale(1.15)}
+.note-action-btn.pin-active{color:var(--accent)!important;background:rgba(200,169,110,0.15)!important}
 .note-card.is-pinned{border-color:rgba(200,169,110,0.4)!important;box-shadow:0 2px 16px rgba(200,169,110,0.12)}
 
 /* 3. KART ARKA PLAN RENK TONU */
@@ -383,7 +384,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.53</span>
+  <span>Pro 1.0.54</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -464,7 +465,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
       <div class="panel-label">🔤 Metin Boyutu</div>
       <div style="display:flex;align-items:center;gap:10px">
         <button onclick="changeFontSize(-1)" style="width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">A−</button>
-        <div style="flex:1;position:relative;height:6px;background:var(--surface3);border-radius:3px;cursor:pointer" onclick="setFontSizeByClick(event,this)">
+        <div id="fsSliderTrack" style="flex:1;position:relative;height:6px;background:var(--surface3);border-radius:3px;cursor:pointer" onclick="setFontSizeByClick(event,this)" ontouchstart="fsTouchStart(event)" ontouchmove="fsTouchMove(event)" ontouchend="fsTouchEnd()">
           <div id="fsTrack" style="position:absolute;left:0;top:0;height:100%;background:var(--accent);border-radius:3px;transition:width 0.15s"></div>
           <div id="fsThumb" style="position:absolute;top:50%;width:18px;height:18px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 1px 6px rgba(0,0,0,0.3);transition:left 0.15s"></div>
         </div>
@@ -710,6 +711,9 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
             <div class="color-dot" style="background:#e05c5c" data-color="#e05c5c" onclick="setColor('#e05c5c',this)"></div>
             <div class="color-dot" style="background:#a06ce0" data-color="#a06ce0" onclick="setColor('#a06ce0',this)"></div>
             <div class="color-dot" style="background:#5a5a72" data-color="#5a5a72" onclick="setColor('#5a5a72',this)"></div>
+            <div class="color-dot" id="customColorDot" title="Özel Renk" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);position:relative;overflow:hidden" onclick="document.getElementById('customColorInput').click()">
+              <input type="color" id="customColorInput" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer" oninput="applyCustomColor(this.value)" onchange="applyCustomColor(this.value)">
+            </div>
           </div>
         </div>
       </div>
@@ -1017,6 +1021,18 @@ function setFontSizeByClick(e,el){
   applyFontSize(currentFontSize);
   savePrefs();
 }
+var _fsDragging=false;
+function fsTouchStart(e){_fsDragging=true;e.preventDefault();_fsApplyTouch(e);}
+function fsTouchMove(e){if(!_fsDragging)return;e.preventDefault();_fsApplyTouch(e);}
+function fsTouchEnd(){_fsDragging=false;}
+function _fsApplyTouch(e){
+  var el=document.getElementById('fsSliderTrack');if(!el)return;
+  var rect=el.getBoundingClientRect();
+  var pct=Math.max(0,Math.min(1,(e.touches[0].clientX-rect.left)/rect.width));
+  currentFontSize=Math.round(pct*4)+1;
+  currentFontSize=Math.max(1,Math.min(5,currentFontSize));
+  applyFontSize(currentFontSize);savePrefs();
+}
 
 function updateThemeIcon(){
   const btn=document.getElementById('themeToggleBtn');
@@ -1228,6 +1244,12 @@ function loadPdfFile(inp){
 }
 
 function setColor(c,el){currentColor=c==='none'?null:c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===(c)))}
+function applyCustomColor(hex){
+  currentColor=hex;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+  var cd=document.getElementById('customColorDot');
+  if(cd){cd.style.background=hex;cd.classList.add('active');cd.dataset.color=hex;}
+}
 
 
 // OG Image fetch
@@ -1477,17 +1499,63 @@ function openLightbox(src){
   const img = document.getElementById('lightboxImg');
   img.src = src;
   img.style.transform = 'scale(1)';
+  img.style.transformOrigin = 'center center';
+  _lbScale=1; _lbPanX=0; _lbPanY=0;
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 function closeLightbox(e){
-  // Sadece overlay'e (siyah alan) tıklayınca kapat, resme veya close btn'e tıklayınca zaten çalışır
   if(e && e.target.closest('#lightboxImg')) return;
   document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightboxImg').src = ''; // bellek temizle
+  document.getElementById('lightboxImg').src = '';
   document.body.style.overflow = '';
+  _lbScale=1;_lbPanX=0;_lbPanY=0;
 }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+// Pinch-zoom + pan için lightbox touch handler
+var _lbScale=1,_lbPanX=0,_lbPanY=0,_lbLastDist=0,_lbDragging=false,_lbLastX=0,_lbLastY=0;
+(function(){
+  function lbImg(){return document.getElementById('lightboxImg');}
+  function applyTransform(){
+    var img=lbImg();if(!img)return;
+    img.style.transform='translate('+_lbPanX+'px,'+_lbPanY+'px) scale('+_lbScale+')';
+    img.style.transition='none';
+  }
+  document.addEventListener('touchstart',function(e){
+    var img=lbImg();if(!img||!document.getElementById('lightbox').classList.contains('open'))return;
+    if(e.touches.length===2){
+      _lbLastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    } else if(e.touches.length===1&&_lbScale>1){
+      _lbDragging=true;_lbLastX=e.touches[0].clientX;_lbLastY=e.touches[0].clientY;
+    }
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    var img=lbImg();if(!img||!document.getElementById('lightbox').classList.contains('open'))return;
+    if(e.touches.length===2){
+      e.preventDefault();
+      var dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      if(_lbLastDist>0){_lbScale*=dist/_lbLastDist;_lbScale=Math.max(1,Math.min(5,_lbScale));}
+      _lbLastDist=dist;
+      applyTransform();
+    } else if(e.touches.length===1&&_lbDragging){
+      var dx=e.touches[0].clientX-_lbLastX,dy=e.touches[0].clientY-_lbLastY;
+      _lbPanX+=dx;_lbPanY+=dy;
+      _lbLastX=e.touches[0].clientX;_lbLastY=e.touches[0].clientY;
+      applyTransform();
+    }
+  },{passive:false});
+  document.addEventListener('touchend',function(e){
+    _lbDragging=false;_lbLastDist=0;
+    if(_lbScale<=1){_lbScale=1;_lbPanX=0;_lbPanY=0;applyTransform();}
+  },{passive:true});
+  // Çift tıklayınca sıfırla
+  document.addEventListener('dblclick',function(e){
+    if(!e.target.closest('#lightboxImg'))return;
+    _lbScale=1;_lbPanX=0;_lbPanY=0;
+    var img=lbImg();if(img){img.style.transition='transform 0.3s';applyTransform();}
+  });
+})();
 
 async function openDetail(id){
   const n=notes.find(n=>n.id===id);if(!n)return;
@@ -1613,8 +1681,8 @@ function noteCardHtml(n,i){
   }
   if(n.pinned) cardClass+=' is-pinned';
 
-  // 1. Pin rozeti
-  const pinBadge=`<div class="pin-badge${n.pinned?' pinned':''}" onclick="togglePin('${n.id}',event)" title="${n.pinned?'Sabiti Kaldır':'Sabitle'}">${n.pinned?'📌':'📍'}</div>`;
+  // 1. Pin butonu — footer'a taşındı, artık ayrı badge yok
+  const pinBadge='';
 
   let top='';
   if(!isCompact){
@@ -1639,6 +1707,7 @@ function noteCardHtml(n,i){
     <div class="note-footer">
       <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}${n.reminder&&new Date(n.reminder)>new Date()?' 🔔':''}</span>
       <div class="note-actions">
+        <button class="note-action-btn${n.pinned?' pin-active':''}" onclick="event.stopPropagation();togglePin('${n.id}',event)" title="${n.pinned?'Sabiti Kaldır':'Sabitle'}">${n.pinned?'📌':'📍'}</button>
         <button class="note-action-btn" onclick="event.stopPropagation();editNote('${n.id}')">✏️</button>
         <button class="note-action-btn del" onclick="deleteNote('${n.id}',event)">🗑</button>
       </div>
