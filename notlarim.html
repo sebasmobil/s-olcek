@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.51
+  Version : Pro 1.0.52
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -176,7 +176,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-preview{font-size:0.79rem;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 [data-view="masonry"] .note-preview{-webkit-line-clamp:5}
 .note-card-num{font-family:monospace;font-size:0.76rem;color:var(--accent);letter-spacing:0.12em;margin-top:6px;font-weight:600}
-.note-link-chip{display:flex;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;background:var(--surface2);border-radius:8px;font-size:0.71rem;color:var(--blue);overflow:hidden}
+.note-link-chip{display:flex;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;background:rgba(92,160,224,0.12);border:1px solid rgba(92,160,224,0.25);border-radius:8px;font-size:0.73rem;font-weight:600;color:#3a8fd4;overflow:hidden}
+[data-theme="light"] .note-link-chip{color:#1a6bb5;background:rgba(26,107,181,0.1);border-color:rgba(26,107,181,0.2)}
 .note-link-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .note-footer{padding:7px 13px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border2)}
 .note-date{font-size:0.67rem;color:var(--text3)}
@@ -382,7 +383,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.51</span>
+  <span>Pro 1.0.52</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1655,6 +1656,7 @@ function trLower(s){
 }
 
 function renderNotes(){
+  loadCustomTags(); // özel etiket emoji/renklerini her render'da taze yükle
   const raw=document.getElementById('searchInput').value.trim();
   const q=trLower(raw);
   const grid=document.getElementById('notesGrid');
