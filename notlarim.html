@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.44
+  Version : Pro 1.0.45
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -29,8 +29,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="statusBarStyleMeta">
 <meta name="apple-mobile-web-app-title" content="Notlarım">
 <meta name="application-name" content="Notlarım">
-<meta name="theme-color" content="#0f0f13" id="tc-dark" media="all">
-<meta name="theme-color" content="#f4f3ef" id="tc-light" media="not all">
+<meta name="theme-color" content="#0f0f13" id="tc-meta">
 <meta name="description" content="Kişisel not uygulaması — metin, fotoğraf, link, kart">
 <link rel="apple-touch-icon" id="apple-touch-icon" href="">
 <link rel="icon" type="image/png" id="favicon" href="">
@@ -368,7 +367,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.44</span>
+  <span>Pro 1.0.45</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1016,17 +1015,9 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
-  // iOS theme-color: iki ayrı meta + media toggle — bazı iOS sürümlerinde anlık çalışır
-  var isLight = (t === 'light');
-  var tcDark  = document.getElementById('tc-dark');
-  var tcLight = document.getElementById('tc-light');
-  if(tcDark)  { tcDark.setAttribute('media',  isLight ? 'not all' : 'all');
-                tcDark.setAttribute('name',   isLight ? '_theme-color' : 'theme-color'); }
-  if(tcLight) { tcLight.setAttribute('media', isLight ? 'all' : 'not all');
-                tcLight.setAttribute('name',  isLight ? 'theme-color' : '_theme-color'); }
-  // status-bar-style — diyet uygulaması gibi her zaman black-translucent (şeffaf)
-  var sbm = document.getElementById('statusBarStyleMeta');
-  if(sbm) sbm.setAttribute('content', 'black-translucent');
+  // theme-color: tek meta, content güncelle
+  var tc=document.getElementById('tc-meta');
+  if(tc) tc.setAttribute('content', t==='dark'?'#0f0f13':'#f4f3ef');
   savePrefs();
 }
 // Sistem saati — version bar
