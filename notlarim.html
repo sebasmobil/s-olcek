@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.32
+  Version : Pro 1.0.35
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -23,13 +23,13 @@
 <html lang="tr" data-theme="dark" data-view="grid">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Notlarım">
 <meta name="application-name" content="Notlarım">
-<meta name="theme-color" content="#0f0f13">
+<meta name="theme-color" content="#0f0f13" id="themeColorMeta">
 <meta name="description" content="Kişisel not uygulaması — metin, fotoğraf, link, kart">
 <link rel="apple-touch-icon" id="apple-touch-icon" href="">
 <link rel="icon" type="image/png" id="favicon" href="">
@@ -229,7 +229,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;color:var(--text);margin-bottom:18px}
 .field{margin-bottom:13px}
 .field label{display:block;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.field input,.field textarea,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.15s;-webkit-appearance:none;appearance:none}
+.field input,.field textarea,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:max(16px,0.88rem);outline:none;transition:border-color 0.15s;-webkit-appearance:none;appearance:none}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
 .field input::placeholder,.field textarea::placeholder{color:var(--text3)}
 .field textarea{resize:vertical;min-height:88px;line-height:1.6}
@@ -366,7 +366,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.32</span>
+  <span>Pro 1.0.35</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1009,6 +1009,9 @@ function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===t));
   updateThemeIcon();
+  // Status bar rengi anlık güncelle
+  const tc=document.getElementById('themeColorMeta');
+  if(tc)tc.setAttribute('content',t==='dark'?'#0f0f13':'#f4f3ef');
   savePrefs();
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
@@ -1480,13 +1483,19 @@ async function openDetail(id){
   // 3. Renk tonu detay — sol kenarda renkli bant + hafif arka plan
   let colorBanner='';
   const detailColor = n.color ? n.color : (allTagColors(n.tag)||null);
-  if(detailColor){
+  const detailModal = document.querySelector('#detailModal .modal');
+  if(detailColor && detailColor.startsWith('#')){
     const _hx=detailColor;
     const _r=parseInt(_hx.slice(1,3),16),_g=parseInt(_hx.slice(3,5),16),_b=parseInt(_hx.slice(5,7),16);
     const _dk=document.documentElement.getAttribute('data-theme')==='dark';
-    document.querySelector('#detailModal .modal').style.cssText=`border-radius:var(--r);border-left:5px solid ${detailColor};background:rgba(${_r},${_g},${_b},${_dk?'0.09':'0.07'})`;
+    const alpha = _dk ? 0.18 : 0.13;
+    detailModal.style.borderLeft = '5px solid '+detailColor;
+    detailModal.style.borderRadius = '';
+    detailModal.style.background = 'linear-gradient(to right, rgba('+_r+','+_g+','+_b+','+alpha+') 0%, rgba('+_r+','+_g+','+_b+',0.04) 60%), var(--surface)';
   } else {
-    document.querySelector('#detailModal .modal').style.cssText='border-radius:var(--r)';
+    detailModal.style.borderLeft = '';
+    detailModal.style.borderRadius = '';
+    detailModal.style.background = '';
   }
 
   let html=colorBanner;
