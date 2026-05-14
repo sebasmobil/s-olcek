@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.63
+  Version : Pro 1.0.64
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.63</span>
+  <span>Pro 1.0.64</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1172,16 +1172,16 @@ function addListeItem(val,checked){
   const div=document.createElement('div');
   div.className='liste-item';
   div.style.cssText='display:flex;align-items:center;gap:8px';
-  div.innerHTML=`<input type="checkbox" ${checked?'checked':''} style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0">
+  div.innerHTML=`<button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">${checked?'✅':'⬜'}</button>
     <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
     <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
   wrap.appendChild(div);
 }
 function getListeData(){
   return [...document.querySelectorAll('.liste-item')].map(d=>{
-    const cb=d.querySelector('input[type=checkbox]');
+    const cb=d.querySelector('button[data-done]');
     const tx=d.querySelector('input[type=text]');
-    return {text:tx?tx.value:'',done:cb?cb.checked:false};
+    return {text:tx?tx.value:'',done:cb?cb.dataset.done==='1':false};
   }).filter(x=>x.text.trim());
 }
 function populateListe(items){
@@ -1797,6 +1797,19 @@ function noteCardHtml(n,i){
     if(n.card)extras+=`<div class="note-card-num">${maskCard(n.card)}</div>`;
     if(n.link)extras+=`<div class="note-link-chip">🔗<span>${esc(n.link)}</span></div>`;
     if(n.linkedId){const ln=notes.find(x=>x.id===n.linkedId);if(ln)extras+=`<div style="font-size:0.68rem;color:var(--text3);margin-top:5px">🔗 bkz. ${escPure(ln.title||ln.text||'—').slice(0,28)}</div>`;}
+    // Liste öğeleri — her zaman göster (showCardDetail bağımsız)
+    if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
+      const maxShow=5;
+      const shown=n.listeItems.slice(0,maxShow);
+      const remaining=n.listeItems.length-maxShow;
+      const itemsHtml=shown.map((it,i)=>{
+        const done=typeof it==='object'?it.done:false;
+        const txt=typeof it==='object'?(it.text||''):it;
+        return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
+      }).join('');
+      const moreHtml=remaining>0?`<div style="font-size:0.72rem;color:var(--text3);padding:3px 10px;text-align:center">+${remaining} öğe daha →</div>`:'';
+      extras+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${itemsHtml}${moreHtml}</div>`;
+    }
     // Kart detay modu açıksa tip'e özgü alanlar
     if(showCardDetail){
       if(n.type==='kisi'){
