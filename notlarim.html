@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.61
+  Version : Pro 1.0.63
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.61</span>
+  <span>Pro 1.0.63</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1679,7 +1679,18 @@ async function openDetail(id){
   if(n.type==='sifre'&&n.sifreUser)html+=`<div class="detail-card-box"><span>👤 ${esc(n.sifreUser)}</span><button class="copy-btn" onclick="copyText('${n.sifreUser.replace(/'/g,"\\'")}')">📋</button></div>`;
   if(n.type==='sifre'&&n.sifrePass)html+=`<div class="detail-card-box" id="pass-row-${id}"><span>🔑 ••••••••</span><button class="copy-btn" onclick="revealPass('${id}','${n.sifrePass.replace(/'/g,"\\'")}')">👁</button><button class="copy-btn" onclick="copyText('${n.sifrePass.replace(/'/g,"\\'")}')">📋</button></div>`;
   if(n.type==='alinti'&&n.alintiKaynak)html+=`<div style="margin-top:8px;font-size:0.72rem;color:var(--text3);font-style:italic">— ${esc(n.alintiKaynak)}</div>`;
-  if(n.type==='liste'&&n.listeItems&&n.listeItems.length)html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">${n.listeItems.map((it,i)=>{const done=typeof it==='object'?it.done:false;const txt=typeof it==='object'?(it.text||''):it;return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;}).join('')}</div>`;
+  if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
+    const maxShow=5;
+    const shown=n.listeItems.slice(0,maxShow);
+    const remaining=n.listeItems.length-maxShow;
+    const itemsHtml=shown.map((it,i)=>{
+      const done=typeof it==='object'?it.done:false;
+      const txt=typeof it==='object'?(it.text||''):it;
+      return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
+    }).join('');
+    const moreHtml=remaining>0?`<div style="font-size:0.75rem;color:var(--text3);padding:4px 10px;text-align:center">+${remaining} öğe daha →</div>`:'';
+    html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">${itemsHtml}${moreHtml}</div>`;
+  }
   if(n.type==='konum'){if(n.konumAdres)html+=`<div class="detail-card-box"><span>📍 ${esc(n.konumAdres)}</span><button class="copy-btn" onclick="copyText('${n.konumAdres.replace(/'/g,"\\'")}')">📋</button></div>`;if(n.konumLink)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.konumLink)}">🗺 Haritada Aç <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;}
   if(n.type==='ses'&&n.sesData)html+=`<div style="margin-top:10px"><audio controls src="${esc(n.sesData)}" style="width:100%;border-radius:8px"></audio></div>`;
   if(n.type==='otp'&&n.otpServis)html+=`<div style="margin-bottom:6px;font-size:0.78rem;color:var(--text3)">🔢 ${esc(n.otpServis)}</div>`;
@@ -2366,7 +2377,14 @@ function clearLinkNote() {
 function openPanel(){document.getElementById('settingsPanel').classList.add('open');document.body.style.overflow='hidden';initBiometricUI();updateFontSizeUI(currentFontSize);}
 function closePanel(){document.getElementById('settingsPanel').classList.remove('open');document.body.style.overflow=''}
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  // Detay modalı kapanınca çalan sesi durdur
+  if(id==='detailModal'){
+    document.querySelectorAll('#detailContent audio').forEach(a=>{a.pause();a.currentTime=0;});
+  }
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('editModal');closeModal('detailModal');closePanel()}});
 
 let toastT;
