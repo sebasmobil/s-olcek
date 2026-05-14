@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.66
+  Version : Pro 1.0.68
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.66</span>
+  <span>Pro 1.0.68</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -596,11 +596,12 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
       </div>
       <div class="field"><label>Başlık</label><input type="text" id="f-title" placeholder="Başlık ekle…"></div>
       <div class="field" id="field-img" style="display:none">
-        <label>Fotoğraf / Ekran Görüntüsü</label>
-        <div style="position:relative">
-          <div class="img-upload-area" id="imgUploadArea"><input type="file" accept="image/*" id="f-img" onchange="handleImg(event)"><div class="img-hint" id="imgHint">📷 Fotoğraf seç veya ekran görüntüsü yükle</div><img class="img-upload-preview" id="imgPreview"></div>
-          <button id="imgRemoveBtn" onclick="removeImg()" style="display:none;position:absolute;top:8px;right:8px;z-index:2;background:rgba(224,92,92,0.85);border:none;border-radius:20px;padding:4px 11px;color:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)">✕ Görseli Sil</button>
+        <label>Fotoğraf / Ekran Görüntüsü <span id="imgCountBadge" style="display:none;background:var(--accent);color:#fff;border-radius:30px;font-size:0.62rem;padding:1px 8px;font-weight:700;margin-left:4px"></span></label>
+        <div class="img-upload-area" id="imgUploadArea" onclick="document.getElementById('f-img').click()">
+          <input type="file" accept="image/*" id="f-img" multiple style="display:none" onchange="handleImgMulti(event)">
+          <div class="img-hint" id="imgHint">📷 Fotoğraf seç (çoklu seçim desteklenir)</div>
         </div>
+        <div id="imgGalleryPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
       </div>
       <div class="field"><label id="textLabel">Not</label><textarea id="f-text" placeholder="Buraya yaz…"></textarea></div>
       <div class="field" id="field-link" style="display:none">
@@ -649,15 +650,14 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
       <!-- SES NOTU -->
       <div class="field" id="field-ses" style="display:none">
-        <label>🎙 Ses Kaydı</label>
-        <div style="display:flex;gap:8px;align-items:center">
+        <label>🎙 Ses Kayıtları <span id="sesCountBadge" style="display:none;background:var(--accent);color:#fff;border-radius:30px;font-size:0.62rem;padding:1px 8px;font-weight:700;margin-left:4px"></span></label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button type="button" id="ses-rec-btn" onclick="toggleSesKayit()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 18px;font-size:0.85rem;font-weight:600;color:var(--text);cursor:pointer">🎙 Kayıt Başlat</button>
           <span id="ses-timer" style="font-size:0.82rem;color:var(--text3);font-variant-numeric:tabular-nums">00:00</span>
+          <button type="button" onclick="document.getElementById('f-ses-upload').click()" style="background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r2);padding:10px 14px;font-size:0.82rem;font-weight:600;color:var(--text2);cursor:pointer">📂 Dosyadan Ekle</button>
+          <input type="file" id="f-ses-upload" accept="audio/*" multiple style="display:none" onchange="handleSesUpload(event)">
         </div>
-        <div id="ses-preview" style="margin-top:10px;display:none">
-          <audio id="ses-audio" controls style="width:100%;border-radius:var(--r2)"></audio>
-          <button type="button" onclick="clearSes()" style="margin-top:6px;background:none;border:none;color:var(--red);font-size:0.78rem;cursor:pointer">🗑 Kaydı Sil</button>
-        </div>
+        <div id="ses-recordings-list" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
         <input type="hidden" id="f-ses-data">
       </div>
 
@@ -1278,11 +1278,14 @@ async function startSesKayit(){
       const reader=new FileReader();
       reader.onload=ev=>{
         const dataUrl=ev.target.result;
-        document.getElementById('f-ses-data').value=dataUrl;
-        const audio=document.getElementById('ses-audio');
-        audio.src=dataUrl;
-        document.getElementById('ses-preview').style.display='';
+        const m=Math.floor(sesSec/60),s=sesSec%60;
+        const durStr=(m>0?m+'dk ':'')+s+'sn';
+        sesList.push({dataUrl,name:'Kayıt '+(sesList.length+1),dur:durStr});
+        renderSesList();
         showToast('✅ Ses kaydedildi ('+Math.round(blob.size/1024)+'KB)');
+        sesSec=0;document.getElementById('ses-timer').textContent='00:00';
+        document.getElementById('ses-rec-btn').textContent='🎙 Yeni Kayıt Başlat';
+        document.getElementById('ses-rec-btn').style.color='';
       };
       reader.readAsDataURL(blob);
     };
@@ -1294,16 +1297,64 @@ async function startSesKayit(){
     showToast('⚠️ Mikrofon erişimi reddedildi: '+e.message);
   }
 }
+let sesList=[]; // [{dataUrl, name, dur}]
+function renderSesList(){
+  const wrap=document.getElementById('ses-recordings-list');
+  const badge=document.getElementById('sesCountBadge');
+  if(!wrap)return;
+  if(badge){badge.style.display=sesList.length>0?'':'none';if(sesList.length>0)badge.textContent=sesList.length+' kayıt';}
+  wrap.innerHTML=sesList.map((s,i)=>`
+    <div style="background:var(--surface2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:0.8rem;font-weight:700;color:var(--accent)">${i+1}.</span>
+        <span style="flex:1;font-size:0.8rem;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</span>
+        ${s.dur?`<span style="font-size:0.72rem;color:var(--text3)">${s.dur}</span>`:''}
+        <button onclick="downloadSes(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap">⬇ İndir</button>
+        <button onclick="sesList.splice(${i},1);renderSesList()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem">✕</button>
+      </div>
+      <audio controls src="${s.dataUrl}" style="width:100%;border-radius:8px;height:36px"></audio>
+    </div>
+  `).join('');
+}
+async function downloadSes(i){
+  const s=sesList[i];if(!s)return;
+  const ext=s.dataUrl.includes('audio/mp4')||s.dataUrl.includes('audio/m4a')?'m4a':s.dataUrl.includes('audio/ogg')?'ogg':'webm';
+  const fname=(s.name||('ses-kaydi-'+(i+1)))+'.'+ext;
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:fname,types:[{description:'Ses Dosyası',accept:{'audio/*':['.'+ext]}}]});
+      const writable=await handle.createWritable();
+      const base64=s.dataUrl.split(',')[1];
+      const binary=atob(base64);const bytes=new Uint8Array(binary.length);
+      for(let j=0;j<binary.length;j++)bytes[j]=binary.charCodeAt(j);
+      await writable.write(bytes);await writable.close();
+      showToast('✅ '+fname+' kaydedildi!');
+    }catch(e){if(e.name==='AbortError')showToast('İptal edildi');else{const a=document.createElement('a');a.href=s.dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);}}
+  } else {
+    const a=document.createElement('a');a.href=s.dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showToast('✅ '+fname+' indiriliyor');
+  }
+}
+async function handleSesUpload(e){
+  const files=Array.from(e.target.files);
+  for(const f of files){
+    await new Promise(resolve=>{
+      const r=new FileReader();
+      r.onload=ev=>{sesList.push({dataUrl:ev.target.result,name:f.name.replace(/\.[^.]+$/,''),dur:''});resolve();};
+      r.readAsDataURL(f);
+    });
+  }
+  renderSesList();
+  e.target.value='';
+}
 function stopSesKayit(){
   sesActive=false;clearInterval(sesTimerInt);
   if(sesRecorder&&sesRecorder.state!=='inactive')sesRecorder.stop();
-  document.getElementById('ses-rec-btn').textContent='🎙 Yeniden Kaydet';
+  document.getElementById('ses-rec-btn').textContent='🎙 Yeni Kayıt Başlat';
   document.getElementById('ses-rec-btn').style.color='';
 }
 function clearSes(){
-  document.getElementById('f-ses-data').value='';
-  document.getElementById('ses-audio').src='';
-  document.getElementById('ses-preview').style.display='none';
+  sesList=[];renderSesList();
   document.getElementById('ses-timer').textContent='00:00';
   document.getElementById('ses-rec-btn').textContent='🎙 Kayıt Başlat';
   sesSec=0;
@@ -1372,6 +1423,54 @@ async function downloadFile(id, idx){
   }catch(e){
     if(e.name==='AbortError'){showToast('İptal edildi');}
     else{showToast('❌ Hata: '+e.message);}
+  }
+}
+// ── RESİM İNDİR ──
+async function downloadImgAt(id, idx){
+  const n=notes.find(n=>n.id===id);if(!n)return;
+  const imgs=n.images&&n.images.length?n.images:(n.img?[n.img]:[]);
+  const src=imgs[idx];if(!src){showToast('⚠️ Resim bulunamadı');return;}
+  const ext=src.startsWith('data:image/png')?'png':src.startsWith('data:image/webp')?'webp':'jpg';
+  const fname=(n.title||'resim')+'-'+(idx+1)+'.'+ext;
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:fname,types:[{description:'Resim',accept:{'image/*':['.'+ext]}}]});
+      const writable=await handle.createWritable();
+      if(src.startsWith('data:')){
+        const base64=src.split(',')[1];
+        const binary=atob(base64);const bytes=new Uint8Array(binary.length);
+        for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+        await writable.write(bytes);
+      } else {
+        const res=await fetch(src);const buf=await res.arrayBuffer();
+        await writable.write(buf);
+      }
+      await writable.close();showToast('✅ '+fname+' kaydedildi!');
+    }catch(e){if(e.name==='AbortError')showToast('İptal edildi');else{const a=document.createElement('a');a.href=src;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);}}
+  } else {
+    const a=document.createElement('a');a.href=src;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showToast('✅ '+fname+' indiriliyor');
+  }
+}
+// ── SES İNDİR (detay modalından) ──
+async function downloadSesDetail(noteId, idx){
+  const n=notes.find(n=>n.id===noteId);if(!n)return;
+  const _slist=n.sesList&&n.sesList.length?n.sesList:(n.sesData?[{dataUrl:n.sesData,name:'Kayıt 1',dur:''}]:[]);
+  const s=_slist[idx];if(!s)return;
+  const dataUrl=s.dataUrl||s;
+  const ext=dataUrl.includes('audio/mp4')||dataUrl.includes('audio/m4a')?'m4a':dataUrl.includes('audio/ogg')?'ogg':'webm';
+  const fname=(s.name||('ses-kaydi-'+(idx+1)))+'.'+ext;
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:fname,types:[{description:'Ses Dosyası',accept:{'audio/*':['.'+ext]}}]});
+      const writable=await handle.createWritable();
+      const base64=dataUrl.split(',')[1];const binary=atob(base64);const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+      await writable.write(bytes);await writable.close();showToast('✅ '+fname+' kaydedildi!');
+    }catch(e){if(e.name==='AbortError')showToast('İptal edildi');else{const a=document.createElement('a');a.href=dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);}}
+  } else {
+    const a=document.createElement('a');a.href=dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    showToast('✅ '+fname+' indiriliyor');
   }
 }
 // Çoklu dosya yükleme
@@ -1455,18 +1554,10 @@ async function fetchOGImage(){
         c.getContext('2d').drawImage(img, 0, 0);
         try {
           const dataUrl = c.toDataURL('image/jpeg', 0.85);
-          const prev = document.getElementById('imgPreview');
-          prev.src = dataUrl; prev.style.display='block';
-          document.getElementById('imgHint').style.display='none';
-          showImgRemoveBtn(true);
+          _setOGImg(dataUrl);
           if(statusEl){ statusEl.textContent='✅ Önizleme yüklendi — istersen değiştirebilirsin'; }
         } catch(e) {
-          // CORS engeli — data URL'e çevrilemedi, harici URL olarak sakla (offline'da görünmeyebilir)
-          // Not: Bu durumda img direkt URL olarak saklanır
-          const prev = document.getElementById('imgPreview');
-          prev.src = imgUrl; prev.style.display='block';
-          document.getElementById('imgHint').style.display='none';
-          showImgRemoveBtn(true);
+          _setOGImg(imgUrl);
           if(statusEl){ statusEl.textContent='⚠️ Önizleme yüklendi (internet gerektirir) — kendi görselini eklemek daha güvenli'; }
         }
       };
@@ -1482,28 +1573,54 @@ async function fetchOGImage(){
   }
 }
 
-function handleImg(e){
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    const p=document.getElementById('imgPreview');
-    p.src=ev.target.result;p.style.display='block';
-    document.getElementById('imgHint').style.display='none';
-    showImgRemoveBtn(true);
-  };
-  r.readAsDataURL(f);
+// ── ÇOK RESM ──
+let imgList=[]; // [{dataUrl, name}]
+function handleImgMulti(e){
+  const files=Array.from(e.target.files);if(!files.length)return;
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      imgList.push({dataUrl:ev.target.result,name:f.name});
+      renderImgGallery();
+    };
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function renderImgGallery(){
+  const wrap=document.getElementById('imgGalleryPreview');
+  const hint=document.getElementById('imgHint');
+  const badge=document.getElementById('imgCountBadge');
+  if(!wrap)return;
+  if(imgList.length===0){
+    wrap.innerHTML='';
+    if(hint)hint.style.display='';
+    if(badge)badge.style.display='none';
+    return;
+  }
+  if(hint)hint.style.display='none';
+  if(badge){badge.style.display='';badge.textContent=imgList.length+' resim';}
+  wrap.innerHTML=imgList.map((img,i)=>`
+    <div style="position:relative;width:calc(33% - 4px);aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--surface2)">
+      ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 6px;border-radius:8px;z-index:2">KAPAK</div>':''}
+      <img src="${img.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block" alt="">
+      <button onclick="removeImgAt(${i})" style="position:absolute;top:4px;right:4px;background:rgba(224,92,92,0.9);border:none;border-radius:50%;width:22px;height:22px;color:#fff;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">✕</button>
+    </div>
+  `).join('');
+}
+function removeImgAt(i){
+  imgList.splice(i,1);
+  renderImgGallery();
 }
 function removeImg(){
-  const p=document.getElementById('imgPreview');
-  p.src='';p.style.display='none';
-  document.getElementById('imgHint').style.display='';
-  document.getElementById('f-img').value='';
-  showImgRemoveBtn(false);
+  imgList=[];renderImgGallery();
   const ogS=document.getElementById('og-status');if(ogS){ogS.textContent='';ogS.style.display='none';}
 }
-function showImgRemoveBtn(show){
-  const btn=document.getElementById('imgRemoveBtn');
-  if(btn)btn.style.display=show?'block':'none';
+function showImgRemoveBtn(show){} // artık kullanılmıyor — geriye dönük uyumluluk
+// OG fetch için tek resim uyumu
+function _setOGImg(dataUrl){
+  imgList=[{dataUrl,name:'og-preview.jpg'}];
+  renderImgGallery();
 }
 
 function openAdd(){editId=null;document.getElementById('editModalTitle').textContent='Yeni Not';resetForm();openModal('editModal')}
@@ -1516,18 +1633,15 @@ function resetForm(){
   document.getElementById('f-reminder').value='';
   const rdEl=document.getElementById('f-reminder-date');if(rdEl){rdEl.value='';updateDatePlaceholder();}
   const rtEl=document.getElementById('f-reminder-time');if(rtEl){rtEl.value='';updateTimePlaceholder();}
-  document.getElementById('imgPreview').style.display='none';
-  document.getElementById('imgHint').style.display='';
-  document.getElementById('f-img').value='';
+  imgList=[];renderImgGallery();
   const ogS=document.getElementById('og-status'); if(ogS)ogS.style.display='none';
-  showImgRemoveBtn(false);
   selectedLinkId=null;
   const prev=document.getElementById('f-linked-preview');
   if(prev){prev.style.display='none';prev.innerHTML='';}
   // Yeni tip alanları temizle
   ['f-sifre-user','f-sifre-pass','f-alinti-kaynak','f-konum-adres','f-konum-link','f-otp-servis','f-otp-secret','f-ilac-ad','f-ilac-doz','f-ilac-siklik','f-kisi-ad','f-kisi-tel','f-kisi-eposta','f-ses-data','f-pdf-data','f-pdf-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('liste-items-wrap').innerHTML='';
-  const sesPreview=document.getElementById('ses-preview');if(sesPreview)sesPreview.style.display='none';
+  sesList=[];renderSesList();
   const pdfInfo=document.getElementById('pdf-file-info');if(pdfInfo)pdfInfo.textContent='';
   dosyaList=[];const pdfFL=document.getElementById('pdf-file-list');if(pdfFL)pdfFL.innerHTML='';
   const otpDisp=document.getElementById('otp-code-display');if(otpDisp)otpDisp.style.display='none';
@@ -1535,6 +1649,7 @@ function resetForm(){
   if(sesActive)stopSesKayit();
   sesSec=0;const st=document.getElementById('ses-timer');if(st)st.textContent='00:00';
   const srb=document.getElementById('ses-rec-btn');if(srb){srb.textContent='🎙 Kayıt Başlat';srb.style.color='';}
+  sesList=[];renderSesList();
   currentType='metin';currentColor=null;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='metin'));
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color==='none'));
@@ -1558,7 +1673,7 @@ function populateForm(n){
   const activeColorKey=currentColor||'none';
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===activeColorKey));
   setType(currentType,null);
-  if(n.img){const p=document.getElementById('imgPreview');p.src=n.img;p.style.display='block';document.getElementById('imgHint').style.display='none';showImgRemoveBtn(true);}else{showImgRemoveBtn(false);}
+  imgList=n.images&&n.images.length?n.images.map(u=>({dataUrl:u,name:'resim.jpg'})):(n.img?[{dataUrl:n.img,name:'resim.jpg'}]:[]);renderImgGallery();
   // Yeni tip alanları doldur
   if(n.sifreUser)document.getElementById('f-sifre-user').value=n.sifreUser;
   if(n.sifrePass)document.getElementById('f-sifre-pass').value=n.sifrePass;
@@ -1566,7 +1681,7 @@ function populateForm(n){
   if(n.listeItems)populateListe(n.listeItems);
   if(n.konumAdres)document.getElementById('f-konum-adres').value=n.konumAdres;
   if(n.konumLink)document.getElementById('f-konum-link').value=n.konumLink;
-  if(n.sesData){document.getElementById('f-ses-data').value=n.sesData;document.getElementById('ses-audio').src=n.sesData;document.getElementById('ses-preview').style.display='';}
+  sesList=n.sesList&&n.sesList.length?n.sesList.map((s,i)=>({dataUrl:s.dataUrl||s,name:s.name||('Kayıt '+(i+1)),dur:s.dur||''})):(n.sesData?[{dataUrl:n.sesData,name:'Kayıt 1',dur:''}]:[]);renderSesList();
   if(n.otpServis)document.getElementById('f-otp-servis').value=n.otpServis;
   if(n.otpSecret)document.getElementById('f-otp-secret').value=n.otpSecret;
   if(n.ilacAd)document.getElementById('f-ilac-ad').value=n.ilacAd;
@@ -1612,7 +1727,7 @@ function saveNote(){
   if(currentType==='alinti'){extra.alintiKaynak=document.getElementById('f-alinti-kaynak').value.trim();}
   if(currentType==='liste'){extra.listeItems=getListeData();}
   if(currentType==='konum'){extra.konumAdres=document.getElementById('f-konum-adres').value.trim();extra.konumLink=document.getElementById('f-konum-link').value.trim();}
-  if(currentType==='ses'){extra.sesData=document.getElementById('f-ses-data').value;}
+  // ses verisi sesList'ten alınıyor
   if(currentType==='otp'){extra.otpServis=document.getElementById('f-otp-servis').value.trim();extra.otpSecret=document.getElementById('f-otp-secret').value.trim();}
   if(currentType==='ilac'){extra.ilacAd=document.getElementById('f-ilac-ad').value.trim();extra.ilacDoz=document.getElementById('f-ilac-doz').value.trim();extra.ilacSiklik=document.getElementById('f-ilac-siklik').value.trim();}
   if(currentType==='kisi'){extra.kisiAd=document.getElementById('f-kisi-ad').value.trim();extra.kisiTel=document.getElementById('f-kisi-tel').value.trim();extra.kisiEposta=document.getElementById('f-kisi-eposta').value.trim();}
@@ -1630,16 +1745,21 @@ function saveNote(){
     }
   }
 
-  let img='';
-  if(ip.style.display!=='none' && ip.src && ip.src.length>10){img=ip.src;}
+  // çoklu resim
+  let images=imgList.length?imgList.map(x=>x.dataUrl):[];
+  let img=images[0]||'';
   const imgFieldVisible=document.getElementById('field-img').style.display!=='none';
-  if(editId && !imgFieldVisible){img=(notes.find(n=>n.id===editId)||{}).img||'';}
+  if(editId && !imgFieldVisible){const _old=notes.find(n=>n.id===editId)||{};img=_old.img||'';images=_old.images||(_old.img?[_old.img]:[]); }
 
   // Doğrulama
   const hasExtra=Object.values(extra).some(v=>typeof v==='string'?v.length>0:(Array.isArray(v)?v.length>0:false));
   if(!title&&!text&&!link&&!card&&!img&&!hasExtra){showToast('⚠️ En az bir alan doldur');return}
 
-  const noteData={title,text,link,card,tag,img,type:currentType,color:currentColor,pinned,pinProtect,linkedId:selectedLinkId||null,reminder,...extra,updatedAt:Date.now()};
+  // çoklu ses
+  if(currentType==='ses'){
+    if(sesList.length>0){extra.sesList=sesList.map(s=>({dataUrl:s.dataUrl,name:s.name,dur:s.dur||''}));extra.sesData=sesList[0].dataUrl;}
+  }
+  const noteData={title,text,link,card,tag,img,images,type:currentType,color:currentColor,pinned,pinProtect,linkedId:selectedLinkId||null,reminder,...extra,updatedAt:Date.now()};
   if(editId){
     const i=notes.findIndex(n=>n.id===editId);
     if(i>-1)notes[i]={...notes[i],...noteData,linkedId:selectedLinkId||notes[i].linkedId||null};
@@ -1790,7 +1910,14 @@ async function openDetail(id){
   }
 
   let html=colorBanner;
-  if(n.img)html+=`<img class="detail-img" src="${esc(n.img)}" alt="" onclick="openLightbox('${esc(n.img).replace(/'/g,"\\'")}')" style="cursor:zoom-in" title="Tam ekran için dokun">`;
+  const _dimgs=n.images&&n.images.length?n.images:(n.img?[n.img]:[]);
+  if(_dimgs.length===1){
+    html+=`<div style="position:relative"><img class="detail-img" src="${esc(_dimgs[0])}" alt="" onclick="openLightbox('${esc(_dimgs[0]).replace(/'/g,"\'")}')" style="cursor:zoom-in" title="Tam ekran için dokun">
+    <button onclick="downloadImgAt('${n.id}',0)" style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:none;border-radius:20px;color:#fff;padding:6px 14px;font-size:0.75rem;font-weight:700;cursor:pointer">⬇ İndir</button></div>`;
+  } else if(_dimgs.length>1){
+    const thumbs=_dimgs.map((src,idx)=>`<div style="position:relative;cursor:zoom-in;border-radius:8px;overflow:hidden;aspect-ratio:1;background:var(--surface2)" onclick="openLightbox('${esc(src).replace(/'/g,"\'")}')"><img src="${esc(src)}" style="width:100%;height:100%;object-fit:cover"><button onclick="event.stopPropagation();downloadImgAt('${n.id}',${idx})" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);border:none;border-radius:12px;color:#fff;padding:3px 8px;font-size:0.65rem;font-weight:700;cursor:pointer">⬇</button></div>`).join('');
+    html+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:12px 12px 0">${thumbs}</div>`;
+  }
   html+=`<div class="detail-body">`;
   if(n.tag)html+=`<div style="margin-bottom:10px"><span style="color:${tc};border:1px solid ${tc};font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 10px;border-radius:30px">${allTagEmojis(n.tag)} ${n.tag}</span>${n.pinned?' <span style="font-size:0.85rem">📌</span>':''}</div>`;
   else if(n.pinned)html+=`<div style="margin-bottom:10px;font-size:0.9rem">📌 Sabitlenmiş</div>`;
@@ -1815,7 +1942,23 @@ async function openDetail(id){
     html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">${itemsHtml}${moreHtml}</div>`;
   }
   if(n.type==='konum'){if(n.konumAdres)html+=`<div class="detail-card-box"><span>📍 ${esc(n.konumAdres)}</span><button class="copy-btn" onclick="copyText('${n.konumAdres.replace(/'/g,"\\'")}')">📋</button></div>`;if(n.konumLink)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.konumLink)}">🗺 Haritada Aç <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;}
-  if(n.type==='ses'&&n.sesData)html+=`<div style="margin-top:10px"><audio controls src="${esc(n.sesData)}" style="width:100%;border-radius:8px"></audio></div>`;
+  if(n.type==='ses'){
+    const _slist=n.sesList&&n.sesList.length?n.sesList:(n.sesData?[{dataUrl:n.sesData,name:'Kayıt 1',dur:''}]:[]);
+    if(_slist.length>0){
+      const sHtml=_slist.map((s,i)=>`
+        <div style="background:var(--surface2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:0.78rem;font-weight:700;color:var(--accent)">${i+1}.</span>
+            <span style="flex:1;font-size:0.78rem;color:var(--text2)">${esc(s.name||('Kayıt '+(i+1)))}</span>
+            ${s.dur?`<span style="font-size:0.7rem;color:var(--text3)">${s.dur}</span>`:''}
+            <button onclick="downloadSesDetail('${n.id}',${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap">⬇ İndir</button>
+          </div>
+          <audio controls src="${esc(s.dataUrl||s)}" style="width:100%;border-radius:8px;height:36px"></audio>
+        </div>
+      `).join('');
+      html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">${sHtml}</div>`;
+    }
+  }
   if(n.type==='otp'&&n.otpServis)html+=`<div style="margin-bottom:6px;font-size:0.78rem;color:var(--text3)">🔢 ${esc(n.otpServis)}</div>`;
   if(n.type==='otp'&&n.otpSecret)html+=`<div id="otp-detail-wrap-${id}" style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center"><button onclick="startDetailOTP('${id}','${n.otpSecret.replace(/'/g,"\\'")}',this)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 18px;color:var(--accent);font-weight:600;cursor:pointer;font-size:0.85rem">🔢 Kodu Göster</button></div>`;
   if(n.type==='ilac'){const parts=[];if(n.ilacAd)parts.push('💊 '+n.ilacAd);if(n.ilacDoz)parts.push('Doz: '+n.ilacDoz);if(n.ilacSiklik)parts.push(n.ilacSiklik);if(parts.length)html+=`<div style="margin-top:8px;font-size:0.85rem;color:var(--text2)">${parts.map(p=>`<span style="display:inline-block;background:var(--surface2);border-radius:8px;padding:4px 10px;margin:2px;font-size:0.8rem">${esc(p)}</span>`).join('')}</div>`;}
@@ -1913,8 +2056,11 @@ function noteCardHtml(n,i){
 
   let top='';
   if(!isCompact){
-    if(n.img) top=`<div class="note-img-wrap"><img class="note-img" src="${esc(n.img)}" alt="" loading="lazy"></div>`;
-    else if(n.type==='fotograf') top=`<div class="note-img-wrap"><div class="note-img-ph">${TYE[n.type]}</div></div>`;
+    const _imgs=n.images&&n.images.length?n.images:(n.img?[n.img]:[]);
+    if(_imgs.length>0){
+      const _multiTag=_imgs.length>1?`<div style="position:absolute;bottom:6px;right:7px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:3px"><span>📷</span>${_imgs.length}</div>`:'';
+      top=`<div class="note-img-wrap" style="position:relative"><img class="note-img" src="${esc(_imgs[0])}" alt="" loading="lazy">${_multiTag}</div>`;
+    } else if(n.type==='fotograf') top=`<div class="note-img-wrap"><div class="note-img-ph">${TYE[n.type]}</div></div>`;
   }
 
   // 5. Arama vurgusu — başlık ve preview için
@@ -2450,11 +2596,16 @@ function openStatsModal() {
   });
 
   if(Object.keys(tagCounts).length) {
+    const untagged = notes.filter(n=>!n.tag).length;
     html += `<div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin:14px 0 10px">Etiket Dağılımı</div>`;
     Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]).forEach(([tag,count])=>{
       const pct = total ? Math.round(count/total*100) : 0;
       html += `<div class="dist-row"><span style="width:80px;color:var(--text2)">${tag}</span><div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%"></div></div><div class="dist-count">${count}</div></div>`;
     });
+    if(untagged>0){
+      const pct = total ? Math.round(untagged/total*100) : 0;
+      html += `<div class="dist-row"><span style="width:80px;color:var(--text3)">🏷 Etiketsiz</span><div class="dist-bar-wrap"><div class="dist-bar" style="width:${pct}%;opacity:0.45"></div></div><div class="dist-count" style="color:var(--text3)">${untagged}</div></div>`;
+    }
   }
 
   document.getElementById('statsContent').innerHTML = html;
