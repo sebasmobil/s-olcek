@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.68
+  Version : Pro 1.0.69
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.68</span>
+  <span>Pro 1.0.69</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -871,69 +871,65 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 </div>
 
 <script>
-// ── KALICI DEPOLAMA ŞİMİ ──
+// ── KALICI DEPOLAMA ──
 // Claude.ai artifact ortamında localStorage çalışmaz.
-// window.storage API'si (kalıcı) ile localStorage'ı taklit ediyoruz.
-(function(){
-  const MEM={};
-  const _get=k=>{try{return window._lsCache&&window._lsCache[k]!==undefined?window._lsCache[k]:null;}catch(e){return null;}};
-  const _set=(k,v)=>{if(!window._lsCache)window._lsCache={};window._lsCache[k]=v;};
-  const _del=k=>{if(window._lsCache)delete window._lsCache[k];};
+// Notlar ve tercihler doğrudan window.storage API'sine yazılır/okunur.
+// localStorage gerçekten varsa (tarayıcıda açıldığında) o kullanılır.
 
-  // Gerçek localStorage erişimini test et
-  let _hasLS=false;
-  try{localStorage.setItem('__t','1');localStorage.removeItem('__t');_hasLS=true;}catch(e){}
+let _hasRealLS = false;
+try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); _hasRealLS = true; }catch(e){}
 
-  if(!_hasLS){
-    // localStorage yoksa window.storage ile destekli hafıza kullan
-    if(!window._lsCache) window._lsCache={};
-    Object.defineProperty(window,'localStorage',{
-      configurable:true,
-      get:()=>({
-        getItem:k=>window._lsCache[k]!==undefined?window._lsCache[k]:null,
-        setItem:(k,v)=>{
-          window._lsCache[k]=String(v);
-          // Arka planda kalıcı storage'a yaz (notlar ve tercihler için)
-          if(window.storage){
-            window.storage.set('ls:'+k,String(v)).catch(()=>{});
-          }
-        },
-        removeItem:k=>{
-          delete window._lsCache[k];
-          if(window.storage) window.storage.delete('ls:'+k).catch(()=>{});
-        },
-        clear:()=>{
-          Object.keys(window._lsCache).forEach(k=>delete window._lsCache[k]);
-          if(window.storage) window.storage.list('ls:').then(r=>{
-            if(r&&r.keys) r.keys.forEach(k=>window.storage.delete(k).catch(()=>{}));
-          }).catch(()=>{});
-        },
-        key:i=>Object.keys(window._lsCache)[i]||null,
-        get length(){return Object.keys(window._lsCache).length;}
-      })
-    });
-  }
-})();
+// ── Dahili depolama soyutlaması ──
+// saveData(key, value)  → string değer yazar
+// loadData(key)         → string değer döner (sync için cache'den)
+window._memCache = {};
+
+async function _persistWrite(key, value){
+  if(_hasRealLS){ try{ localStorage.setItem(key, value); }catch(e){} return; }
+  if(!window.storage) return;
+  try{ await window.storage.set('app:'+key, value); }catch(e){}
+}
+function _syncWrite(key, value){
+  window._memCache[key] = value;
+  // Arka planda kalıcı yaz
+  _persistWrite(key, value);
+}
+function _syncRead(key){
+  return window._memCache[key] !== undefined ? window._memCache[key] : null;
+}
+function _syncDelete(key){
+  delete window._memCache[key];
+  if(_hasRealLS){ try{ localStorage.removeItem(key); }catch(e){} return; }
+  if(window.storage) window.storage.delete('app:'+key).catch(()=>{});
+}
+
+// localStorage erişimi — şim (gerçek localStorage yoksa cache'e yönlendir)
+if(!_hasRealLS){
+  Object.defineProperty(window,'localStorage',{
+    configurable:true,
+    get:()=>({
+      getItem:  k => _syncRead(k),
+      setItem:  (k,v) => _syncWrite(k, String(v)),
+      removeItem: k => _syncDelete(k),
+      clear:()=>{ Object.keys(window._memCache).forEach(k=>_syncDelete(k)); },
+      key: i => Object.keys(window._memCache)[i]||null,
+      get length(){ return Object.keys(window._memCache).length; }
+    })
+  });
+}
 
 // ── BAŞLANGIÇTA KALICI STORAGE'DAN YÜKLEMEYİ BEKLE ──
-// window.storage varsa önce tüm ls: anahtarlarını yükle, sonra uygulamayı başlat
 window._storageReady = (async function(){
+  if(_hasRealLS) return; // gerçek localStorage var, doğrudan kullan
   if(!window.storage) return;
-  try{
-    const keys = await window.storage.list('ls:');
-    if(keys && keys.keys && keys.keys.length){
-      for(const k of keys.keys){
-        try{
-          const r = await window.storage.get(k);
-          if(r && r.value !== undefined){
-            const localKey = k.replace(/^ls:/,'');
-            if(!window._lsCache) window._lsCache={};
-            window._lsCache[localKey] = r.value;
-          }
-        }catch(e){}
-      }
-    }
-  }catch(e){}
+  // Sadece bilinen iki anahtarı yükle — list() yerine doğrudan get() çok daha güvenilir
+  const KEYS = ['notlarim_v3','notlarim_prefs','notlarim_custom_tags','notlarim_applock'];
+  for(const k of KEYS){
+    try{
+      const r = await window.storage.get('app:'+k);
+      if(r && r.value !== undefined) window._memCache[k] = r.value;
+    }catch(e){}
+  }
 })();
 
 let notes=[],editId=null,detailId=null,currentFilter='all',currentType='metin',currentColor='#c8a96e',currentTheme='dark',currentView='grid',showCardDetail=false;
@@ -1068,9 +1064,18 @@ const FS_LABELS=['Çok Küçük','Küçük','Normal','Büyük','Çok Büyük'];
 
 function save(){
   try{
-    localStorage.setItem(SK,JSON.stringify(notes));
+    const val = JSON.stringify(notes);
+    localStorage.setItem(SK, val); // cache'e yazar + arka planda window.storage'a persist eder
   }catch(e){
     showToast('⚠️ Depolama dolu! Bazı notlar kaydedilemedi. Eski notları silin veya yedek alın.');
+  }
+}
+// save()'i async olarak güvenli kaydet — kritik işlemler sonrası çağrılır
+async function saveAndConfirm(){
+  save();
+  // window.storage varsa tamamlanmasını bekle (yedek yükleme gibi kritik durumlar için)
+  if(!_hasRealLS && window.storage){
+    try{ await window.storage.set('app:'+SK, JSON.stringify(notes)); }catch(e){}
   }
 }
 function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter,fontSize:currentFontSize,showCardDetail:showCardDetail}))}catch(e){}}
@@ -2734,7 +2739,9 @@ function importNotes(e){
       const ver = d.version || '?';
       if(!confirm(`📦 Yedek: ${ver}\n📅 ${dateStr}\n📝 ${info}\n\nGeri yüklensin mi? Mevcut notlar silinecek.`))return;
       notes=imp;
-      save();
+      saveAndConfirm().then(()=>{
+        showToast(`✅ ${imp.length} not yüklendi ve kaydedildi`);
+      });
       // HATA6 fix: yedekteki prefs varsa geri yükle, UI'ı senkronize et
       if(d.prefs){
         const p=d.prefs;
@@ -2758,7 +2765,6 @@ function importNotes(e){
       }
       closePanel();
       renderNotes();
-      showToast(`✅ ${imp.length} not yüklendi`);
     }catch(err){showToast('❌ '+err.message)}
   };
   r.readAsText(f);e.target.value='';
