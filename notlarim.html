@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.69
+  Version : Pro 1.0.70
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.69</span>
+  <span>Pro 1.0.70</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -873,62 +873,95 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 <script>
 // ── KALICI DEPOLAMA ──
 // Claude.ai artifact ortamında localStorage çalışmaz.
-// Notlar ve tercihler doğrudan window.storage API'sine yazılır/okunur.
-// localStorage gerçekten varsa (tarayıcıda açıldığında) o kullanılır.
+// Notlar window.storage'a not başına ayrı anahtar olarak kaydedilir (güvenilir küçük parçalar).
+// Tercihler tek bir anahtarla kaydedilir.
+// Gerçek localStorage varsa (tarayıcıda açılırsa) o kullanılır — hiçbir şey değişmez.
 
 let _hasRealLS = false;
 try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); _hasRealLS = true; }catch(e){}
 
-// ── Dahili depolama soyutlaması ──
-// saveData(key, value)  → string değer yazar
-// loadData(key)         → string değer döner (sync için cache'den)
-window._memCache = {};
+window._memCache = {}; // bellek içi önbellek (sync okuma için)
 
-async function _persistWrite(key, value){
-  if(_hasRealLS){ try{ localStorage.setItem(key, value); }catch(e){} return; }
-  if(!window.storage) return;
-  try{ await window.storage.set('app:'+key, value); }catch(e){}
-}
-function _syncWrite(key, value){
-  window._memCache[key] = value;
-  // Arka planda kalıcı yaz
-  _persistWrite(key, value);
-}
-function _syncRead(key){
-  return window._memCache[key] !== undefined ? window._memCache[key] : null;
-}
-function _syncDelete(key){
-  delete window._memCache[key];
-  if(_hasRealLS){ try{ localStorage.removeItem(key); }catch(e){} return; }
-  if(window.storage) window.storage.delete('app:'+key).catch(()=>{});
-}
-
-// localStorage erişimi — şim (gerçek localStorage yoksa cache'e yönlendir)
+// localStorage şimi — gerçek localStorage yoksa _memCache'e yönlendir
 if(!_hasRealLS){
   Object.defineProperty(window,'localStorage',{
     configurable:true,
     get:()=>({
-      getItem:  k => _syncRead(k),
-      setItem:  (k,v) => _syncWrite(k, String(v)),
-      removeItem: k => _syncDelete(k),
-      clear:()=>{ Object.keys(window._memCache).forEach(k=>_syncDelete(k)); },
+      getItem:  k => (window._memCache[k] !== undefined ? window._memCache[k] : null),
+      setItem:  (k,v) => { window._memCache[k] = String(v); },
+      removeItem: k => { delete window._memCache[k]; },
+      clear: () => { Object.keys(window._memCache).forEach(k => delete window._memCache[k]); },
       key: i => Object.keys(window._memCache)[i]||null,
       get length(){ return Object.keys(window._memCache).length; }
     })
   });
 }
 
-// ── BAŞLANGIÇTA KALICI STORAGE'DAN YÜKLEMEYİ BEKLE ──
-window._storageReady = (async function(){
-  if(_hasRealLS) return; // gerçek localStorage var, doğrudan kullan
+// ── window.storage kalıcı kayıt fonksiyonları ──
+// Notları not-başına-anahtar olarak kaydeder: note:ID
+async function _wsWriteNotes(notesArr){
   if(!window.storage) return;
-  // Sadece bilinen iki anahtarı yükle — list() yerine doğrudan get() çok daha güvenilir
-  const KEYS = ['notlarim_v3','notlarim_prefs','notlarim_custom_tags','notlarim_applock'];
-  for(const k of KEYS){
+  try{
+    // Metadata (ID listesi + sayısı) kaydet
+    const ids = notesArr.map(n=>n.id);
+    await window.storage.set('notes_index', JSON.stringify(ids));
+    // Her notu ayrı ayrı kaydet
+    for(const n of notesArr){
+      try{ await window.storage.set('note:'+n.id, JSON.stringify(n)); }catch(e){}
+    }
+    // Silinen notları temizle: önceki index varsa farkı bul
+  }catch(e){}
+}
+async function _wsReadNotes(){
+  if(!window.storage) return null;
+  try{
+    const idxR = await window.storage.get('notes_index');
+    if(!idxR || !idxR.value) return null;
+    const ids = JSON.parse(idxR.value);
+    const result = [];
+    for(const id of ids){
+      try{
+        const r = await window.storage.get('note:'+id);
+        if(r && r.value) result.push(JSON.parse(r.value));
+      }catch(e){}
+    }
+    return result;
+  }catch(e){ return null; }
+}
+async function _wsWritePrefs(key, val){
+  if(!window.storage) return;
+  try{ await window.storage.set('pref:'+key, val); }catch(e){}
+}
+async function _wsReadPref(key){
+  if(!window.storage) return null;
+  try{ const r = await window.storage.get('pref:'+key); return (r&&r.value!==undefined)?r.value:null; }catch(e){ return null; }
+}
+
+// ── BAŞLANGIÇTA KALICI STORAGE'DAN YÜKLE ──
+window._storageReady = (async function(){
+  if(_hasRealLS) return; // gerçek localStorage var, direkt kullan
+  if(!window.storage) return;
+
+  // Notları yükle (note başına anahtar)
+  const loadedNotes = await _wsReadNotes();
+  if(loadedNotes && loadedNotes.length > 0){
+    window._memCache['notlarim_v3'] = JSON.stringify(loadedNotes);
+  } else {
+    // Eski tek-blob formatını dene (geriye dönük uyumluluk)
     try{
-      const r = await window.storage.get('app:'+k);
-      if(r && r.value !== undefined) window._memCache[k] = r.value;
+      const r = await window.storage.get('app:notlarim_v3');
+      if(r && r.value) window._memCache['notlarim_v3'] = r.value;
     }catch(e){}
+  }
+
+  // Tercihleri yükle
+  for(const k of ['notlarim_prefs','notlarim_custom_tags','notlarim_applock']){
+    const v = await _wsReadPref(k);
+    if(v !== null) window._memCache[k] = v;
+    else {
+      // Eski format fallback
+      try{ const r = await window.storage.get('app:'+k); if(r&&r.value) window._memCache[k]=r.value; }catch(e){}
+    }
   }
 })();
 
@@ -1064,21 +1097,35 @@ const FS_LABELS=['Çok Küçük','Küçük','Normal','Büyük','Çok Büyük'];
 
 function save(){
   try{
-    const val = JSON.stringify(notes);
-    localStorage.setItem(SK, val); // cache'e yazar + arka planda window.storage'a persist eder
+    // 1. Bellek önbelleğine yaz (sync, anında)
+    localStorage.setItem(SK, JSON.stringify(notes));
+    // 2. window.storage'a not-başına-anahtar olarak kaydet (async, arka planda)
+    if(!_hasRealLS && window.storage){
+      _wsWriteNotes(notes).catch(()=>{});
+    }
   }catch(e){
     showToast('⚠️ Depolama dolu! Bazı notlar kaydedilemedi. Eski notları silin veya yedek alın.');
   }
 }
-// save()'i async olarak güvenli kaydet — kritik işlemler sonrası çağrılır
+// Kritik işlemlerde (yedek yükleme vb.) yazmanın tamamlanmasını bekle
 async function saveAndConfirm(){
-  save();
-  // window.storage varsa tamamlanmasını bekle (yedek yükleme gibi kritik durumlar için)
+  try{
+    localStorage.setItem(SK, JSON.stringify(notes));
+  }catch(e){}
   if(!_hasRealLS && window.storage){
-    try{ await window.storage.set('app:'+SK, JSON.stringify(notes)); }catch(e){}
+    // Her notu sırayla yaz ve tamamlanmasını bekle
+    await _wsWriteNotes(notes);
+    // Prefs da yaz
+    try{ await _wsWritePrefs(PK, localStorage.getItem(PK)||''); }catch(e){}
   }
 }
-function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter,fontSize:currentFontSize,showCardDetail:showCardDetail}))}catch(e){}}
+function savePrefs(){
+  try{
+    const val = JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter,fontSize:currentFontSize,showCardDetail:showCardDetail});
+    localStorage.setItem(PK, val);
+    if(!_hasRealLS && window.storage) _wsWritePrefs(PK, val).catch(()=>{});
+  }catch(e){}
+}
 function setCardDetail(val){
   showCardDetail=val;
   const knob=document.getElementById('cardDetailKnob');
