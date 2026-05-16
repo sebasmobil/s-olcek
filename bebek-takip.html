@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.28
+  Bebek Takip Pro v1.0.29
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.28">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.29">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.28</title>
+<title>Bebek Takip Pro v1.0.29</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -44,7 +44,12 @@
 /* ===== INFO BAR ===== */
 .info-bar {
   width: 100%;
-  background: rgba(0,0,0,0.04);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: rgba(245,245,245,0.92);
   border-bottom: 1px solid rgba(0,0,0,0.08);
   color: rgba(0,0,0,0.55);
   font-family: var(--font);
@@ -56,12 +61,13 @@
   justify-content: center;
   gap: 6px;
   padding: 4px 12px;
-  flex-shrink: 0;
   user-select: none;
   line-height: 1.4;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 [data-theme="dark"] .info-bar {
-  background: rgba(255,255,255,0.04);
+  background: rgba(18,18,28,0.88);
   border-bottom: 1px solid rgba(255,255,255,0.07);
   color: rgba(255,255,255,0.35);
 }
@@ -419,8 +425,10 @@ button, a, [onclick] {
 .header {
   background: var(--header-bg);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: var(--info-bar-h, 26px);
+  left: 0;
+  right: 0;
   z-index: 50;
   box-shadow: 0 2px 10px var(--shadow);
   transition: background 0.3s, border-color 0.3s;
@@ -1064,6 +1072,12 @@ td {
   outline: none;
   -webkit-appearance: none;
   touch-action: manipulation;
+}
+/* Bebek formu tarih kutusu — daha yüksek */
+#bf_birth {
+  padding-top: 18px;
+  padding-bottom: 18px;
+  min-height: 56px;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--primary);
@@ -1748,9 +1762,17 @@ mark.hl {
   cursor: pointer;
   border: 3px solid transparent;
   transition: var(--transition);
+  outline: 3px solid transparent;
+  outline-offset: 2px;
 }
 .color-option:hover { transform: scale(1.15); }
-.color-option.selected { border-color: var(--text); }
+.color-option.selected { outline-color: var(--text); }
+.color-option[data-color="green"]  { background: linear-gradient(135deg,#4CAF50,#2E7D32); }
+.color-option[data-color="blue"]   { background: linear-gradient(135deg,#42A5F5,#1565C0); }
+.color-option[data-color="pink"]   { background: linear-gradient(135deg,#EC407A,#880E4F); }
+.color-option[data-color="orange"] { background: linear-gradient(135deg,#FFA726,#E65100); }
+.color-option[data-color="purple"] { background: linear-gradient(135deg,#AB47BC,#6A1B9A); }
+.color-option[data-color="teal"]   { background: linear-gradient(135deg,#26A69A,#00695C); }
 
 .emoji-picker {
   display: flex;
@@ -2084,7 +2106,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.28</span>
+  <span>Pro 1.0.29</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2571,8 +2593,7 @@ function openAddBabyModal(editId) {
         <label class="form-label">🎨 Avatar Rengi</label>
         <div class="color-picker" id="bf_colorPicker">
           ${AVATAR_COLORS.map(c => `
-            <div class="color-option avatar-${c} ${c === color ? 'selected' : ''}"
-                 style="background:var(--avatar-${c}, '')"
+            <div class="color-option ${c === color ? 'selected' : ''}"
                  onclick="selectAvatarColor('${c}')" data-color="${c}" title="${c}">
             </div>
           `).join('')}
@@ -3624,6 +3645,46 @@ function highlightText(text, query) {
 }
 
 // ===== EXCEL İÇE AKTARMA =====
+
+// Excel serial date → YYYY-MM-DD
+function parseImpDate(raw) {
+  if (!raw && raw !== 0) return '';
+  const s = String(raw).trim();
+  if (!s) return '';
+
+  // Sayısal serial (Excel: 1 = 1900-01-01, ama 1900 yılı hatası var)
+  const num = Number(s);
+  if (!isNaN(num) && num > 1000 && num < 100000) {
+    // Excel serial → JS Date (Excel epoch: 25569 = 1970-01-01)
+    const ms = (num - 25569) * 86400 * 1000;
+    const d = new Date(ms);
+    if (!isNaN(d)) {
+      return d.toISOString().split('T')[0];
+    }
+  }
+
+  // DD.MM.YYYY veya DD/MM/YYYY veya DD-MM-YYYY
+  const dmy = s.match(/^(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{4})$/);
+  if (dmy) return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+
+  // YYYY-MM-DD (zaten doğru format)
+  const ymd = s.match(/^(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})$/);
+  if (ymd) return `${ymd[1]}-${ymd[2].padStart(2,'0')}-${ymd[3].padStart(2,'0')}`;
+
+  // MM/DD/YYYY (Amerikan)
+  const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdy) {
+    // Eğer ilk sayı > 12 ise gün, değilse ay olarak yorumla
+    if (parseInt(mdy[1]) > 12) return `${mdy[3]}-${mdy[2].padStart(2,'0')}-${mdy[1].padStart(2,'0')}`;
+    return `${mdy[3]}-${mdy[1].padStart(2,'0')}-${mdy[2].padStart(2,'0')}`;
+  }
+
+  // JS Date.parse dene
+  const parsed = Date.parse(s);
+  if (!isNaN(parsed)) return new Date(parsed).toISOString().split('T')[0];
+
+  return s; // dönüştürülemediyse ham bırak
+}
 const impFieldDefs = {
   olay:    [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'saat',label:'⏰ Saat'}, {key:'olay',label:'⚡ Olay',req:true}, {key:'not',label:'📝 Not'} ],
   gelisim: [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'notlar',label:'💬 Notlar'} ],
@@ -3789,7 +3850,8 @@ function impBuildPreview() {
     const rec = {};
     fields.forEach(f => {
       const colIdx = mapping[f.key];
-      rec[f.key] = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+      const raw = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+      rec[f.key] = f.key === 'tarih' ? parseImpDate(raw) : raw;
     });
     const missing = fields.filter(f => f.req && !rec[f.key]);
     if (missing.length) { skipped++; return; }
@@ -3839,7 +3901,8 @@ function impDoImport() {
     const rec = { id: genId() };
     fields.forEach(f => {
       const colIdx = mapping[f.key];
-      rec[f.key] = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+      const raw = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+      rec[f.key] = f.key === 'tarih' ? parseImpDate(raw) : raw;
     });
     const missing = fields.filter(f => f.req && !rec[f.key]);
     if (missing.length) { skipped++; return; }
@@ -3989,6 +4052,21 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// Info bar + header fixed offset
+function applyInfoBarOffset() {
+  const bar = document.getElementById('infoBar');
+  const header = document.querySelector('.header');
+  if (!bar) return;
+  const barH = bar.getBoundingClientRect().height;
+  const headerH = header ? header.getBoundingClientRect().height : 54;
+  document.documentElement.style.setProperty('--info-bar-h', barH + 'px');
+  document.documentElement.style.setProperty('--header-h', headerH + 'px');
+  const mc = document.querySelector('.main-content');
+  if (mc) mc.style.paddingTop = (barH + headerH) + 'px';
+}
+window.addEventListener('load', applyInfoBarOffset);
+window.addEventListener('resize', applyInfoBarOffset);
 
 // ===== PWA SETUP =====
 (function setupPWA() {
