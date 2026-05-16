@@ -25,60 +25,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" id="metaStatusBar">
+<meta name="color-scheme" content="light dark" id="metaColorScheme">
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
 <meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.01">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
-<title>Bebek Takip Pro v1.0.20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
+<title>Bebek Takip Pro v1.0.26</title>
 <style>
-/* ===== IOS ZOOM ÖNLEME — tüm input/select/textarea =====
-   iOS Safari, font-size < 16px olan alanlara odaklanınca zoom yapar.
-   Bu kural bunu tamamen engeller. */
+/* ===== FONTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
+
+/* ===== IOS ZOOM ÖNLEME ===== */
 input, select, textarea {
   font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
-} */
-.top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 51;
-  height: 14px;
-  background: var(--top-bar-bg);
-  color: var(--top-bar-text);
-  font-size: 7px;
-  font-weight: 400;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  user-select: none;
-  border-bottom: 1px solid var(--top-bar-border);
-  flex-shrink: 0;
 }
-.top-bar-sep { opacity: 0.2; font-size: 5px; }
-.top-bar a { color: inherit; text-decoration: none; opacity: 0.7; }
-.top-bar a:hover { opacity: 1; }
-
-:root {
-  --top-bar-bg: #f0f4f8;
-  --top-bar-text: rgba(0,0,0,0.5);
-  --top-bar-border: rgba(0,0,0,0.08);
-  --top-bar-hover: rgba(0,0,0,0.8);
-}
-[data-theme="dark"] {
-  --top-bar-bg: #070c14;
-  --top-bar-text: rgba(255,255,255,0.5);
-  --top-bar-border: rgba(255,255,255,0.06);
-  --top-bar-hover: rgba(255,255,255,0.85);
-}
-
-/* ===== FONTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Fredoka+One&display=swap');
 
 /* ===== CSS VARIABLES ===== */
 :root {
@@ -405,7 +372,7 @@ button, a, [onclick] {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 26px);
+  min-height: 100dvh;
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
@@ -418,7 +385,7 @@ button, a, [onclick] {
   background: var(--header-bg);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 14px;
+  top: 0;
   z-index: 50;
   box-shadow: 0 2px 10px var(--shadow);
   transition: background 0.3s, border-color 0.3s;
@@ -727,13 +694,13 @@ button, a, [onclick] {
 
 /* ===== HOME BACK BUTTON ===== */
 .header-baby-btn {
-  max-width: 120px;
+  max-width: 180px;
 }
 .header-baby-btn span:first-of-type {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 70px;
+  max-width: 130px;
 }
 
 .home-back-btn {
@@ -831,6 +798,81 @@ button, a, [onclick] {
 }
 .card-body {
   padding: 18px 22px;
+}
+
+/* ===== RECORD CARDS ===== */
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 16px;
+}
+.record-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  animation: fadeInUp 0.3s ease forwards;
+  transition: box-shadow 0.2s;
+}
+.record-card:hover {
+  box-shadow: 0 2px 12px var(--shadow-md);
+}
+.rc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.rc-date {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+}
+.rc-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.rc-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.rc-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+.rc-note {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.rc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.rc-chip {
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--text2);
+}
+.rc-chip-red {
+  background: rgba(239,68,68,0.08);
+  border-color: rgba(239,68,68,0.25);
+  color: #C62828;
 }
 
 /* ===== TABLE ===== */
@@ -1318,7 +1360,7 @@ mark.hl {
 
 /* ===== LANDSCAPE MOBILE ===== */
 @media (orientation: landscape) and (max-height: 500px) {
-  .top-bar { height: 22px; font-size: 10px; }
+  .top-bar { display: none; }
   .header-row1 { height: 40px; }
   .header-row2 { padding: 0 12px 6px; }
   .bottom-nav { height: 52px; }
@@ -1692,14 +1734,6 @@ mark.hl {
 </head>
 <body>
 
-<!-- TOP INFO BAR -->
-<div class="top-bar">
-  <span>Pro 1.0.20</span>
-  <span class="top-bar-sep">◆</span>
-  <span>© sebasmobil 2026</span>
-  <span class="top-bar-sep">◆</span>
-  <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
-</div>
 
 <!-- Sidebar Overlay for mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -1713,7 +1747,7 @@ mark.hl {
     <div class="side-nav-logo">👶</div>
     <div>
       <div class="side-nav-title">Bebek Takip</div>
-      <div class="side-nav-sub" id="sideNavSubtitle">Pro v1.0.20</div>
+      <div class="side-nav-sub" id="sideNavSubtitle">Pro v1.0.26</div>
     </div>
   </div>
 
@@ -1964,28 +1998,8 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">⚡ Olaylar</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="search-wrapper" style="max-width:220px">
-              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('olay', this.value)" />
-              <span class="search-icon">🔍</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Olay Ekle</button>
-          </div>
         </div>
-        <div class="table-wrapper">
-          <table id="olay-table">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Saat</th>
-                <th>Olay</th>
-                <th>Not</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="olay-tbody"></tbody>
-          </table>
-        </div>
+        <div class="records-list" id="olay-cards"></div>
         <div id="olay-empty" class="empty-state" style="display:none">
           <div class="es-icon">⚡</div>
           <div class="es-title">Henüz olay yok</div>
@@ -1999,29 +2013,8 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">📈 Gelişim Kayıtları</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="search-wrapper" style="max-width:220px">
-              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gelisim', this.value)" />
-              <span class="search-icon">🔍</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Gelişim Ekle</button>
-          </div>
         </div>
-        <div class="table-wrapper">
-          <table id="gelisim-table">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Boy (cm)</th>
-                <th>Ağırlık (kg)</th>
-                <th>Baş (cm)</th>
-                <th>Notlar</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="gelisim-tbody"></tbody>
-          </table>
-        </div>
+        <div class="records-list" id="gelisim-cards"></div>
         <div id="gelisim-empty" class="empty-state" style="display:none">
           <div class="es-icon">📈</div>
           <div class="es-title">Henüz gelişim kaydı yok</div>
@@ -2035,30 +2028,8 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">🏥 Doktor Kontrolleri</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="search-wrapper" style="max-width:220px">
-              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('kontrol', this.value)" />
-              <span class="search-icon">🔍</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Kontrol Ekle</button>
-          </div>
         </div>
-        <div class="table-wrapper">
-          <table id="kontrol-table">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Hastane</th>
-                <th>Doktor</th>
-                <th>Tanı</th>
-                <th>Tedavi</th>
-                <th>Verilen İlaç</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="kontrol-tbody"></tbody>
-          </table>
-        </div>
+        <div class="records-list" id="kontrol-cards"></div>
         <div id="kontrol-empty" class="empty-state" style="display:none">
           <div class="es-icon">🏥</div>
           <div class="es-title">Henüz kontrol kaydı yok</div>
@@ -2072,32 +2043,8 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">🍼 Gıda Takibi</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="search-wrapper" style="max-width:220px">
-              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gida', this.value)" />
-              <span class="search-icon">🔍</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Gıda Ekle</button>
-          </div>
         </div>
-        <div class="table-wrapper">
-          <table id="gida-table">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Saat</th>
-                <th>Tür</th>
-                <th>Adı</th>
-                <th>İçerik</th>
-                <th>Miktar</th>
-                <th>Alerji</th>
-                <th>Not</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="gida-tbody"></tbody>
-          </table>
-        </div>
+        <div class="records-list" id="gida-cards"></div>
         <div id="gida-empty" class="empty-state" style="display:none">
           <div class="es-icon">🍼</div>
           <div class="es-title">Henüz gıda kaydı yok</div>
@@ -2111,27 +2058,8 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">📔 Günlük</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="search-wrapper" style="max-width:220px">
-              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gunluk', this.value)" />
-              <span class="search-icon">🔍</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Günlük Ekle</button>
-          </div>
         </div>
-        <div class="table-wrapper">
-          <table id="gunluk-table">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Başlık</th>
-                <th>Not</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="gunluk-tbody"></tbody>
-          </table>
-        </div>
+        <div class="records-list" id="gunluk-cards"></div>
         <div id="gunluk-empty" class="empty-state" style="display:none">
           <div class="es-icon">📔</div>
           <div class="es-title">Henüz günlük kaydı yok</div>
@@ -2145,7 +2073,6 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">🦷 Diş Takibi</span>
-          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Diş Ekle</button>
         </div>
         <div class="card-body">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -2158,20 +2085,7 @@ mark.hl {
               <div class="tooth-grid" id="lowerTeeth"></div>
             </div>
           </div>
-          <div class="table-wrapper" style="margin-top:20px">
-            <table id="dis-table">
-              <thead>
-                <tr>
-                  <th>Diş</th>
-                  <th>Konum</th>
-                  <th>Çıkma Tarihi</th>
-                  <th>Not</th>
-                  <th>İşlem</th>
-                </tr>
-              </thead>
-              <tbody id="dis-tbody"></tbody>
-            </table>
-          </div>
+          <div class="records-list" id="dis-cards" style="margin-top:16px"></div>
         </div>
       </div>
     </div>
@@ -2181,29 +2095,12 @@ mark.hl {
       <div class="card">
         <div class="card-header">
           <span class="card-title">💉 Aşı Takvimi</span>
-          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Aşı Ekle</button>
         </div>
-        <div class="card-body">
-          <div class="table-wrapper">
-            <table id="asi-table">
-              <thead>
-                <tr>
-                  <th>Tarih</th>
-                  <th>Dönem</th>
-                  <th>Aşı Adı</th>
-                  <th>Durum</th>
-                  <th>Açıklama</th>
-                  <th>İşlem</th>
-                </tr>
-              </thead>
-              <tbody id="asi-tbody"></tbody>
-            </table>
-          </div>
-          <div id="asi-empty" class="empty-state" style="display:none">
-            <div class="es-icon">💉</div>
-            <div class="es-title">Henüz aşı kaydı yok</div>
-            <div class="es-sub">Aşı takvimini buradan yönetin</div>
-          </div>
+        <div class="records-list" id="asi-cards"></div>
+        <div id="asi-empty" class="empty-state" style="display:none">
+          <div class="es-icon">💉</div>
+          <div class="es-title">Henüz aşı kaydı yok</div>
+          <div class="es-sub">Aşı takvimini buradan yönetin</div>
         </div>
       </div>
     </div>
@@ -2571,6 +2468,13 @@ function loadTheme() {
   document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
+  // Status bar & color-scheme on init
+  const metaTheme = document.getElementById('metaThemeColor');
+  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : '#4CAF50';
+  const metaStatusBar = document.getElementById('metaStatusBar');
+  if (metaStatusBar) metaStatusBar.content = theme === 'dark' ? 'black-translucent' : 'default';
+  const metaColorScheme = document.getElementById('metaColorScheme');
+  if (metaColorScheme) metaColorScheme.content = theme === 'dark' ? 'dark' : 'light';
 }
 
 function toggleTheme() {
@@ -2588,9 +2492,15 @@ function setTheme(theme) {
   if (sideBtn) sideBtn.textContent = (theme === 'dark' ? '☀️' : '🌙') + ' Tema';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
-  // Update meta theme-color
+  // Update meta theme-color (status bar arka plan rengi)
   const metaTheme = document.getElementById('metaThemeColor');
-  if (metaTheme) metaTheme.content = theme === 'dark' ? '#0b1120' : '#4CAF50';
+  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : '#4CAF50';
+  // iOS status bar style: dark → black (beyaz yazı), light → default (siyah yazı)
+  const metaStatusBar = document.getElementById('metaStatusBar');
+  if (metaStatusBar) metaStatusBar.content = theme === 'dark' ? 'black-translucent' : 'default';
+  // color-scheme: dark/light
+  const metaColorScheme = document.getElementById('metaColorScheme');
+  if (metaColorScheme) metaColorScheme.content = theme === 'dark' ? 'dark' : 'light';
   // Re-render chart if on dashboard
   if (currentPage === 'dashboard') setTimeout(renderGrowthChart, 100);
 }
@@ -3093,44 +3003,103 @@ function renderTable(section, filterQuery = '') {
     return q ? highlightText(display, q) : escHtml(display);
   };
 
-  const configs = {
-    olay: {
-      fields: ['tarih','saat','olay','not'],
-      headers: ['Tarih','Saat','Olay','Not'],
-      render: r => [formatDate(r.tarih), r.saat||'-', `<strong>${hl(r.olay||'-')}</strong>`, `<span title="${escHtml(r.not||'')}">${hlTrunc(r.not)}</span>`]
-    },
-    gelisim: {
-      fields: ['tarih','boy','agirlik','bas','notlar'],
-      headers: ['Tarih','Boy (cm)','Ağırlık (kg)','Baş (cm)','Notlar'],
-      render: r => [formatDate(r.tarih), r.boy||'-', r.agirlik||'-', r.bas||'-', hlTrunc(r.notlar)]
-    },
-    kontrol: {
-      fields: ['tarih','hastane','doktor','teshis','tedavi','ilac'],
-      headers: ['Tarih','Hastane','Doktor','Tanı','Tedavi','İlaç'],
-      render: r => [formatDate(r.tarih), hl(r.hastane||'-'), hl(r.doktor||'-'), hlTrunc(r.teshis), hlTrunc(r.tedavi), hlTrunc(r.ilac)]
-    },
-    gida: {
-      fields: ['tarih','saat','tur','adi','icerik','miktar','alerji','not'],
-      headers: ['Tarih','Saat','Tür','Adı','İçerik','Miktar','Alerji','Not'],
-      render: r => [formatDate(r.tarih), r.saat||'-', r.tur?`<span class="badge badge-orange">${hl(r.tur)}</span>`:'-', `<strong>${hl(r.adi||'-')}</strong>`, hlTrunc(r.icerik), r.miktar||'-', r.alerji||'-', hlTrunc(r.not)]
-    },
-    gunluk: {
-      fields: ['tarih','baslik','not'],
-      headers: ['Tarih','Başlık','Not'],
-      render: r => [formatDate(r.tarih), `<strong>${hl(r.baslik||'-')}</strong>`, `<span title="${escHtml(r.not||'')}">${hlTrunc(r.not,60)}</span>`]
-    },
-    asi: {
-      fields: ['tarih','donem','asi','durum','aciklama'],
-      headers: ['Tarih','Dönem','Aşı','Durum','Açıklama'],
-      render: r => {
-        const durumClass = { 'Uygulandı': 'badge-green', 'Planlandı': 'badge-blue', 'Beklemede': 'badge-orange', 'Ertelendi': 'badge-red' };
-        return [formatDate(r.tarih), r.donem||'-', `<strong>${hl(r.asi||'-')}</strong>`, `<span class="badge ${durumClass[r.durum]||'badge-blue'}">${r.durum||'Planlandı'}</span>`, hlTrunc(r.aciklama)];
-      }
+  // Kart render fonksiyonları — her bölüm için özel
+  const cardRenders = {
+    olay: r => `
+      <div class="rc-top">
+        <span class="rc-date">📅 ${formatDate(r.tarih)}${r.saat ? ' · ' + r.saat : ''}</span>
+        <div class="rc-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('olay','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('olay','${r.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="rc-title">${hl(r.olay||'-')}</div>
+      ${r.not ? `<div class="rc-note">${hl(r.not)}</div>` : ''}
+    `,
+    gelisim: r => `
+      <div class="rc-top">
+        <span class="rc-date">📅 ${formatDate(r.tarih)}</span>
+        <div class="rc-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('gelisim','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('gelisim','${r.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="rc-chips">
+        ${r.boy ? `<span class="rc-chip">📏 Boy: <strong>${r.boy} cm</strong></span>` : ''}
+        ${r.agirlik ? `<span class="rc-chip">⚖️ Ağırlık: <strong>${r.agirlik} kg</strong></span>` : ''}
+        ${r.bas ? `<span class="rc-chip">🔵 Baş: <strong>${r.bas} cm</strong></span>` : ''}
+      </div>
+      ${r.notlar ? `<div class="rc-note">${hl(r.notlar)}</div>` : ''}
+    `,
+    kontrol: r => `
+      <div class="rc-top">
+        <span class="rc-date">📅 ${formatDate(r.tarih)}</span>
+        <div class="rc-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('kontrol','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('kontrol','${r.id}')">🗑️</button>
+        </div>
+      </div>
+      ${r.hastane ? `<div class="rc-title">🏥 ${hl(r.hastane)}</div>` : ''}
+      ${r.doktor ? `<div class="rc-sub">👨‍⚕️ ${hl(r.doktor)}</div>` : ''}
+      <div class="rc-chips">
+        ${r.teshis ? `<span class="rc-chip">🩺 Tanı: <strong>${hl(r.teshis)}</strong></span>` : ''}
+        ${r.tedavi ? `<span class="rc-chip">💊 Tedavi: <strong>${hl(r.tedavi)}</strong></span>` : ''}
+        ${r.ilac ? `<span class="rc-chip">💉 İlaç: <strong>${hl(r.ilac)}</strong></span>` : ''}
+      </div>
+      ${r.not ? `<div class="rc-note">${hl(r.not)}</div>` : ''}
+    `,
+    gida: r => `
+      <div class="rc-top">
+        <span class="rc-date">📅 ${formatDate(r.tarih)}${r.saat ? ' · ' + r.saat : ''}</span>
+        <div class="rc-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('gida','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('gida','${r.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="rc-top" style="margin-top:4px">
+        <div class="rc-title" style="margin:0">${hl(r.adi||'-')}</div>
+        ${r.tur ? `<span class="badge badge-orange">${hl(r.tur)}</span>` : ''}
+      </div>
+      <div class="rc-chips">
+        ${r.icerik ? `<span class="rc-chip">🥕 İçerik: <strong>${hl(r.icerik)}</strong></span>` : ''}
+        ${r.miktar ? `<span class="rc-chip">🥄 Miktar: <strong>${r.miktar}</strong></span>` : ''}
+        ${r.alerji ? `<span class="rc-chip rc-chip-red">⚠️ Alerji: <strong>${hl(r.alerji)}</strong></span>` : ''}
+      </div>
+      ${r.not ? `<div class="rc-note">${hl(r.not)}</div>` : ''}
+    `,
+    gunluk: r => `
+      <div class="rc-top">
+        <span class="rc-date">📅 ${formatDate(r.tarih)}</span>
+        <div class="rc-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('gunluk','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('gunluk','${r.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="rc-title">${hl(r.baslik||'-')}</div>
+      ${r.not ? `<div class="rc-note">${hl(r.not)}</div>` : ''}
+    `,
+    asi: r => {
+      const durumClass = { 'Uygulandı': 'badge-green', 'Planlandı': 'badge-blue', 'Beklemede': 'badge-orange', 'Ertelendi': 'badge-red' };
+      return `
+        <div class="rc-top">
+          <span class="rc-date">📅 ${formatDate(r.tarih)}</span>
+          <div class="rc-actions">
+            <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('asi','${r.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('asi','${r.id}')">🗑️</button>
+          </div>
+        </div>
+        <div class="rc-top" style="margin-top:4px">
+          <div class="rc-title" style="margin:0">💉 ${hl(r.asi||'-')}</div>
+          <span class="badge ${durumClass[r.durum]||'badge-blue'}">${r.durum||'Planlandı'}</span>
+        </div>
+        ${r.donem ? `<div class="rc-sub">🗓️ ${hl(r.donem)}</div>` : ''}
+        ${r.aciklama ? `<div class="rc-note">${hl(r.aciklama)}</div>` : ''}
+      `;
     }
   };
 
-  const config = configs[section];
-  if (!config) return;
+  const cardRender = cardRenders[section];
+  if (!cardRender) return;
 
   let rows = [...data[section]];
   if (q) {
@@ -3138,45 +3107,27 @@ function renderTable(section, filterQuery = '') {
   }
   rows.sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
 
-  const tbody = document.getElementById(section + '-tbody');
+  const container = document.getElementById(section + '-cards');
   const emptyEl = document.getElementById(section + '-empty');
-  const tableEl = document.getElementById(section + '-table');
-  if (!tbody) return;
+  if (!container) return;
 
   if (rows.length === 0) {
-    tbody.innerHTML = '';
+    container.innerHTML = '';
     if (emptyEl) { emptyEl.style.display = 'block'; emptyEl.innerHTML = q ? `<div style="padding:30px 20px;text-align:center;color:var(--text3)">🔍 "<strong>${escHtml(q)}</strong>" için sonuç bulunamadı</div>` : `<div class="empty-state" style="padding:60px 20px"><div class="es-icon" style="font-size:60px">📝</div><div class="es-sub">Henüz kayıt yok</div></div>`; }
-    if (tableEl) tableEl.style.display = 'none';
     return;
   }
   if (emptyEl) emptyEl.style.display = 'none';
-  if (tableEl) tableEl.style.display = 'table';
 
-  // Arama sonuç banner
-  const bannerId = section + '-search-banner';
-  let banner = document.getElementById(bannerId);
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = bannerId;
-    tableEl?.parentElement?.insertBefore(banner, tableEl);
-  }
   if (q) {
-    banner.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,200,0,0.12);border:1px solid rgba(255,200,0,0.4);border-radius:var(--radius-sm);margin-bottom:10px;font-size:13px;font-weight:700;color:var(--text2)">🔍 "<mark class="hl">${escHtml(q)}</mark>" — ${rows.length} sonuç bulundu</div>`;
+    const banner = `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,200,0,0.12);border:1px solid rgba(255,200,0,0.4);border-radius:var(--radius-sm);margin-bottom:10px;font-size:13px;font-weight:700;color:var(--text2)">🔍 "<mark class="hl">${escHtml(q)}</mark>" — ${rows.length} sonuç</div>`;
+    container.innerHTML = banner + rows.map((r,i) => `
+      <div class="record-card" style="animation-delay:${i*0.04}s">${cardRender(r)}</div>
+    `).join('');
   } else {
-    banner.innerHTML = '';
+    container.innerHTML = rows.map((r,i) => `
+      <div class="record-card" style="animation-delay:${i*0.04}s">${cardRender(r)}</div>
+    `).join('');
   }
-
-  tbody.innerHTML = rows.map((r, i) => `
-    <tr style="animation-delay:${i*0.04}s">
-      ${config.render(r).map(cell => `<td>${cell}</td>`).join('')}
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('${section}','${r.id}')" title="D\u00fczenle">✏️</button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('${section}','${r.id}')" title="Sil">🗑️</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
 }
 
 function filterTable(section, query) {
@@ -3195,22 +3146,25 @@ function renderDisPage() {
   renderDisGrid('upperTeeth', ['\u00dcst Sa\u011f','\u00dcst Sol']);
   renderDisGrid('lowerTeeth', ['Alt Sa\u011f','Alt Sol']);
 
-  const tbody = document.getElementById('dis-tbody');
-  if (!tbody) return;
+  const container = document.getElementById('dis-cards');
+  if (!container) return;
   const rows = [...data.dis].sort((a,b) => (b.cikma||'').localeCompare(a.cikma||''));
-  tbody.innerHTML = rows.map((r,i) => `
-    <tr style="animation-delay:${i*0.04}s">
-      <td><strong>${escHtml(r.dis||'-')}</strong></td>
-      <td>${r.konum||'-'}</td>
-      <td>${formatDate(r.cikma)}</td>
-      <td>${truncate(r.not)}</td>
-      <td>
-        <div class="td-actions">
+  if (rows.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = rows.map((r,i) => `
+    <div class="record-card" style="animation-delay:${i*0.04}s">
+      <div class="rc-top">
+        <span class="rc-date">🦷 ${escHtml(r.dis||'-')} · ${r.konum||'-'}</span>
+        <div class="rc-actions">
           <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('dis','${r.id}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('dis','${r.id}')">🗑️</button>
         </div>
-      </td>
-    </tr>
+      </div>
+      <div class="rc-chips">
+        ${r.cikma ? `<span class="rc-chip">📅 Çıkma: <strong>${formatDate(r.cikma)}</strong></span>` : ''}
+        ${r.dusme ? `<span class="rc-chip">📅 Düşme: <strong>${formatDate(r.dusme)}</strong></span>` : ''}
+      </div>
+      ${r.not ? `<div class="rc-note">${escHtml(r.not)}</div>` : ''}
+    </div>
   `).join('');
 }
 
