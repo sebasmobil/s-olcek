@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.30
+  Bebek Takip Pro v1.0.32
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.30">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.32">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.30</title>
+<title>Bebek Takip Pro v1.0.32</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -762,11 +762,7 @@ button, a, [onclick] {
   cursor: pointer;
   transition: var(--transition);
   touch-action: manipulation;
-  position: fixed;
-  bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-  left: 16px;
-  z-index: 40;
-  box-shadow: 0 2px 10px var(--shadow);
+  flex-shrink: 0;
 }
 .home-back-btn:hover {
   border-color: var(--primary);
@@ -2108,7 +2104,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.30</span>
+  <span>Pro 1.0.32</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2161,15 +2157,14 @@ mark.hl {
 
       </div><!-- /sağa dayalı grup -->
 
-      <!-- Ekle -->
+      <!-- Ana Sayfa & Ekle -->
+      <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
       <button class="btn btn-primary btn-sm" id="addBtn" onclick="openAddModal()" style="display:none">+ Ekle</button>
     </div>
   </div>
 
   <!-- PAGES -->
   <div class="page-content">
-    <!-- ANA SAYFA GERİ BUTONU -->
-    <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <!-- HIZLI EKLE (üstte, sayılarla) -->
@@ -3688,12 +3683,12 @@ function parseImpDate(raw) {
   return s; // dönüştürülemediyse ham bırak
 }
 const impFieldDefs = {
-  olay:    [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'saat',label:'⏰ Saat'}, {key:'olay',label:'⚡ Olay',req:true}, {key:'not',label:'📝 Not'} ],
-  gelisim: [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'notlar',label:'💬 Notlar'} ],
-  kontrol: [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'ilac',label:'💉 İlaç'}, {key:'not',label:'📝 Not'} ],
-  gida:    [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı',req:true}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
-  gunluk:  [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'baslik',label:'📝 Başlık',req:true}, {key:'not',label:'💬 Not'} ],
-  asi:     [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı',req:true}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ]
+  olay:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'olay',label:'⚡ Olay'}, {key:'not',label:'📝 Not'} ],
+  gelisim: [ {key:'tarih',label:'📅 Tarih'}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'notlar',label:'💬 Notlar'} ],
+  kontrol: [ {key:'tarih',label:'📅 Tarih'}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'ilac',label:'💉 İlaç'}, {key:'not',label:'📝 Not'} ],
+  gida:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı'}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
+  gunluk:  [ {key:'tarih',label:'📅 Tarih'}, {key:'baslik',label:'📝 Başlık'}, {key:'not',label:'💬 Not'} ],
+  asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ]
 };
 const impSectionNames = { olay:'Olaylar', gelisim:'Gelişim', kontrol:'Kontroller', gida:'Gıda', gunluk:'Günlük', asi:'Aşı' };
 
@@ -3816,7 +3811,7 @@ function impShowMapping() {
   const container = document.getElementById('impMappingTable');
   container.innerHTML = fields.map(f => `
     <div class="import-map-row">
-      <div class="field-label">${f.label}${f.req?' *':''}</div>
+      <div class="field-label">${f.label}</div>
       <div class="map-arrow">←</div>
       <select id="imp_map_${f.key}">
         ${colOptions.map((c,i) => `<option value="${i}" ${autoMatch(f.key)===i?'selected':''}>${i===0?'— boş bırak —':c}</option>`).join('')}
@@ -3855,14 +3850,11 @@ function impBuildPreview() {
       const raw = colIdx > 0 ? (row[colIdx - 1] || '') : '';
       rec[f.key] = f.key === 'tarih' ? parseImpDate(raw) : raw;
     });
-    const missing = fields.filter(f => f.req && !rec[f.key]);
-    if (missing.length) { skipped++; return; }
     valid.push(rec);
   });
 
-  // Önizleme tablosunu oluştur
   const previewCount = Math.min(valid.length, 50);
-  const shownFields = fields.filter(f => mapping[f.key] > 0 || f.req);
+  const shownFields = fields.filter(f => mapping[f.key] > 0);
 
   const thead = `<thead><tr style="background:var(--bg);position:sticky;top:0">${
     shownFields.map(f => `<th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap">${f.label}</th>`).join('')
@@ -3878,16 +3870,10 @@ function impBuildPreview() {
 
   const info = document.getElementById('impPreviewInfo');
   info.innerHTML = `<strong style="color:var(--text)">${valid.length}</strong> kayıt aktarılacak` +
-    (valid.length > previewCount ? ` (ilk ${previewCount} gösteriliyor)` : '') +
-    (skipped > 0 ? ` · <span style="color:#e65100">${skipped} satır atlanacak</span>` : '');
+    (valid.length > previewCount ? ` (ilk ${previewCount} gösteriliyor)` : '');
 
   const warn = document.getElementById('impSkipWarning');
-  if (skipped > 0) {
-    warn.style.display = '';
-    warn.textContent = `⚠️ ${skipped} satır zorunlu alan (${fields.filter(f=>f.req).map(f=>f.label).join(', ')}) eksik olduğu için aktarılmayacak.`;
-  } else {
-    warn.style.display = 'none';
-  }
+  warn.style.display = 'none';
 
   document.getElementById('imp-step3').style.display = 'none';
   document.getElementById('imp-step4').style.display = '';
@@ -3925,9 +3911,7 @@ function impDoImport() {
   document.getElementById('imp-step4').style.display = 'none';
   document.getElementById('imp-step5').style.display = '';
   document.getElementById('impResultMsg').textContent = added > 0 ? `${added} kayıt başarıyla aktarıldı! 🎉` : 'Aktarılacak geçerli kayıt bulunamadı.';
-  document.getElementById('impResultSub').textContent = skipped > 0
-    ? `${skipped} satır zorunlu alan eksik olduğu için atlandı.`
-    : added > 0 ? 'Tüm satırlar başarıyla içe aktarıldı.' : 'Eşleştirmeyi kontrol edip tekrar deneyin.';
+  document.getElementById('impResultSub').textContent = added > 0 ? 'Tüm satırlar başarıyla içe aktarıldı.' : 'Eşleştirmeyi kontrol edip tekrar deneyin.';
 }
 
 // ===== BACKUP & RESTORE =====
@@ -4051,6 +4035,28 @@ function init() {
   script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
   script.onload = () => setTimeout(renderGrowthChart, 200);
   document.head.appendChild(script);
+
+  // Veri kaybı uyarısı — sayfa kapanmadan yedek al
+  window.addEventListener('beforeunload', () => {
+    try { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); } catch(e) {}
+  });
+
+  // Açılışta veri yoksa restore banner göster
+  const totalRecords = Object.values(profiles).reduce((sum, p) => {
+    if (!p || typeof p !== 'object') return sum;
+    const keys = ['olay','gelisim','kontrol','gida','gunluk','asi','dis'];
+    return sum + keys.reduce((s,k) => s + ((p[k]||[]).length), 0);
+  }, 0);
+  if (totalRecords === 0) {
+    setTimeout(() => {
+      const banner = document.createElement('div');
+      banner.id = 'restoreBanner';
+      banner.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--primary);border-radius:14px;padding:12px 18px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--text);max-width:90vw;white-space:nowrap';
+      banner.innerHTML = `<span>📦 Yedeğiniz var mı?</span><button onclick="openSettingsDrawer();switchDrawerTab('yedek');document.getElementById('restoreBanner').remove()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font)">Yedek Yükle</button><button onclick="document.getElementById('restoreBanner').remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px">✕</button>`;
+      document.body.appendChild(banner);
+      setTimeout(() => { if (banner.parentNode) banner.remove(); }, 8000);
+    }, 1200);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
