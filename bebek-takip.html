@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.27
+  Bebek Takip Pro v1.0.28
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.27">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.28">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.27</title>
+<title>Bebek Takip Pro v1.0.28</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -614,15 +614,16 @@ button, a, [onclick] {
 }
 .drawer-tab {
   flex: 1;
-  padding: 8px 12px;
+  padding: 8px 6px;
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11.5px;
   color: var(--text3);
   transition: var(--transition);
   user-select: none;
+  white-space: nowrap;
 }
 .drawer-tab.active {
   background: var(--card);
@@ -1379,6 +1380,97 @@ mark.hl {
 }
 .backup-icon { font-size: 52px; animation: pulse 2s ease infinite; }
 
+/* ===== EXCEL İÇE AKTARMA ===== */
+.import-step-title {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.import-section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.import-sec-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 20px;
+  touch-action: manipulation;
+}
+.import-sec-btn span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+}
+.import-sec-btn:hover, .import-sec-btn.active {
+  border-color: var(--primary);
+  background: rgba(76,175,80,0.07);
+}
+.import-sec-btn.active span { color: var(--primary); }
+.import-file-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  color: var(--text2);
+  width: 100%;
+}
+.import-file-zone:hover {
+  border-color: var(--primary);
+  background: rgba(76,175,80,0.04);
+}
+.import-map-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.import-map-row .field-label {
+  font-weight: 700;
+  color: var(--text2);
+  font-size: 12px;
+}
+.import-map-row .map-arrow {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 800;
+}
+.import-map-row select {
+  font-size: 12px;
+  padding: 5px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  width: 100%;
+}
+
+/* Preview table scrollbar */
+#imp-step4 ::-webkit-scrollbar { width: 4px; height: 4px; }
+#imp-step4 ::-webkit-scrollbar-track { background: var(--bg); }
+#imp-step4 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .dashboard-grid { grid-template-columns: 1fr; }
@@ -1841,8 +1933,7 @@ mark.hl {
   </div>
 
   <div class="side-nav-footer">
-    <button class="btn btn-secondary btn-sm" onclick="toggleTheme();closeSideNav()" id="themeBtnSide">🌙 Tema</button>
-    <button class="btn btn-secondary btn-sm" onclick="openSettingsDrawer();closeSideNav()">⚙️ Ayarlar</button>
+    <button class="btn btn-secondary btn-sm" onclick="openSettingsDrawer();closeSideNav()" style="flex:1">⚙️ Ayarlar</button>
   </div>
 </nav>
 
@@ -1858,6 +1949,7 @@ mark.hl {
     <div class="drawer-tabs">
       <div class="drawer-tab active" onclick="switchDrawerTab('ayarlar')">⚙️ Ayarlar</div>
       <div class="drawer-tab" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
+      <div class="drawer-tab" onclick="switchDrawerTab('iceaktar')">📥 İçe Aktar</div>
     </div>
 
     <!-- Ayarlar Tab -->
@@ -1906,13 +1998,93 @@ mark.hl {
           <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Tüm Verileri Sil</button>
         </div>
       </div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-header"><span class="card-title">🗂️ Bölüm Sıfırla</span></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Sadece seçtiğiniz bölümün verilerini kalıcı siler. Diğer bölümler etkilenmez.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-danger btn-sm" onclick="clearSection('olay')">⚡ Olaylar</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('gelisim')">📈 Gelişim</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('kontrol')">🏥 Kontroller</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('gida')">🍼 Gıda</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('gunluk')">📔 Günlük</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('asi')">💉 Aşı</button>
+            <button class="btn btn-danger btn-sm" onclick="clearSection('dis')" style="grid-column:1/-1">🦷 Diş Takibi</button>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- İçe Aktar Tab -->
+    <div class="drawer-section" id="drawer-iceaktar">
+      <!-- Adım 1: Bölüm seç -->
+      <div class="import-step" id="imp-step1">
+        <div class="import-step-title">1️⃣ Bölüm Seçin</div>
+        <div class="import-section-grid" id="impSectionGrid">
+          <div class="import-sec-btn" onclick="impSelectSection('olay')">⚡<span>Olaylar</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('gelisim')">📈<span>Gelişim</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('kontrol')">🏥<span>Kontroller</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('gida')">🍼<span>Gıda</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('gunluk')">📔<span>Günlük</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('asi')">💉<span>Aşı</span></div>
+        </div>
+      </div>
+      <!-- Adım 2: Dosya yükle -->
+      <div class="import-step" id="imp-step2" style="display:none">
+        <div class="import-step-title">2️⃣ Excel / CSV Dosyası Seçin</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Seçili bölüm: <strong id="impSectionLabel" style="color:var(--primary)"></strong></div>
+        <label class="import-file-zone" id="impFileZone">
+          <div style="font-size:32px">📂</div>
+          <div style="font-weight:700;font-size:14px">Dosya Seçin veya Sürükleyin</div>
+          <div style="font-size:12px;color:var(--text3)">.xlsx, .xls veya .csv</div>
+          <input type="file" accept=".xlsx,.xls,.csv" style="display:none" id="impFileInput" onchange="impLoadFile(this)" />
+        </label>
+        <button class="btn btn-secondary btn-sm" style="margin-top:10px;width:100%" onclick="impBack(1)">← Geri</button>
+      </div>
+      <!-- Adım 3: Sütun eşleştirme -->
+      <div class="import-step" id="imp-step3" style="display:none">
+        <div class="import-step-title">3️⃣ Sütun Eşleştirme</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Hangi Excel sütunu hangi alana karşılık gelsin?</div>
+        <div id="impMappingTable" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div style="margin-top:14px;padding:10px 12px;background:var(--bg);border-radius:10px;font-size:12px;color:var(--text3)">
+          <strong style="color:var(--text2)">Ham veri</strong> — ilk satır:<br>
+          <span id="impPreviewRow" style="font-family:monospace;font-size:11px;color:var(--text2);word-break:break-all"></span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="impBack(2)">← Geri</button>
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="impBuildPreview()">👁 Önizle →</button>
+        </div>
+      </div>
+      <!-- Adım 4: Önizleme tablosu -->
+      <div class="import-step" id="imp-step4" style="display:none">
+        <div class="import-step-title">4️⃣ Önizleme & Onay</div>
+        <div id="impPreviewInfo" style="font-size:12px;color:var(--text3);margin-bottom:10px"></div>
+        <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);max-height:260px;overflow-y:auto">
+          <table id="impPreviewTable" style="width:100%;border-collapse:collapse;font-size:11.5px"></table>
+        </div>
+        <div id="impSkipWarning" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(255,100,0,0.08);border-radius:8px;font-size:12px;color:#e65100"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="impBack(3)">← Geri</button>
+          <button class="btn btn-primary btn-sm" style="flex:2" onclick="impDoImport()">✅ Onayla ve Aktar</button>
+        </div>
+      </div>
+      <!-- Adım 5: Sonuç -->
+      <div class="import-step" id="imp-step5" style="display:none">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:48px">🎉</div>
+          <div id="impResultMsg" style="font-size:15px;font-weight:800;color:var(--text);margin-top:10px"></div>
+          <div id="impResultSub" style="font-size:13px;color:var(--text3);margin-top:6px"></div>
+          <button class="btn btn-primary" style="margin-top:18px;width:100%" onclick="impReset()">Yeni Aktarım</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.27</span>
+  <span>Pro 1.0.28</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2537,8 +2709,6 @@ function setTheme(theme) {
   data.settings.theme = theme;
   saveData();
   document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
-  const sideBtn = document.getElementById('themeBtnSide');
-  if (sideBtn) sideBtn.textContent = (theme === 'dark' ? '☀️' : '🌙') + ' Tema';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
   // Update meta theme-color (status bar arka plan rengi)
@@ -2624,14 +2794,15 @@ function closeSettingsDrawer() {
   document.getElementById('settingsDrawer').classList.remove('open');
 }
 function switchDrawerTab(tab) {
+  const tabs = ['ayarlar','yedek','iceaktar'];
   document.querySelectorAll('.drawer-tab').forEach((el, i) => {
-    const tabs = ['ayarlar','yedek'];
     el.classList.toggle('active', tabs[i] === tab);
   });
   document.querySelectorAll('.drawer-section').forEach(el => el.classList.remove('active'));
   const sec = document.getElementById('drawer-' + tab);
   if (sec) sec.classList.add('active');
   if (tab === 'ayarlar') loadSettings();
+  if (tab === 'iceaktar') impReset();
 }
 
 // ===== HEADER SEARCH EXPAND =====
@@ -2723,7 +2894,10 @@ function showModal(section, record) {
 
 function getFormHTML(section, r) {
   const v = r || {};
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+  const isNew = !r;
 
   if (section === 'olay') return `
     <div class="form-grid form-grid-2">
@@ -2733,7 +2907,7 @@ function getFormHTML(section, r) {
       </div>
       <div class="form-group">
         <label class="form-label">⏰ Saat</label>
-        <input class="form-input" type="time" id="f_saat" value="${v.saat||''}" />
+        <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
       <div class="form-group full">
         <label class="form-label">⚡ Olay *</label>
@@ -2829,7 +3003,7 @@ function getFormHTML(section, r) {
       </div>
       <div class="form-group">
         <label class="form-label">⏰ Saat</label>
-        <input class="form-input" type="time" id="f_saat" value="${v.saat||''}" />
+        <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
       <div class="form-group">
         <label class="form-label">🏷️ T\u00fcr</label>
@@ -3449,6 +3623,248 @@ function highlightText(text, query) {
   return result;
 }
 
+// ===== EXCEL İÇE AKTARMA =====
+const impFieldDefs = {
+  olay:    [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'saat',label:'⏰ Saat'}, {key:'olay',label:'⚡ Olay',req:true}, {key:'not',label:'📝 Not'} ],
+  gelisim: [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'notlar',label:'💬 Notlar'} ],
+  kontrol: [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'ilac',label:'💉 İlaç'}, {key:'not',label:'📝 Not'} ],
+  gida:    [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı',req:true}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
+  gunluk:  [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'baslik',label:'📝 Başlık',req:true}, {key:'not',label:'💬 Not'} ],
+  asi:     [ {key:'tarih',label:'📅 Tarih',req:true}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı',req:true}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ]
+};
+const impSectionNames = { olay:'Olaylar', gelisim:'Gelişim', kontrol:'Kontroller', gida:'Gıda', gunluk:'Günlük', asi:'Aşı' };
+
+let impSection = null;
+let impHeaders = [];
+let impRows = [];
+
+function impReset() {
+  impSection = null; impHeaders = []; impRows = [];
+  ['imp-step1','imp-step2','imp-step3','imp-step4','imp-step5'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = i === 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.import-sec-btn').forEach(b => b.classList.remove('active'));
+  const fi = document.getElementById('impFileInput');
+  if (fi) fi.value = '';
+}
+
+function impSelectSection(sec) {
+  impSection = sec;
+  document.querySelectorAll('.import-sec-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  setTimeout(() => {
+    document.getElementById('imp-step1').style.display = 'none';
+    document.getElementById('imp-step2').style.display = '';
+    const lbl = document.getElementById('impSectionLabel');
+    if (lbl) lbl.textContent = impSectionNames[sec] || sec;
+  }, 180);
+}
+
+function impBack(toStep) {
+  ['imp-step1','imp-step2','imp-step3','imp-step4','imp-step5'].forEach((id,i) => {
+    document.getElementById(id).style.display = i === toStep - 1 ? '' : 'none';
+  });
+  if (toStep === 1) { impSection = null; document.querySelectorAll('.import-sec-btn').forEach(b=>b.classList.remove('active')); }
+}
+
+function impLoadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const isCsv = file.name.toLowerCase().endsWith('.csv');
+
+  if (isCsv) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) { showToast('Dosya boş veya hatalı!', 'error'); return; }
+      impHeaders = lines[0].split(/[,;	]/).map(h => h.trim().replace(/^"|"$/g,''));
+      impRows = lines.slice(1).map(l => l.split(/[,;	]/).map(c => c.trim().replace(/^"|"$/g,'')));
+      impShowMapping();
+    };
+    reader.readAsText(file, 'UTF-8');
+  } else {
+    // xlsx — SheetJS CDN yükle (yoksa)
+    function parseXlsx(ab) {
+      const wb = XLSX.read(ab, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      if (!json || json.length < 2) { showToast('Excel dosyası boş!', 'error'); return; }
+      impHeaders = (json[0] || []).map(h => String(h).trim());
+      impRows = json.slice(1).map(row => impHeaders.map((_,i) => String(row[i]||'').trim()));
+      impShowMapping();
+    }
+    if (typeof XLSX !== 'undefined') {
+      const reader = new FileReader();
+      reader.onload = e => parseXlsx(new Uint8Array(e.target.result));
+      reader.readAsArrayBuffer(file);
+    } else {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      s.onload = () => {
+        const reader = new FileReader();
+        reader.onload = e => parseXlsx(new Uint8Array(e.target.result));
+        reader.readAsArrayBuffer(file);
+      };
+      s.onerror = () => showToast('Kütüphane yüklenemedi, internet bağlantısını kontrol edin.', 'error');
+      document.head.appendChild(s);
+    }
+  }
+}
+
+function impShowMapping() {
+  document.getElementById('imp-step2').style.display = 'none';
+  document.getElementById('imp-step3').style.display = '';
+
+  const fields = impFieldDefs[impSection] || [];
+  const colOptions = ['(Boş bırak)', ...impHeaders];
+
+  function autoMatch(fieldKey) {
+    const aliases = {
+      tarih:   ['tarih','date','güncellenme','güncelleme'],
+      saat:    ['saat','time','zaman'],
+      olay:    ['olay','event','başlık','konu','açıklama'],
+      not:     ['not','note','notlar','açıklama','yorum','detay'],
+      adi:     ['adı','adi','ad','isim','name','gıda','yemek'],
+      tur:     ['tür','tur','type','kategori'],
+      icerik:  ['içerik','icerik','içindekiler','malzeme'],
+      miktar:  ['miktar','amount','quantity','porsiyon'],
+      alerji:  ['alerji','allergy'],
+      boy:     ['boy','height','cm','boy(cm)'],
+      agirlik: ['ağırlık','agirlik','kilo','weight','kg'],
+      bas:     ['baş','bas','head','baş çevresi'],
+      notlar:  ['notlar','not','note','açıklama'],
+      hastane: ['hastane','hospital','klinik'],
+      doktor:  ['doktor','doctor','hekim'],
+      teshis:  ['teşhis','teshis','tanı','diagnosis'],
+      tedavi:  ['tedavi','treatment'],
+      ilac:    ['ilaç','ilac','medicine','drug'],
+      baslik:  ['başlık','baslik','title','konu','olay'],
+      donem:   ['dönem','donem','period'],
+      asi:     ['aşı','asi','vaccine'],
+      durum:   ['durum','status','sonuç'],
+      aciklama:['açıklama','aciklama','note','not']
+    };
+    const keys = aliases[fieldKey] || [fieldKey];
+    const idx = impHeaders.findIndex(h => keys.some(k => h.toLowerCase().includes(k)));
+    return idx >= 0 ? idx + 1 : 0;
+  }
+
+  const container = document.getElementById('impMappingTable');
+  container.innerHTML = fields.map(f => `
+    <div class="import-map-row">
+      <div class="field-label">${f.label}${f.req?' *':''}</div>
+      <div class="map-arrow">←</div>
+      <select id="imp_map_${f.key}">
+        ${colOptions.map((c,i) => `<option value="${i}" ${autoMatch(f.key)===i?'selected':''}>${i===0?'— boş bırak —':c}</option>`).join('')}
+      </select>
+    </div>`).join('');
+
+  const prev = document.getElementById('impPreviewRow');
+  if (impRows.length > 0) {
+    prev.textContent = impHeaders.map((h,i) => `${h}: "${impRows[0][i]||''}"`).join('  |  ');
+  } else {
+    prev.textContent = 'Veri bulunamadı';
+  }
+}
+
+function impGetMapping() {
+  const fields = impFieldDefs[impSection] || [];
+  const mapping = {};
+  fields.forEach(f => {
+    const sel = document.getElementById('imp_map_' + f.key);
+    mapping[f.key] = sel ? parseInt(sel.value) : 0;
+  });
+  return mapping;
+}
+
+function impBuildPreview() {
+  const fields = impFieldDefs[impSection] || [];
+  const mapping = impGetMapping();
+
+  // Önizleme için verileri parse et
+  let valid = [], skipped = 0;
+  impRows.forEach(row => {
+    if (!row || row.every(c => !c)) return;
+    const rec = {};
+    fields.forEach(f => {
+      const colIdx = mapping[f.key];
+      rec[f.key] = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+    });
+    const missing = fields.filter(f => f.req && !rec[f.key]);
+    if (missing.length) { skipped++; return; }
+    valid.push(rec);
+  });
+
+  // Önizleme tablosunu oluştur
+  const previewCount = Math.min(valid.length, 50);
+  const shownFields = fields.filter(f => mapping[f.key] > 0 || f.req);
+
+  const thead = `<thead><tr style="background:var(--bg);position:sticky;top:0">${
+    shownFields.map(f => `<th style="padding:7px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap">${f.label}</th>`).join('')
+  }</tr></thead>`;
+
+  const tbody = `<tbody>${
+    valid.slice(0, previewCount).map((rec, ri) => `<tr style="border-bottom:1px solid var(--border);${ri%2===1?'background:var(--bg)':''}">${
+      shownFields.map(f => `<td style="padding:6px 10px;font-size:11px;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(rec[f.key]||'').replace(/"/g,"'")}">${rec[f.key]||'<span style="color:var(--text3)">—</span>'}</td>`).join('')
+    }</tr>`).join('')
+  }</tbody>`;
+
+  document.getElementById('impPreviewTable').innerHTML = thead + tbody;
+
+  const info = document.getElementById('impPreviewInfo');
+  info.innerHTML = `<strong style="color:var(--text)">${valid.length}</strong> kayıt aktarılacak` +
+    (valid.length > previewCount ? ` (ilk ${previewCount} gösteriliyor)` : '') +
+    (skipped > 0 ? ` · <span style="color:#e65100">${skipped} satır atlanacak</span>` : '');
+
+  const warn = document.getElementById('impSkipWarning');
+  if (skipped > 0) {
+    warn.style.display = '';
+    warn.textContent = `⚠️ ${skipped} satır zorunlu alan (${fields.filter(f=>f.req).map(f=>f.label).join(', ')}) eksik olduğu için aktarılmayacak.`;
+  } else {
+    warn.style.display = 'none';
+  }
+
+  document.getElementById('imp-step3').style.display = 'none';
+  document.getElementById('imp-step4').style.display = '';
+}
+
+function impDoImport() {
+  const fields = impFieldDefs[impSection] || [];
+  const mapping = impGetMapping();
+
+  let added = 0, skipped = 0;
+  impRows.forEach(row => {
+    if (!row || row.every(c => !c)) return;
+    const rec = { id: genId() };
+    fields.forEach(f => {
+      const colIdx = mapping[f.key];
+      rec[f.key] = colIdx > 0 ? (row[colIdx - 1] || '') : '';
+    });
+    const missing = fields.filter(f => f.req && !rec[f.key]);
+    if (missing.length) { skipped++; return; }
+    data[impSection].push(rec);
+    added++;
+  });
+
+  if (added > 0) {
+    saveData();
+    updateCounts();
+    if (currentPage === impSection) {
+      if (impSection === 'dis') renderDisPage();
+      else renderTable(impSection);
+    }
+    if (currentPage === 'dashboard') renderDashboard();
+  }
+
+  document.getElementById('imp-step4').style.display = 'none';
+  document.getElementById('imp-step5').style.display = '';
+  document.getElementById('impResultMsg').textContent = added > 0 ? `${added} kayıt başarıyla aktarıldı! 🎉` : 'Aktarılacak geçerli kayıt bulunamadı.';
+  document.getElementById('impResultSub').textContent = skipped > 0
+    ? `${skipped} satır zorunlu alan eksik olduğu için atlandı.`
+    : added > 0 ? 'Tüm satırlar başarıyla içe aktarıldı.' : 'Eşleştirmeyi kontrol edip tekrar deneyin.';
+}
+
 // ===== BACKUP & RESTORE =====
 function exportData() {
   const blob = new Blob([JSON.stringify({ profiles, activeId }, null, 2)], { type: 'application/json' });
@@ -3499,6 +3915,23 @@ function clearAllData() {
   updateCounts();
   renderDashboard();
   showToast('Tüm veriler silindi!', 'info');
+}
+
+function clearSection(section) {
+  const names = { olay:'Olaylar', gelisim:'Gelişim Kayıtları', kontrol:'Doktor Kontrolleri', gida:'Gıda Takibi', gunluk:'Günlük', asi:'Aşı Takvimi', dis:'Diş Takibi' };
+  const name = names[section] || section;
+  const count = (data[section] || []).length;
+  if (count === 0) { showToast(`${name} bölümü zaten boş.`, 'info'); return; }
+  if (!confirm(`"${name}" bölümündeki ${count} kayıt kalıcı olarak silinecek.\n\nBu işlem GERİ ALINAMAZ!\n\nDevam etmek istiyor musunuz?`)) return;
+  data[section] = [];
+  saveData();
+  updateCounts();
+  if (currentPage === section) {
+    if (section === 'dis') renderDisPage();
+    else renderTable(section);
+  }
+  if (currentPage === 'dashboard') renderDashboard();
+  showToast(`${name} bölümü sıfırlandı! 🗑️`, 'info');
 }
 
 // ===== SETTINGS =====
