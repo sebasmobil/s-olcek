@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.56
+  Bebek Takip Pro v1.0.65
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.56">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.65">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.64</title>
+<title>Bebek Takip Pro v1.0.65</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2383,6 +2383,52 @@ mark.hl {
             <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">💉</div><div class="es-sub">Bilgi yok</div></div>
           </div>
         </div>
+
+        <!-- OLAY KARTI -->
+        <div class="card" id="olayKartCard">
+          <div class="card-header" style="cursor:pointer" onclick="showPage('olay')">
+            <span class="card-title">⚡ Olaylar</span>
+            <span id="olayKartBadge" style="font-size:11px;font-weight:700;color:var(--primary)"></span>
+          </div>
+          <div class="card-body" id="olayKartInfo" style="padding:0"></div>
+        </div>
+
+        <!-- GELİŞİM ÖZET KARTI -->
+        <div class="card" id="gelisimOzetCard">
+          <div class="card-header" style="cursor:pointer" onclick="showPage('gelisim')">
+            <span class="card-title">📈 Son Gelişim</span>
+            <span id="gelisimOzetBadge" style="font-size:11px;font-weight:700;color:var(--accent2)"></span>
+          </div>
+          <div class="card-body" id="gelisimOzetInfo" style="padding:0"></div>
+        </div>
+
+        <!-- GIDA KARTI -->
+        <div class="card" id="gidaKartCard">
+          <div class="card-header" style="cursor:pointer" onclick="showPage('gida')">
+            <span class="card-title">🍼 Gıda Takibi</span>
+            <span id="gidaKartBadge" style="font-size:11px;font-weight:700;color:var(--accent4)"></span>
+          </div>
+          <div class="card-body" id="gidaKartInfo" style="padding:0"></div>
+        </div>
+
+        <!-- GÜNLÜK KARTI -->
+        <div class="card" id="gunlukKartCard">
+          <div class="card-header" style="cursor:pointer" onclick="showPage('gunluk')">
+            <span class="card-title">📔 Günlük</span>
+            <span id="gunlukKartBadge" style="font-size:11px;font-weight:700;color:var(--accent3)"></span>
+          </div>
+          <div class="card-body" id="gunlukKartInfo" style="padding:0"></div>
+        </div>
+
+        <!-- DİŞ KARTI -->
+        <div class="card" id="disKartCard">
+          <div class="card-header" style="cursor:pointer" onclick="showPage('dis')">
+            <span class="card-title">🦷 Diş Takibi</span>
+            <span id="disKartBadge" style="font-size:11px;font-weight:700;color:#26A69A"></span>
+          </div>
+          <div class="card-body" id="disKartInfo" style="padding:0"></div>
+        </div>
+
       </div>
     </div>
 
@@ -2590,7 +2636,12 @@ function saveProfiles() {
 const DASH_CARDS_DEFAULT = [
   { id: 'hizliEkle',      label: '⚡ Hızlı Ekle',       visible: true },
   { id: 'gelisimGrafik',  label: '📊 Gelişim Grafiği',   visible: true },
+  { id: 'gelisimOzet',    label: '📈 Son Gelişim',        visible: true },
   { id: 'sonAktivite',    label: '🕐 Son Aktiviteler',    visible: true },
+  { id: 'olayKart',       label: '⚡ Olaylar',            visible: true },
+  { id: 'gidaKart',       label: '🍼 Gıda Takibi',        visible: true },
+  { id: 'gunlukKart',     label: '📔 Günlük',             visible: true },
+  { id: 'disKart',        label: '🦷 Diş Takibi',         visible: true },
   { id: 'sonKontrol',     label: '📋 Son Kontrol',        visible: true },
   { id: 'yaklasanAsi',    label: '💉 Yaklaşan Aşı',      visible: true },
 ];
@@ -2704,7 +2755,12 @@ function renderDashboard() {
     const cardMap = {
       hizliEkle:     document.getElementById('hizliEkleCard'),
       gelisimGrafik: document.getElementById('gelisimGrafikCard'),
+      gelisimOzet:   document.getElementById('gelisimOzetCard'),
       sonAktivite:   document.getElementById('sonAktiviteCard'),
+      olayKart:      document.getElementById('olayKartCard'),
+      gidaKart:      document.getElementById('gidaKartCard'),
+      gunlukKart:    document.getElementById('gunlukKartCard'),
+      disKart:       document.getElementById('disKartCard'),
       sonKontrol:    document.getElementById('sonKontrolCard'),
       yaklasanAsi:   document.getElementById('yaklasanAsiCard'),
     };
@@ -2719,6 +2775,11 @@ function renderDashboard() {
   renderRecentActivities();
   updateLastControl();
   updateNextVaccine();
+  renderOlayKart();
+  renderGelisimOzet();
+  renderGidaKart();
+  renderGunlukKart();
+  renderDisKart();
   setTimeout(renderGrowthChart, 100);
 }
 
@@ -4391,6 +4452,173 @@ function gcSelectPoint(i) {
     const hl = document.querySelector('#gcList .gc-highlight');
     if (hl) hl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 50);
+}
+
+
+// ===== BÖLÜM ÖZET KARTLARI =====
+
+function renderOlayKart() {
+  const container = document.getElementById('olayKartInfo');
+  const badge = document.getElementById('olayKartBadge');
+  if (!container) return;
+  const sorted = [...(data.olay || [])].sort((a,b) => {
+    const da = (a.tarih||'') + (a.saat||'');
+    const db = (b.tarih||'') + (b.saat||'');
+    return db.localeCompare(da);
+  });
+  if (badge) badge.textContent = sorted.length > 0 ? sorted.length + ' kayit' : '';
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">⚡</div>Henüz olay kaydi yok</div>`;
+    return;
+  }
+  const recent = sorted.slice(0, 3);
+  container.innerHTML = recent.map((r, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:${i < recent.length-1 ? '1px solid var(--border)' : 'none'};cursor:pointer" onclick="showPage('olay')">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;color:var(--text);font-family:var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(r.olay||'Kayit')}</div>
+        ${r.not ? `<div style="font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(truncate(r.not,40))}</div>` : ''}
+      </div>
+      <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${formatDate(r.tarih)}${r.saat?' '+r.saat:''}</div>
+    </div>
+  `).join('');
+}
+
+function renderGelisimOzet() {
+  const container = document.getElementById('gelisimOzetInfo');
+  const badge = document.getElementById('gelisimOzetBadge');
+  if (!container) return;
+  const sorted = [...(data.gelisim || [])].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+  if (badge) badge.textContent = sorted.length > 0 ? sorted.length + ' ölçüm' : '';
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">📈</div>Henüz gelisim verisi yok</div>`;
+    return;
+  }
+  const r = sorted[0];
+  const prev = sorted[1];
+  function delta(cur, prv, field, unit) {
+    const c = parseFloat(cur[field]), p = prv ? parseFloat(prv[field]) : NaN;
+    if (isNaN(c) || isNaN(p)) return '';
+    const diff = Math.abs(c - p).toFixed(field === 'agirlik' ? 3 : 1);
+    const sign = c > p ? '↑' : c < p ? '↓' : '';
+    const color = c > p ? '#4CAF50' : c < p ? '#EF5350' : 'var(--text3)';
+    return `<span style="color:${color};font-size:11px;font-weight:700;margin-left:4px">${sign}${diff}${unit}</span>`;
+  }
+  const metrics = [
+    { icon:'⚖️', label:'Ağırlık', field:'agirlik', unit:'kg' },
+    { icon:'📏', label:'Boy',     field:'boy',     unit:'cm' },
+    { icon:'📐', label:'Baş',     field:'bas',     unit:'cm' },
+  ];
+  container.innerHTML = `
+    <div style="padding:6px 14px 4px;font-size:11px;color:var(--text3);font-family:var(--font);font-weight:700">${formatDate(r.tarih)}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding-bottom:12px">
+      ${metrics.map(m => {
+        const val = parseFloat(r[m.field]);
+        return `<div style="text-align:center;padding:10px 4px;cursor:pointer" onclick="showPage('gelisim')">
+          <div style="font-size:18px">${m.icon}</div>
+          <div style="font-weight:800;font-size:15px;color:var(--accent2);font-family:var(--font-display)">${!isNaN(val)?val+m.unit:'—'}</div>
+          <div style="font-size:10px;color:var(--text3);font-weight:700">${m.label}${delta(r,prev,m.field,m.unit)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${r.notlar ? `<div style="padding:8px 14px 12px;font-size:12px;color:var(--text2);border-top:1px solid var(--border)">${escHtml(truncate(r.notlar,60))}</div>` : ''}
+  `;
+}
+
+function renderGidaKart() {
+  const container = document.getElementById('gidaKartInfo');
+  const badge = document.getElementById('gidaKartBadge');
+  if (!container) return;
+  const today = new Date().toISOString().split('T')[0];
+  const sorted = [...(data.gida || [])].sort((a,b) => {
+    const da = (a.tarih||'') + (a.saat||'');
+    const db = (b.tarih||'') + (b.saat||'');
+    return db.localeCompare(da);
+  });
+  const todayItems = sorted.filter(r => r.tarih === today);
+  if (badge) badge.textContent = todayItems.length > 0 ? 'Bugün ' + todayItems.length + ' öğün' : sorted.length > 0 ? sorted.length + ' kayit' : '';
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">🍼</div>Henüz gida kaydi yok</div>`;
+    return;
+  }
+  const display = todayItems.length > 0 ? todayItems.slice(0,4) : sorted.slice(0,3);
+  const lbl = todayItems.length > 0 ? 'Bugün' : 'Son kayitlar';
+  const emojiMap = {'Sebze':'🥦','Meyve':'🍎','Et':'🍖','Tahil':'🌾','Süt Ürünleri':'🥛','Anne Sütü':'🤱','Mama':'🍼','Çorba':'🍲','Diğer':'🥄'};
+  container.innerHTML = `
+    <div style="padding:6px 14px 2px;font-size:11px;color:var(--text3);font-family:var(--font);font-weight:700">${lbl}</div>
+    ${display.map((r, i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:${i<display.length-1?'1px solid var(--border)':'none'};cursor:pointer" onclick="showPage('gida')">
+        <div style="width:32px;height:32px;border-radius:10px;background:rgba(255,167,38,0.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emojiMap[r.tur]||'🍽️'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px;color:var(--text);font-family:var(--font)">${escHtml(r.adi||r.tur||'Kayit')}</div>
+          <div style="font-size:11px;color:var(--text3)">${r.miktar?escHtml(r.miktar)+' · ':''}<span style="color:var(--accent4)">${r.tur||''}</span></div>
+        </div>
+        ${r.alerji ? `<span title="Alerji: ${escHtml(r.alerji)}" style="font-size:14px">⚠️</span>` : ''}
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${r.saat||formatDate(r.tarih)}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderGunlukKart() {
+  const container = document.getElementById('gunlukKartInfo');
+  const badge = document.getElementById('gunlukKartBadge');
+  if (!container) return;
+  const sorted = [...(data.gunluk || [])].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+  if (badge) badge.textContent = sorted.length > 0 ? sorted.length + ' anı' : '';
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">📔</div>Henüz günlük kaydi yok</div>`;
+    return;
+  }
+  const r = sorted[0];
+  container.innerHTML = `
+    <div style="padding:12px 14px;cursor:pointer" onclick="showPage('gunluk')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:18px">📔</span>
+        <div style="font-weight:800;font-size:14px;color:var(--text);font-family:var(--font);flex:1">${escHtml(r.baslik||'Anı')}</div>
+        <span style="font-size:11px;color:var(--text3)">${formatDate(r.tarih)}</span>
+      </div>
+      ${r.not ? `<div style="font-size:13px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${escHtml(r.not)}</div>` : ''}
+      ${sorted.length > 1 ? `<div style="margin-top:8px;font-size:11px;color:var(--text3);font-weight:700">+ ${sorted.length-1} anı daha →</div>` : ''}
+    </div>
+  `;
+}
+
+function renderDisKart() {
+  const container = document.getElementById('disKartInfo');
+  const badge = document.getElementById('disKartBadge');
+  if (!container) return;
+  const disList = data.dis || [];
+  const erupted = disList.filter(r => r.cikma || r.tarih).length;
+  const total = 20;
+  if (badge) badge.textContent = erupted > 0 ? erupted + '/' + total + ' diş çikti' : disList.length > 0 ? disList.length + ' kayit' : '';
+  if (disList.length === 0) {
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">🦷</div>Henüz dis kaydi yok</div>`;
+    return;
+  }
+  const sorted = [...disList].sort((a,b) => (b.cikma||b.tarih||'').localeCompare(a.cikma||a.tarih||''));
+  const latest = sorted[0];
+  const pct = Math.min(100, Math.round((erupted/total)*100));
+  container.innerHTML = `
+    <div style="padding:12px 14px;cursor:pointer" onclick="showPage('dis')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--text);font-family:var(--font)">🦷 ${erupted} / ${total} diş</span>
+        <span style="font-size:12px;font-weight:800;color:#26A69A">%${pct}</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#26A69A,#00695C);border-radius:4px;transition:width 0.5s ease"></div>
+      </div>
+      ${latest ? `
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">🦷</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text)">${escHtml((latest.dis||latest.toothId||'Diş')+' '+(latest.konum||''))}</div>
+            <div style="font-size:11px;color:var(--text3)">Çikma: ${formatDate(latest.cikma||latest.tarih)}</div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 // ===== GLOBAL SEARCH =====
