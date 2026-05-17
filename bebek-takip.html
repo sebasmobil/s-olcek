@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.62</title>
+<title>Bebek Takip Pro v1.0.64</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -98,20 +98,6 @@ input, select, textarea {
   --accent3: #AB47BC;
   --accent4: #FFA726;
 
-/* ===== RENK PALETLERİ (avatar rengi → uygulama teması) ===== */
-/* green */
-:root[data-color="green"] { --primary:#4CAF50; --primary-dark:#388E3C; --primary-light:#A5D6A7; }
-/* blue */
-:root[data-color="blue"]  { --primary:#42A5F5; --primary-dark:#1565C0; --primary-light:#90CAF9; }
-/* pink */
-:root[data-color="pink"]  { --primary:#EC407A; --primary-dark:#880E4F; --primary-light:#F48FB1; }
-/* orange */
-:root[data-color="orange"]{ --primary:#FFA726; --primary-dark:#E65100; --primary-light:#FFCC80; }
-/* purple */
-:root[data-color="purple"]{ --primary:#AB47BC; --primary-dark:#6A1B9A; --primary-light:#CE93D8; }
-/* teal */
-:root[data-color="teal"]  { --primary:#26A69A; --primary-dark:#00695C; --primary-light:#80CBC4; }
-
   --bg: #F0F4F8;
   --card: #FFFFFF;
   --card2: #F8FAFC;
@@ -134,6 +120,21 @@ input, select, textarea {
   --font-display: 'Fredoka One', Arial, sans-serif;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ===== RENK PALETLERİ (avatar rengi → uygulama teması) ===== */
+/* green */
+:root[data-color="green"] { --primary:#4CAF50; --primary-dark:#388E3C; --primary-light:#A5D6A7; }
+/* blue */
+:root[data-color="blue"]  { --primary:#42A5F5; --primary-dark:#1565C0; --primary-light:#90CAF9; }
+/* pink */
+:root[data-color="pink"]  { --primary:#EC407A; --primary-dark:#880E4F; --primary-light:#F48FB1; }
+/* orange */
+:root[data-color="orange"]{ --primary:#FFA726; --primary-dark:#E65100; --primary-light:#FFCC80; }
+/* purple */
+:root[data-color="purple"]{ --primary:#AB47BC; --primary-dark:#6A1B9A; --primary-light:#CE93D8; }
+/* teal */
+:root[data-color="teal"]  { --primary:#26A69A; --primary-dark:#00695C; --primary-light:#80CBC4; }
+
 
 [data-theme="dark"] {
   --bg: #0b1120;
@@ -1121,10 +1122,8 @@ input[type="date"], input[type="time"] {
 .date-ph-wrap input[type="time"] {
   min-height: 46px;
   height: 46px;
-}
   padding-top: 18px;
   padding-bottom: 18px;
-  min-height: 56px;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--primary);
@@ -2268,7 +2267,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.62</span>
+  <span>Pro 1.0.64</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2376,8 +2375,11 @@ mark.hl {
           </div>
         </div>
         <div class="card" id="yaklasanAsiCard">
-          <div class="card-header"><span class="card-title">💉 Yaklaşan Aşı</span></div>
-          <div class="card-body" id="nextVaccineInfo">
+          <div class="card-header">
+            <span class="card-title">💉 Aşı Takvimi</span>
+            <span style="font-size:11px;color:var(--text3);font-weight:600">2025 Sağlık Bakanlığı</span>
+          </div>
+          <div class="card-body" style="padding:0" id="nextVaccineInfo">
             <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">💉</div><div class="es-sub">Bilgi yok</div></div>
           </div>
         </div>
@@ -2758,22 +2760,23 @@ function addBaby(name, birthDate, avatarColor, avatarEmoji) {
 /* ── Bebek sil ── */
 function deleteBaby(id) {
   if (Object.keys(profiles).length <= 1) { showToast('En az 1 profil olmalı!', 'error'); return; }
-  if (!confirm('Bu bebek profilini ve tüm verilerini kalıcı olarak silmek istiyor musunuz?')) return;
-  delete profiles[id];
-  saveProfiles();
-  if (activeId === id) {
-    activeId = Object.keys(profiles)[0];
-    localStorage.setItem(ACTIVE_KEY, activeId);
-    data = profiles[activeId];
-    loadTheme();
-    updateCounts();
-    renderDashboard();
-  }
-  renderSidebarBabyList();
-  renderDropdownBabyList();
-  renderBabiesGrid();
-  updateHeaderBaby();
-  showToast('Profil silindi!', 'info');
+  showConfirm('Bu bebek profilini ve tüm verilerini kalıcı olarak silmek istiyor musunuz?', () => {
+    delete profiles[id];
+    saveProfiles();
+    if (activeId === id) {
+      activeId = Object.keys(profiles)[0];
+      localStorage.setItem(ACTIVE_KEY, activeId);
+      data = profiles[activeId];
+      loadTheme();
+      updateCounts();
+      renderDashboard();
+    }
+    renderSidebarBabyList();
+    renderDropdownBabyList();
+    renderBabiesGrid();
+    updateHeaderBaby();
+    showToast('Profil silindi!', 'info');
+  });
 }
 
 /* ── Bebek düzenle ── */
@@ -2903,7 +2906,7 @@ function openAddBabyModal(editId) {
   document.getElementById('modalBody').innerHTML = `
     <div class="form-grid">
       <div class="form-group">
-        <label class="form-label">👶 Bebek Adı *</label>
+        <label class="form-label">👶 Bebek Adı</label>
         <input class="form-input" type="text" id="bf_name" value="${escHtml(p?.settings?.babyName || '')}" placeholder="Bebeğin adını girin" />
       </div>
       <div class="form-group">
@@ -3219,6 +3222,24 @@ function scrollNavToActive() {
 }
 
 // ===== TOAST =====
+/* ── Özel onay modalı (iOS confirm() çalışmaz) ── */
+function showConfirm(msg, onOk) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML = `
+    <div style="background:var(--card);border-radius:var(--radius);width:100%;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;font-family:var(--font)">
+      <div style="padding:20px 20px 8px;font-size:15px;font-weight:700;color:var(--text);line-height:1.5">${msg}</div>
+      <div style="display:flex;gap:10px;padding:14px 20px 20px">
+        <button id="confirmCancel" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer">İptal</button>
+        <button id="confirmOk" style="flex:1;padding:11px;border-radius:10px;border:none;background:#E53E3E;color:#fff;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer">🗑️ Sil</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmCancel').onclick = () => overlay.remove();
+  overlay.querySelector('#confirmOk').onclick = () => { overlay.remove(); onOk(); };
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+}
+
 function showToast(msg, type = 'success') {
   const container = document.getElementById('toastContainer');
   const icons = { success: '✅', error: '❌', info: 'ℹ️' };
@@ -3346,7 +3367,7 @@ function getFormHTML(section, r) {
   if (section === 'olay') return `
     <div class="form-grid form-grid-2">
       <div class="form-group">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
@@ -3354,7 +3375,7 @@ function getFormHTML(section, r) {
         <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
       <div class="form-group full">
-        <label class="form-label">⚡ Olay *</label>
+        <label class="form-label">⚡ Olay</label>
         <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="\u00d6rn: Titreme, Ate\u015f, \u00d6ks\u00fcr\u00fck..."/>
       </div>
       <div class="form-group full">
@@ -3366,7 +3387,7 @@ function getFormHTML(section, r) {
   if (section === 'gelisim') return `
     <div class="form-grid form-grid-2">
       <div class="form-group full">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
@@ -3394,7 +3415,7 @@ function getFormHTML(section, r) {
   if (section === 'kontrol') return `
     <div class="form-grid form-grid-2">
       <div class="form-group full">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
@@ -3442,7 +3463,7 @@ function getFormHTML(section, r) {
   if (section === 'gida') return `
     <div class="form-grid form-grid-2">
       <div class="form-group">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
@@ -3456,7 +3477,7 @@ function getFormHTML(section, r) {
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">🍽️ Ad\u0131 *</label>
+        <label class="form-label">🍽️ Ad\u0131</label>
         <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="G\u0131da ad\u0131..."/>
       </div>
       <div class="form-group full">
@@ -3480,11 +3501,11 @@ function getFormHTML(section, r) {
   if (section === 'gunluk') return `
     <div class="form-grid">
       <div class="form-group">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
-        <label class="form-label">📝 Ba\u015fl\u0131k *</label>
+        <label class="form-label">📝 Ba\u015fl\u0131k</label>
         <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="\u0130lk ad\u0131m, ilk kelime..."/>
       </div>
       <div class="form-group">
@@ -3496,7 +3517,7 @@ function getFormHTML(section, r) {
   if (section === 'dis') return `
     <div class="form-grid form-grid-2">
       <div class="form-group">
-        <label class="form-label">🦷 Di\u015f Ad\u0131 *</label>
+        <label class="form-label">🦷 Di\u015f Ad\u0131</label>
         <select class="form-select" id="f_dis">
           ${['Merkez Kesici','Yan Kesici','K\u00f6pek Di\u015fi','1. Az\u0131 Di\u015fi','2. Az\u0131 Di\u015fi'].map(d=>`<option value="${d}" ${v.dis===d?'selected':''}>${d}</option>`).join('')}
         </select>
@@ -3524,7 +3545,7 @@ function getFormHTML(section, r) {
   if (section === 'asi') return `
     <div class="form-grid form-grid-2">
       <div class="form-group">
-        <label class="form-label">📅 Tarih *</label>
+        <label class="form-label">📅 Tarih</label>
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
@@ -3534,7 +3555,7 @@ function getFormHTML(section, r) {
         </select>
       </div>
       <div class="form-group full">
-        <label class="form-label">💉 Aşı Adı *</label>
+        <label class="form-label">💉 Aşı Adı</label>
         <div style="position:relative">
           <input class="form-input" type="text" id="f_asi" value="${v.asi||''}"
             placeholder="Aşı adı yazın veya listeden seçin..."
@@ -3640,16 +3661,17 @@ function editRecord(section, id) {
 }
 
 function deleteRecord(section, id) {
-  if (!confirm('Bu kayd\u0131 silmek istedi\u011finizden emin misiniz?')) return;
-  data[section] = data[section].filter(r => r.id !== id);
-  saveData();
-  updateCounts();
-  showToast('Kay\u0131t silindi!', 'info');
-  if (currentPage === section) {
-    if (section === 'dis') renderDisPage();
-    else renderTable(section);
-  }
-  if (currentPage === 'dashboard') renderDashboard();
+  showConfirm('Bu kaydı silmek istediğinizden emin misiniz?', () => {
+    data[section] = data[section].filter(r => r.id !== id);
+    saveData();
+    updateCounts();
+    showToast('Kayıt silindi!', 'info');
+    if (currentPage === section) {
+      if (section === 'dis') renderDisPage();
+      else renderTable(section);
+    }
+    if (currentPage === 'dashboard') renderDashboard();
+  });
 }
 
 // ===== TABLE RENDERING =====
@@ -3972,10 +3994,11 @@ function saveToothRecord() {
 function deleteToothRecord() {
   if (!selectedToothId) return;
   const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
-  if (!confirm(`"${tooth.label}" kaydını silmek istiyor musunuz?`)) return;
-  data.dis = data.dis.filter(d => d.toothId !== selectedToothId);
-  saveData(); updateCounts(); closeToothPanel(); renderDisPage();
-  showToast('Kayıt silindi.');
+  showConfirm(`"${tooth.label}" kaydını silmek istiyor musunuz?`, () => {
+    data.dis = data.dis.filter(d => d.toothId !== selectedToothId);
+    saveData(); updateCounts(); closeToothPanel(); renderDisPage();
+    showToast('Kayıt silindi.');
+  });
 }
 
 function renderDisGrid() {}
@@ -4092,19 +4115,130 @@ function updateLastControl() {
   `;
 }
 
-function updateNextVaccine() {
+function updateNextVaccine() { renderNextVaccine(); }
+
+/* ===== AKILLI AŞI TAKVİMİ (T.C. Sağlık Bakanlığı 2025) ===== */
+const VACCINE_SCHEDULE = [
+  { key:'hepb1',     label:'Hepatit B 1. doz',         kisaltma:'Hep-B',     gün:0    },
+  { key:'bcg',       label:'BCG – Verem Aşısı',         kisaltma:'BCG',       gün:60   },
+  { key:'kpa1',      label:'KPA – Pnömokok 1. doz',     kisaltma:'KPA',       gün:60   },
+  { key:'dabt1',     label:'6\'lı Karma Aşı 1. doz',    kisaltma:'DaBT 1',    gün:60   },
+  { key:'kpa2',      label:'KPA – Pnömokok 2. doz',     kisaltma:'KPA 2',     gün:120  },
+  { key:'dabt2',     label:'6\'lı Karma Aşı 2. doz',    kisaltma:'DaBT 2',    gün:120  },
+  { key:'opa1',      label:'OPA – Oral Polio 1. doz',   kisaltma:'OPA 1',     gün:180  },
+  { key:'dabt3',     label:'6\'lı Karma Aşı 3. doz',    kisaltma:'DaBT 3',    gün:180  },
+  { key:'kkk1',      label:'KKK 1. doz',                kisaltma:'KKK 1',     gün:270  },
+  { key:'sucicegi1', label:'Suçiçeği 1. doz',           kisaltma:'Suçiçeği',  gün:270  },
+  { key:'kpar',      label:'KPA – Pnömokok Rapel',      kisaltma:'KPA R',     gün:365  },
+  { key:'hepa1',     label:'Hepatit A 1. doz',          kisaltma:'Hep-A 1',   gün:548  },
+  { key:'dabtr',     label:'6\'lı Karma Aşı Rapel',     kisaltma:'DaBT R',    gün:548  },
+  { key:'opar',      label:'OPA Rapel',                  kisaltma:'OPA R',     gün:548  },
+  { key:'hepa2',     label:'Hepatit A 2. doz',          kisaltma:'Hep-A 2',   gün:730  },
+  { key:'kkk2',      label:'KKK 2. doz',                kisaltma:'KKK 2',     gün:730  },
+  { key:'dabt4pa',   label:'Dörtlü Karma Aşı Rapel',    kisaltma:'DaBT-İPA',  gün:1460 },
+  { key:'opa2r',     label:'OPA 2. Rapel',               kisaltma:'OPA 2R',    gün:1460 },
+];
+
+function renderNextVaccine() {
   const container = document.getElementById('nextVaccineInfo');
-  const pending = data.asi.filter(a => a.durum !== 'Uyguland\u0131').sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
-  if (pending.length === 0) {
-    container.innerHTML = `<div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">✅</div><div class="es-sub">Bekleyen a\u015f\u0131 yok</div></div>`;
+  if (!container) return;
+
+  const birthDate = data.settings?.birthDate;
+
+  // Doğum tarihi girilmemişse basit mesaj
+  if (!birthDate) {
+    const pending = data.asi.filter(a => a.durum !== 'Uygulandı').sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
+    if (!pending.length) {
+      container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)">
+        <div style="font-size:28px;margin-bottom:8px">👶</div>
+        Profil ayarlarından doğum tarihi girin — takvim otomatik hesaplansın!
+      </div>`;
+      return;
+    }
+    const r = pending[0];
+    container.innerHTML = `<div style="padding:12px 14px">
+      <div class="info-row"><span class="ir-label">💉 Aşı</span><span class="ir-value"><strong>${escHtml(r.asi||'-')}</strong></span></div>
+      <div class="info-row"><span class="ir-label">📅 Tarih</span><span class="ir-value">${formatDate(r.tarih)}</span></div>
+      <div class="info-row"><span class="ir-label">🗓️ Dönem</span><span class="ir-value">${r.donem||'-'}</span></div>
+    </div>`;
     return;
   }
-  const r = pending[0];
-  container.innerHTML = `
-    <div class="info-row"><span class="ir-label">💉 A\u015f\u0131</span><span class="ir-value"><strong>${escHtml(r.asi||'-')}</strong></span></div>
-    <div class="info-row"><span class="ir-label">📅 Tarih</span><span class="ir-value">${formatDate(r.tarih)}</span></div>
-    <div class="info-row"><span class="ir-label">🗓️ D\u00f6nem</span><span class="ir-value">${r.donem||'-'}</span></div>
-  `;
+
+  const birth = new Date(birthDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Elle girilen "Uygulandı" kayıtlarıyla eşleştir
+  function isDone(vac) {
+    return data.asi.some(a => {
+      if (a.durum !== 'Uygulandı') return false;
+      const name = (a.asi||'').toLocaleLowerCase('tr-TR');
+      const k = vac.kisaltma.toLocaleLowerCase('tr-TR');
+      return name.includes(k) || k.includes(name.split(' ')[0]);
+    });
+  }
+
+  const items = VACCINE_SCHEDULE.map(vac => {
+    const target = new Date(birth);
+    target.setDate(target.getDate() + vac.gün);
+    const diffGün = Math.round((target - today) / 86400000);
+    return { ...vac, target, diffGün, done: isDone(vac) };
+  });
+
+  const gecmis   = items.filter(i => !i.done && i.diffGün < 0).slice(-2);
+  const yaklasan = items.filter(i => !i.done && i.diffGün >= 0).slice(0, 4);
+  const yapildi  = items.filter(i => i.done);
+
+  function diffTag(d) {
+    if (d === 0)  return `<span style="background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px">Bugün!</span>`;
+    if (d < 0)    return `<span style="background:#FEB2B2;color:#822727;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px">${Math.abs(d)}g gecikti</span>`;
+    if (d <= 7)   return `<span style="background:#FEEBC8;color:#7B341E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">${d} gün</span>`;
+    if (d <= 30)  return `<span style="background:#C6F6D5;color:#22543D;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">${d} gün</span>`;
+    return `<span style="background:var(--bg);color:var(--text3);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">${d} gün</span>`;
+  }
+
+  function fmtDate(d) {
+    return d.toLocaleDateString('tr-TR', {day:'numeric',month:'short',year:'numeric'});
+  }
+
+  function row(v, highlight) {
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);${highlight?'background:rgba(76,175,80,0.05)':''}">
+      <div>
+        <div style="font-weight:800;font-size:13px;color:var(--text);font-family:var(--font)">${v.kisaltma}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:1px">${v.label}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">📅 ${fmtDate(v.target)}</div>
+      </div>
+      <div>${diffTag(v.diffGün)}</div>
+    </div>`;
+  }
+
+  const pct = Math.round((yapildi.length / items.length) * 100);
+  let html = `<div style="padding:10px 14px 8px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px">
+      <span>✅ Tamamlanan: ${yapildi.length} / ${items.length}</span>
+      <span style="color:var(--primary)">${pct}%</span>
+    </div>
+    <div style="height:7px;background:var(--border);border-radius:4px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:4px;transition:width 0.6s"></div>
+    </div>
+  </div>`;
+
+  if (gecmis.length) {
+    html += `<div style="padding:6px 14px 2px;font-size:10px;font-weight:900;color:#E53E3E;letter-spacing:0.8px;font-family:var(--font)">⚠️ GECİKEN</div>`;
+    gecmis.forEach(v => { html += row(v, false); });
+  }
+
+  if (yaklasan.length) {
+    html += `<div style="padding:6px 14px 2px;font-size:10px;font-weight:900;color:var(--primary);letter-spacing:0.8px;font-family:var(--font)">💉 YAKLAŞAN</div>`;
+    yaklasan.forEach((v,i) => { html += row(v, i===0 && !gecmis.length); });
+  }
+
+  if (!gecmis.length && !yaklasan.length) {
+    html += `<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)">
+      <div style="font-size:30px;margin-bottom:8px">🎉</div>Tüm takvim aşıları tamamlandı!
+    </div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 // ===== GROWTH CHART =====
@@ -4612,37 +4746,40 @@ function importData(input) {
   reader.onload = e => {
     try {
       const imported = JSON.parse(e.target.result);
-      if (!confirm('Mevcut veriler silinecek ve yedek yüklenecek. Onaylıyor musunuz?')) return;
-      if (imported.profiles) {
-        profiles = imported.profiles;
-        activeId = imported.activeId || Object.keys(profiles)[0];
-      } else {
-        // Eski format (tek bebek)
-        const id = genIdStatic();
-        profiles = { [id]: { id, ...imported } };
-        activeId = id;
-      }
-      localStorage.setItem(ACTIVE_KEY, activeId);
-      saveProfiles();
-      data = profiles[activeId];
-      loadTheme(); updateCounts(); renderDashboard();
-      renderSidebarBabyList(); renderDropdownBabyList(); updateHeaderBaby();
-      showToast('Veriler başarıyla geri yüklendi! 🎉');
-    } catch { showToast('Geçersiz dosya formatı!', 'error'); }
+      if (imported.profiles || imported.olay) {
+        showConfirm('Mevcut veriler silinecek ve yedek yüklenecek. Onaylıyor musunuz?', () => {
+          if (imported.profiles) {
+            profiles = imported.profiles;
+            activeId = imported.activeId || Object.keys(profiles)[0];
+          } else {
+            const id = genIdStatic();
+            profiles = { [id]: { id, ...imported } };
+            activeId = id;
+          }
+          localStorage.setItem(ACTIVE_KEY, activeId);
+          saveProfiles();
+          data = profiles[activeId];
+          loadTheme(); updateCounts(); renderDashboard();
+          renderSidebarBabyList(); renderDropdownBabyList(); updateHeaderBaby();
+          showToast('Veriler başarıyla geri yüklendi! 🎉');
+        });
+      } else { showToast('Geçersiz dosya formatı!', 'error'); }
+    } catch(err) { showToast('Dosya okunamadı!', 'error'); }
     input.value = '';
   };
   reader.readAsText(file);
 }
 
 function clearAllData() {
-  if (!confirm('Aktif bebeğin TÜM verilerini kalıcı olarak silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz!')) return;
-  const settings = { ...data.settings };
-  data = { ...emptyBabyData(settings) };
-  profiles[activeId] = data;
-  saveProfiles();
-  updateCounts();
-  renderDashboard();
-  showToast('Tüm veriler silindi!', 'info');
+  showConfirm('Aktif bebeğin TÜM verilerini kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!', () => {
+    const settings = { ...data.settings };
+    data = { ...emptyBabyData(settings) };
+    profiles[activeId] = data;
+    saveProfiles();
+    updateCounts();
+    renderDashboard();
+    showToast('Tüm veriler silindi!', 'info');
+  });
 }
 
 function clearSection(section) {
@@ -4650,16 +4787,17 @@ function clearSection(section) {
   const name = names[section] || section;
   const count = (data[section] || []).length;
   if (count === 0) { showToast(`${name} bölümü zaten boş.`, 'info'); return; }
-  if (!confirm(`"${name}" bölümündeki ${count} kayıt kalıcı olarak silinecek.\n\nBu işlem GERİ ALINAMAZ!\n\nDevam etmek istiyor musunuz?`)) return;
-  data[section] = [];
-  saveData();
-  updateCounts();
-  if (currentPage === section) {
-    if (section === 'dis') renderDisPage();
-    else renderTable(section);
-  }
-  if (currentPage === 'dashboard') renderDashboard();
-  showToast(`${name} bölümü sıfırlandı! 🗑️`, 'info');
+  showConfirm(`"${name}" bölümündeki ${count} kayıt kalıcı olarak silinecek. Bu işlem GERİ ALINAMAZ!`, () => {
+    data[section] = [];
+    saveData();
+    updateCounts();
+    if (currentPage === section) {
+      if (section === 'dis') renderDisPage();
+      else renderTable(section);
+    }
+    if (currentPage === 'dashboard') renderDashboard();
+    showToast(`${name} bölümü sıfırlandı! 🗑️`, 'info');
+  });
 }
 
 // ===== SETTINGS =====
