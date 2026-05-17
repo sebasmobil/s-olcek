@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.43
+  Bebek Takip Pro v1.0.46
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.43">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.46">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.43</title>
+<title>Bebek Takip Pro v1.0.46</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2194,7 +2194,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.43</span>
+  <span>Pro 1.0.46</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2258,15 +2258,14 @@ mark.hl {
     <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <!-- HIZLI EKLE -->
-      <div class="card" id="hizliEkleCard" style="margin-bottom:16px">
-        <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
-        <div class="card-body">
-          <div class="quick-actions" id="quickActionsGrid"></div>
-        </div>
-      </div>
-      <!-- DİĞER KARTLAR (sıralanabilir) -->
+      <!-- TÜM KARTLAR (sıralanabilir) -->
       <div id="dashCardsContainer" style="display:flex;flex-direction:column;gap:16px">
+        <div class="card" id="hizliEkleCard">
+          <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
+          <div class="card-body">
+            <div class="quick-actions" id="quickActionsGrid"></div>
+          </div>
+        </div>
         <div class="card" id="gelisimGrafikCard">
           <div class="card-header">
             <span class="card-title">📊 Gelişim Grafiği</span>
@@ -2513,6 +2512,11 @@ const DASH_CARDS_DEFAULT = [
 ];
 
 function getDashLayout() {
+  // Önce data.settings içine bak (kalıcı)
+  if (data && data.settings && data.settings.dashLayout && data.settings.dashLayout.length > 0) {
+    return data.settings.dashLayout;
+  }
+  // localStorage fallback
   try {
     const raw = localStorage.getItem('dashLayout');
     if (raw) return JSON.parse(raw);
@@ -2530,7 +2534,12 @@ function saveDashLayout() {
       visible: row.querySelector('.card-row-toggle').classList.contains('on')
     });
   });
-  localStorage.setItem('dashLayout', JSON.stringify(layout));
+  // data.settings içine kaydet (yedekle taşınsın)
+  if (!data.settings) data.settings = {};
+  data.settings.dashLayout = layout;
+  saveData();
+  // localStorage'a da yaz (hız için)
+  try { localStorage.setItem('dashLayout', JSON.stringify(layout)); } catch(e) {}
   renderDashboard();
   showToast('Ana sayfa düzeni kaydedildi! ✅');
 }
@@ -2604,33 +2613,23 @@ function renderDashCardList() {
 
 function renderDashboard() {
   const layout = getDashLayout();
-
-  // Hızlı Ekle
   renderQuickActions();
-  const hizliCard = document.getElementById('hizliEkleCard');
-  if (hizliCard) {
-    const hizli = layout.find(c => c.id === 'hizliEkle');
-    hizliCard.style.display = (hizli && !hizli.visible) ? 'none' : '';
-  }
 
-  // Diğer kartları sırayla container'a ekle
   const container = document.getElementById('dashCardsContainer');
   if (container) {
     const cardMap = {
+      hizliEkle:     document.getElementById('hizliEkleCard'),
       gelisimGrafik: document.getElementById('gelisimGrafikCard'),
       sonAktivite:   document.getElementById('sonAktiviteCard'),
       sonKontrol:    document.getElementById('sonKontrolCard'),
       yaklasanAsi:   document.getElementById('yaklasanAsiCard'),
     };
-
-    layout
-      .filter(c => c.id !== 'hizliEkle')
-      .forEach(c => {
-        const el = cardMap[c.id];
-        if (!el) return;
-        el.style.display = c.visible ? '' : 'none';
-        if (c.visible) container.appendChild(el); // sona ekle = sırayı uygula
-      });
+    layout.forEach(c => {
+      const el = cardMap[c.id];
+      if (!el) return;
+      el.style.display = c.visible ? '' : 'none';
+      container.appendChild(el);
+    });
   }
 
   renderRecentActivities();
@@ -3032,6 +3031,7 @@ function openSettingsDrawer() {
 function closeSettingsDrawer() {
   document.getElementById('settingsOverlay').classList.remove('open');
   document.getElementById('settingsDrawer').classList.remove('open');
+  if (currentPage === 'dashboard') renderDashboard();
 }
 function switchDrawerTab(tab) {
   document.querySelectorAll('.drawer-tab').forEach(el => {
