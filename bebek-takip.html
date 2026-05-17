@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.61</title>
+<title>Bebek Takip Pro v1.0.62</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -97,6 +97,20 @@ input, select, textarea {
   --accent2: #42A5F5;
   --accent3: #AB47BC;
   --accent4: #FFA726;
+
+/* ===== RENK PALETLERİ (avatar rengi → uygulama teması) ===== */
+/* green */
+:root[data-color="green"] { --primary:#4CAF50; --primary-dark:#388E3C; --primary-light:#A5D6A7; }
+/* blue */
+:root[data-color="blue"]  { --primary:#42A5F5; --primary-dark:#1565C0; --primary-light:#90CAF9; }
+/* pink */
+:root[data-color="pink"]  { --primary:#EC407A; --primary-dark:#880E4F; --primary-light:#F48FB1; }
+/* orange */
+:root[data-color="orange"]{ --primary:#FFA726; --primary-dark:#E65100; --primary-light:#FFCC80; }
+/* purple */
+:root[data-color="purple"]{ --primary:#AB47BC; --primary-dark:#6A1B9A; --primary-light:#CE93D8; }
+/* teal */
+:root[data-color="teal"]  { --primary:#26A69A; --primary-dark:#00695C; --primary-light:#80CBC4; }
 
   --bg: #F0F4F8;
   --card: #FFFFFF;
@@ -2254,7 +2268,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.61</span>
+  <span>Pro 1.0.62</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2769,7 +2783,10 @@ function updateBaby(id, name, birthDate, avatarColor, avatarEmoji) {
   profiles[id].settings.birthDate = birthDate;
   profiles[id].settings.avatarColor = avatarColor || profiles[id].settings.avatarColor;
   profiles[id].settings.avatarEmoji = avatarEmoji || profiles[id].settings.avatarEmoji;
-  if (id === activeId) data = profiles[id];
+  if (id === activeId) {
+    data = profiles[id];
+    applyColorTheme(avatarColor || 'green');
+  }
   saveProfiles();
   renderSidebarBabyList();
   renderDropdownBabyList();
@@ -3014,13 +3031,35 @@ function loadTheme() {
   document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
-  // Status bar & color-scheme on init
+  // Aktif bebeğin renk temasını uygula
+  const color = data.settings?.avatarColor || 'green';
+  applyColorTheme(color);
+  // Status bar
+  const primaryHex = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#4CAF50';
   const metaTheme = document.getElementById('metaThemeColor');
-  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : '#4CAF50';
+  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : primaryHex;
   const metaStatusBar = document.getElementById('metaStatusBar');
   if (metaStatusBar) metaStatusBar.content = theme === 'dark' ? 'black-translucent' : 'default';
   const metaColorScheme = document.getElementById('metaColorScheme');
   if (metaColorScheme) metaColorScheme.content = theme === 'dark' ? 'dark' : 'light';
+}
+
+const COLOR_PALETTES = {
+  green:  { primary: '#4CAF50', dark: '#388E3C', light: '#A5D6A7' },
+  blue:   { primary: '#42A5F5', dark: '#1565C0', light: '#90CAF9' },
+  pink:   { primary: '#EC407A', dark: '#880E4F', light: '#F48FB1' },
+  orange: { primary: '#FFA726', dark: '#E65100', light: '#FFCC80' },
+  purple: { primary: '#AB47BC', dark: '#6A1B9A', light: '#CE93D8' },
+  teal:   { primary: '#26A69A', dark: '#00695C', light: '#80CBC4' },
+};
+
+function applyColorTheme(color) {
+  const p = COLOR_PALETTES[color] || COLOR_PALETTES.green;
+  const root = document.documentElement;
+  root.style.setProperty('--primary',       p.primary);
+  root.style.setProperty('--primary-dark',  p.dark);
+  root.style.setProperty('--primary-light', p.light);
+  root.setAttribute('data-color', color);
 }
 
 function toggleTheme() {
@@ -3037,8 +3076,10 @@ function setTheme(theme) {
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
   // Update meta theme-color (status bar arka plan rengi)
+  const activeColor = data.settings?.avatarColor || 'green';
+  const palette = COLOR_PALETTES[activeColor] || COLOR_PALETTES.green;
   const metaTheme = document.getElementById('metaThemeColor');
-  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : '#4CAF50';
+  if (metaTheme) metaTheme.content = theme === 'dark' ? '#060d1a' : palette.primary;
   // iOS status bar style: dark → black (beyaz yazı), light → default (siyah yazı)
   const metaStatusBar = document.getElementById('metaStatusBar');
   if (metaStatusBar) metaStatusBar.content = theme === 'dark' ? 'black-translucent' : 'default';
