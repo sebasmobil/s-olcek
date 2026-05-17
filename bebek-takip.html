@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.38
+  Bebek Takip Pro v1.0.39
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.38">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.39">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.38</title>
+<title>Bebek Takip Pro v1.0.39</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -622,12 +622,12 @@ button, a, [onclick] {
 }
 .drawer-tab {
   flex: 1;
-  padding: 8px 6px;
+  padding: 8px 4px;
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: var(--text3);
   transition: var(--transition);
   user-select: none;
@@ -1510,6 +1510,61 @@ mark.hl {
 #imp-step4 ::-webkit-scrollbar-track { background: var(--bg); }
 #imp-step4 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+/* ===== DASHBOARD CARD SORT ===== */
+.dash-card-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: grab;
+  user-select: none;
+  transition: var(--transition);
+}
+.dash-card-row.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+.dash-card-row.drag-over {
+  border-color: var(--primary);
+  background: rgba(76,175,80,0.07);
+}
+.dash-card-row .drag-handle {
+  font-size: 18px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+.dash-card-row .card-row-label {
+  flex: 1;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+.dash-card-row .card-row-toggle {
+  width: 44px; height: 26px;
+  border-radius: 13px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  border: none;
+}
+.dash-card-row .card-row-toggle.on { background: var(--primary); }
+.dash-card-row .card-row-toggle::after {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.dash-card-row .card-row-toggle.on::after { left: 21px; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .dashboard-grid { gap: 12px; }
@@ -1996,7 +2051,8 @@ mark.hl {
     <div class="drawer-tabs">
       <div class="drawer-tab active" onclick="switchDrawerTab('ayarlar')">⚙️ Ayarlar</div>
       <div class="drawer-tab" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
-      <div class="drawer-tab" onclick="switchDrawerTab('iceaktar')">📥 İçe Aktar</div>
+      <div class="drawer-tab" onclick="switchDrawerTab('iceaktar')">📥 Aktar</div>
+      <div class="drawer-tab" onclick="switchDrawerTab('anasayfa')">🏠 Sayfa</div>
     </div>
 
     <!-- Ayarlar Tab -->
@@ -2131,7 +2187,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.38</span>
+  <span>Pro 1.0.39</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2195,54 +2251,49 @@ mark.hl {
     <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <!-- HIZLI EKLE (üstte, sayılarla) -->
-      <div class="card" style="margin-bottom:20px">
+      <!-- HIZLI EKLE -->
+      <div class="card" id="hizliEkleCard" style="margin-bottom:16px">
         <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
         <div class="card-body">
           <div class="quick-actions" id="quickActionsGrid"></div>
         </div>
       </div>
-      <div class="dashboard-grid">
-        <div>
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">📊 Gelişim Grafiği</span>
-              <select class="form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:16px" onchange="renderGrowthChart(this.value)">
-                <option value="weight">Ağırlık</option>
-                <option value="height">Boy</option>
-                <option value="head">Baş Çevresi</option>
-              </select>
-            </div>
-            <div class="card-body">
-              <div class="chart-area">
-                <canvas id="growthChart"></canvas>
-              </div>
-            </div>
+      <!-- DİĞER KARTLAR (sıralanabilir) -->
+      <div id="dashCardsContainer" style="display:flex;flex-direction:column;gap:16px">
+        <div class="card" id="gelisimGrafikCard">
+          <div class="card-header">
+            <span class="card-title">📊 Gelişim Grafiği</span>
+            <select class="form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:16px" onchange="renderGrowthChart(this.value)">
+              <option value="weight">Ağırlık</option>
+              <option value="height">Boy</option>
+              <option value="head">Baş Çevresi</option>
+            </select>
           </div>
-          <div class="card" style="margin-top:16px">
-            <div class="card-header">
-              <span class="card-title">🕐 Son Aktiviteler</span>
-            </div>
-            <div class="card-body" id="recentActivities">
-              <div class="empty-state" style="padding:30px 20px">
-                <div class="es-icon" style="font-size:36px">📝</div>
-                <div class="es-sub">Henüz kayıt yok</div>
-              </div>
+          <div class="card-body">
+            <div class="chart-area">
+              <canvas id="growthChart"></canvas>
             </div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="card">
-            <div class="card-header"><span class="card-title">📋 Son Kontrol</span></div>
-            <div class="card-body" id="lastControlInfo">
-              <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">🏥</div><div class="es-sub">Kontrol kaydı yok</div></div>
+        <div class="card" id="sonAktiviteCard">
+          <div class="card-header"><span class="card-title">🕐 Son Aktiviteler</span></div>
+          <div class="card-body" id="recentActivities">
+            <div class="empty-state" style="padding:30px 20px">
+              <div class="es-icon" style="font-size:36px">📝</div>
+              <div class="es-sub">Henüz kayıt yok</div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><span class="card-title">💉 Yaklaşan Aşı</span></div>
-            <div class="card-body" id="nextVaccineInfo">
-              <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">💉</div><div class="es-sub">Bilgi yok</div></div>
-            </div>
+        </div>
+        <div class="card" id="sonKontrolCard">
+          <div class="card-header"><span class="card-title">📋 Son Kontrol</span></div>
+          <div class="card-body" id="lastControlInfo">
+            <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">🏥</div><div class="es-sub">Kontrol kaydı yok</div></div>
+          </div>
+        </div>
+        <div class="card" id="yaklasanAsiCard">
+          <div class="card-header"><span class="card-title">💉 Yaklaşan Aşı</span></div>
+          <div class="card-body" id="nextVaccineInfo">
+            <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">💉</div><div class="es-sub">Bilgi yok</div></div>
           </div>
         </div>
       </div>
@@ -2388,6 +2439,14 @@ mark.hl {
       <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
       <button class="btn btn-primary" onclick="saveRecord()">💾 Kaydet</button>
     </div>
+
+    <!-- Ana Sayfa Özelleştirme Tab -->
+    <div class="drawer-section" id="drawer-anasayfa">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Kartları açıp kapatın ve sürükleyerek sıralayın.</div>
+      <div id="dashCardList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveDashLayout()">💾 Kaydet</button>
+    </div>
+
   </div>
 </div>
 
@@ -2443,6 +2502,109 @@ function loadProfiles() {
 function saveProfiles() {
   try { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); }
   catch(e) { showToast('Kaydetme hatası!', 'error'); }
+}
+
+// ===== DASHBOARD LAYOUT =====
+const DASH_CARDS_DEFAULT = [
+  { id: 'hizliEkle',      label: '⚡ Hızlı Ekle',       visible: true },
+  { id: 'gelisimGrafik',  label: '📊 Gelişim Grafiği',   visible: true },
+  { id: 'sonAktivite',    label: '🕐 Son Aktiviteler',    visible: true },
+  { id: 'sonKontrol',     label: '📋 Son Kontrol',        visible: true },
+  { id: 'yaklasanAsi',    label: '💉 Yaklaşan Aşı',      visible: true },
+];
+
+function getDashLayout() {
+  try {
+    const raw = localStorage.getItem('dashLayout');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return DASH_CARDS_DEFAULT.map(c => ({ ...c }));
+}
+
+function saveDashLayout() {
+  const rows = document.querySelectorAll('#dashCardList .dash-card-row');
+  const layout = [];
+  rows.forEach(row => {
+    layout.push({
+      id: row.dataset.id,
+      label: row.querySelector('.card-row-label').textContent,
+      visible: row.querySelector('.card-row-toggle').classList.contains('on')
+    });
+  });
+  localStorage.setItem('dashLayout', JSON.stringify(layout));
+  renderDashboard();
+  showToast('Ana sayfa düzeni kaydedildi! ✅');
+}
+
+function renderDashCardList() {
+  const list = document.getElementById('dashCardList');
+  if (!list) return;
+  const layout = getDashLayout();
+  let dragSrc = null;
+
+  list.innerHTML = layout.map(c => `
+    <div class="dash-card-row" data-id="${c.id}" draggable="true">
+      <span class="drag-handle">☰</span>
+      <span class="card-row-label">${c.label}</span>
+      <button class="card-row-toggle ${c.visible ? 'on' : ''}" onclick="this.classList.toggle('on')" title="${c.visible ? 'Gizle' : 'Göster'}"></button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.dash-card-row').forEach(row => {
+    row.addEventListener('dragstart', e => { dragSrc = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    row.addEventListener('dragend', () => { row.classList.remove('dragging'); list.querySelectorAll('.dash-card-row').forEach(r => r.classList.remove('drag-over')); });
+    row.addEventListener('dragover', e => { e.preventDefault(); if (row !== dragSrc) row.classList.add('drag-over'); });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      if (dragSrc && row !== dragSrc) {
+        const allRows = [...list.querySelectorAll('.dash-card-row')];
+        const fromIdx = allRows.indexOf(dragSrc);
+        const toIdx = allRows.indexOf(row);
+        if (fromIdx < toIdx) list.insertBefore(dragSrc, row.nextSibling);
+        else list.insertBefore(dragSrc, row);
+      }
+    });
+  });
+}
+
+function renderDashboard() {
+  const layout = getDashLayout();
+  const dashGrid = document.getElementById('page-dashboard');
+  if (!dashGrid) return;
+
+  // Hızlı Ekle her zaman en üstte (ayrı render)
+  renderQuickActions();
+
+  // Diğer kartların görünürlüğünü ayarla
+  const cardMap = {
+    hizliEkle:     document.getElementById('hizliEkleCard'),
+    gelisimGrafik: document.getElementById('gelisimGrafikCard'),
+    sonAktivite:   document.getElementById('sonAktiviteCard'),
+    sonKontrol:    document.getElementById('sonKontrolCard'),
+    yaklasanAsi:   document.getElementById('yaklasanAsiCard'),
+  };
+
+  layout.forEach(c => {
+    const el = cardMap[c.id];
+    if (el) el.style.display = c.visible ? '' : 'none';
+  });
+
+  // Sırayı uygula — dashboard-grid içindeki kartları yeniden sırala
+  const grid = document.getElementById('dashCardsContainer');
+  if (grid) {
+    const ordered = layout.filter(c => c.id !== 'hizliEkle' && c.visible);
+    ordered.forEach(c => {
+      const el = cardMap[c.id];
+      if (el) grid.appendChild(el);
+    });
+  }
+
+  renderRecentActivities();
+  updateLastControl();
+  updateNextVaccine();
+  setTimeout(renderGrowthChart, 100);
 }
 
 function saveData() {
@@ -2840,7 +3002,7 @@ function closeSettingsDrawer() {
   document.getElementById('settingsDrawer').classList.remove('open');
 }
 function switchDrawerTab(tab) {
-  const tabs = ['ayarlar','yedek','iceaktar'];
+  const tabs = ['ayarlar','yedek','iceaktar','anasayfa'];
   document.querySelectorAll('.drawer-tab').forEach((el, i) => {
     el.classList.toggle('active', tabs[i] === tab);
   });
@@ -2849,6 +3011,7 @@ function switchDrawerTab(tab) {
   if (sec) sec.classList.add('active');
   if (tab === 'ayarlar') loadSettings();
   if (tab === 'iceaktar') impReset();
+  if (tab === 'anasayfa') renderDashCardList();
 }
 
 // ===== HEADER SEARCH EXPAND =====
@@ -3454,14 +3617,6 @@ function renderDisGrid(containerId, posFilter) {
 }
 
 // ===== DASHBOARD =====
-function renderDashboard() {
-  renderQuickActions();
-  renderRecentActivities();
-  updateLastControl();
-  updateNextVaccine();
-  setTimeout(renderGrowthChart, 100);
-}
-
 function renderQuickActions() {
   const grid = document.getElementById('quickActionsGrid');
   if (!grid) return;
