@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.56</title>
+<title>Bebek Takip Pro v1.0.57</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1771,9 +1771,8 @@ mark.hl {
 
 /* Profile switcher modal / dropdown */
 .profile-dropdown {
-  position: absolute;
-  top: 60px; left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
+  top: 80px; left: 12px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -2205,7 +2204,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.56</span>
+  <span>Pro 1.0.57</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2225,20 +2224,12 @@ mark.hl {
       </button>
 
       <!-- Bebek Profil Seçici — esner, sağdakileri sağa iter -->
-      <div style="position:relative;flex:1;min-width:0">
+      <div style="flex:1;min-width:0">
         <button class="header-baby-btn" id="headerBabyBtn" onclick="toggleProfileDropdown()">
           <div class="hb-avatar avatar-green" id="headerBabyAvatar">👶</div>
           <span id="headerBabyName">Bebek</span>
           <span class="hb-chevron">▼</span>
         </button>
-        <div class="profile-dropdown" id="profileDropdown" style="display:none">
-          <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
-          <div id="dropdownBabyList"></div>
-          <div class="profile-dropdown-footer">
-            <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
-          </div>
-        </div>
       </div>
 
       <!-- Arama + Tema — sağa dayalı -->
@@ -2806,9 +2797,26 @@ function toggleProfileDropdown() {
   const dd  = document.getElementById('profileDropdown');
   const btn = document.getElementById('headerBabyBtn');
   const isOpen = dd.style.display !== 'none';
-  dd.style.display = isOpen ? 'none' : 'block';
-  btn.classList.toggle('open', !isOpen);
-  if (!isOpen) renderDropdownBabyList();
+  if (isOpen) {
+    dd.style.display = 'none';
+    btn.classList.remove('open');
+    return;
+  }
+  // Butonun ekrandaki konumunu ölç
+  const rect = btn.getBoundingClientRect();
+  const ddW  = Math.min(280, window.innerWidth - 24);
+  let left   = rect.left;
+  // Sağa taşarsa sola kaydır
+  if (left + ddW > window.innerWidth - 12) {
+    left = window.innerWidth - ddW - 12;
+  }
+  if (left < 12) left = 12;
+  dd.style.top  = (rect.bottom + 6) + 'px';
+  dd.style.left = left + 'px';
+  dd.style.width = ddW + 'px';
+  dd.style.display = 'block';
+  btn.classList.add('open');
+  renderDropdownBabyList();
 }
 
 function closeDropdown() {
@@ -2895,11 +2903,11 @@ function getSelectedEmoji() {
 }
 
 function saveBabyProfile() {
-  const name  = document.getElementById('bf_name')?.value.trim();
+  const nameRaw = document.getElementById('bf_name')?.value.trim();
+  const name  = nameRaw || 'Bebek';
   const birth = document.getElementById('bf_birth')?.value;
   const color = getSelectedColor();
   const emoji = getSelectedEmoji();
-  if (!name) { showToast('Bebek adı zorunlu!', 'error'); return; }
 
   if (editingBabyId) {
     updateBaby(editingBabyId, name, birth, color, emoji);
@@ -3169,7 +3177,8 @@ function showModal(section, record) {
   const modalBody = document.getElementById('modalBody');
 
   const meta = pageMeta[section] || {};
-  modalTitle.innerHTML = `${meta.icon || ''} ${record ? 'D\u00fczenle' : 'Yeni ' + meta.title}`;
+  const babyTag = `<span style="font-size:12px;font-weight:600;color:var(--primary);margin-left:8px;opacity:0.8">👶 ${data.settings?.babyName || 'Bebek'}</span>`;
+  modalTitle.innerHTML = `${meta.icon || ''} ${record ? 'Düzenle' : 'Yeni ' + meta.title}${babyTag}`;
 
   modalBody.innerHTML = getFormHTML(section, record);
   overlay.style.display = 'flex';
@@ -3413,6 +3422,9 @@ function getVal(id) {
 function saveRecord() {
   const section = editingSection;
   if (!section || !pageMeta[section]) return;
+
+  // Her zaman aktif profile kaydet
+  data = profiles[activeId];
 
   let record = { id: editingId || genId() };
 
@@ -4655,5 +4667,14 @@ self.addEventListener('fetch', e => {
 
 })();
 </script>
+<!-- Profil dropdown — body seviyesinde, JS ile konumlandırılır -->
+<div class="profile-dropdown" id="profileDropdown" style="display:none">
+  <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
+  <div id="dropdownBabyList"></div>
+  <div class="profile-dropdown-footer">
+    <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
+    <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
+  </div>
+</div>
 </body>
 </html>
