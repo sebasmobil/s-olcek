@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.49
+  Bebek Takip Pro v1.0.56
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.49">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.56">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.49</title>
+<title>Bebek Takip Pro v1.0.56</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1096,8 +1096,18 @@ td {
   -webkit-appearance: none;
   touch-action: manipulation;
 }
-/* Bebek formu tarih kutusu — daha yüksek */
-#bf_birth {
+/* Boş tarih/saat inputlar — overlay ile yönetiliyor */
+input[type="date"], input[type="time"] {
+  position: relative;
+  min-height: 46px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.date-ph-wrap input[type="date"],
+.date-ph-wrap input[type="time"] {
+  min-height: 46px;
+  height: 46px;
+}
   padding-top: 18px;
   padding-bottom: 18px;
   min-height: 56px;
@@ -1927,7 +1937,7 @@ mark.hl {
   position: absolute;
   top: 10px; right: 10px;
   display: flex; gap: 4px;
-  opacity: 0;
+  opacity: 1;
   transition: var(--transition);
 }
 .baby-card:hover .baby-card-actions { opacity: 1; }
@@ -2195,7 +2205,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.49</span>
+  <span>Pro 1.0.56</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2677,20 +2687,21 @@ function saveData() {
 
 /* ── Aktif bebek değiştir ── */
 function switchBaby(id) {
-  if (!profiles[id]) return;
-  activeId = id;
-  localStorage.setItem(ACTIVE_KEY, id);
-  data = profiles[id];
-  // Temayı yeni bebeğe göre yükle
-  loadTheme();
-  updateCounts();
-  renderDashboard();
-  renderSidebarBabyList();
-  renderDropdownBabyList();
-  updateHeaderBaby();
-  showPage('dashboard');
+  if (!profiles[id]) { showToast('Profil bulunamadı!', 'error'); return; }
+  // Önce dropdown'u kapat, sonra geç
   closeDropdown();
-  showToast('👶 ' + (data.settings.babyName || 'Bebek') + ' profiline geçildi!');
+  setTimeout(() => {
+    activeId = id;
+    localStorage.setItem(ACTIVE_KEY, id);
+    data = profiles[id];
+    loadTheme();
+    updateCounts();
+    renderSidebarBabyList();
+    renderDropdownBabyList();
+    updateHeaderBaby();
+    showPage('dashboard');
+    showToast('👶 ' + (data.settings?.babyName || 'Bebek') + ' profiline geçildi!');
+  }, 50);
 }
 
 /* ── Bebek ekle ── */
@@ -2767,7 +2778,7 @@ function renderDropdownBabyList() {
   const list = document.getElementById('dropdownBabyList');
   if (!list) return;
   list.innerHTML = Object.values(profiles).map(p => `
-    <div class="profile-dropdown-item ${p.id === activeId ? 'active-profile' : ''}" onclick="switchBaby('${p.id}')">
+    <div class="profile-dropdown-item ${p.id === activeId ? 'active-profile' : ''}" onclick="event.stopPropagation();switchBaby('${p.id}')">
       ${avatarHtml(p, 32, 16)}
       <div>
         <div class="pd-name">${escHtml(p.settings.babyName || 'Bebek')}</div>
@@ -3162,6 +3173,7 @@ function showModal(section, record) {
 
   modalBody.innerHTML = getFormHTML(section, record);
   overlay.style.display = 'flex';
+  setTimeout(applyDatePlaceholders, 50);
 }
 
 function getFormHTML(section, r) {
@@ -3745,6 +3757,7 @@ function openToothPanel(toothId) {
   document.getElementById('toothDeleteBtn').style.display = rec ? '' : 'none';
   document.getElementById('toothDetailPanel').style.display = '';
   document.getElementById('toothDetailPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(applyDatePlaceholders, 50);
 }
 
 function closeToothPanel() {
@@ -4457,6 +4470,52 @@ function init() {
 document.addEventListener('DOMContentLoaded', init);
 
 // Info bar + header fixed offset
+// Boş tarih/saat inputlarına overlay placeholder
+function applyDatePlaceholders() {
+  document.querySelectorAll('input[type="date"], input[type="time"]').forEach(inp => {
+    if (inp.dataset.placeholderDone) return;
+    inp.dataset.placeholderDone = '1';
+
+    const isDate = inp.type === 'date';
+    const txt = isDate ? '📅 Tarih seçin' : '⏰ Saat seçin';
+
+    // Wrapper — sadece relative positioning için
+    const parent = inp.parentNode;
+    if (!parent || parent.classList.contains('date-ph-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'date-ph-wrap';
+    wrap.style.cssText = 'position:relative;width:100%';
+    parent.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+
+    // Overlay label — input'un üstünde ama tıklama iletilir
+    const lbl = document.createElement('label');
+    lbl.textContent = txt;
+    lbl.style.cssText = `
+      position:absolute;inset:0;
+      display:flex;align-items:center;padding:0 13px;
+      color:var(--text3);font-size:15px;font-family:var(--font);
+      pointer-events:none;user-select:none;
+      border-radius:var(--radius-sm);
+      transition:opacity 0.15s;
+      background:var(--input-bg);
+      z-index:1;
+    `;
+    wrap.appendChild(lbl);
+
+    const update = () => {
+      lbl.style.opacity = inp.value ? '0' : '1';
+      lbl.style.pointerEvents = inp.value ? 'none' : 'none';
+    };
+    update();
+    inp.addEventListener('change', update);
+    inp.addEventListener('input', update);
+    inp.addEventListener('blur', update);
+    // Label tıklanınca input'u tetikle
+    lbl.addEventListener('click', () => inp.showPicker ? inp.showPicker() : inp.click());
+  });
+}
+
 function applyInfoBarOffset() {
   const bar = document.getElementById('infoBar');
   const header = document.querySelector('.header');
@@ -4470,6 +4529,7 @@ function applyInfoBarOffset() {
 }
 window.addEventListener('load', applyInfoBarOffset);
 window.addEventListener('resize', applyInfoBarOffset);
+window.addEventListener('load', applyDatePlaceholders);
 
 // ===== PWA SETUP =====
 (function setupPWA() {
