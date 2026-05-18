@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.90
+  Bebek Takip Pro v1.0.91
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.90">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.91">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.90</title>
+<title>Bebek Takip Pro v1.0.91</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1039,6 +1039,7 @@ td {
   max-width: 580px;
   max-height: 88vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 25px 60px rgba(0,0,0,0.3);
   animation: scaleIn 0.25s ease;
 }
@@ -1064,6 +1065,8 @@ td {
 }
 .modal-body {
   padding: 22px 24px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 .modal-footer {
   padding: 16px 24px;
@@ -2275,7 +2278,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.90</span>
+  <span>Pro 1.0.91</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3511,7 +3514,7 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">⚡ Olay <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('olay_tur','Hızlı Olay Seçenekleri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="Örn: Titreme, Ateş, Öksürük..."/>
-        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3559,7 +3562,7 @@ function getFormHTML(section, r) {
           autocomplete="off"
           oninput="renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane')"
           onfocus="renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane')" />
-        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">👨‍⚕️ Doktor <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_doktor','Doktorlar')">✏️ Düzenle</span></label>
@@ -3567,27 +3570,27 @@ function getFormHTML(section, r) {
           autocomplete="off"
           oninput="renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor')"
           onfocus="renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor')" />
-        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔬 Hastalık / Teşhis <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_teshis','Teşhis Önerileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Teşhis..." autocomplete="off" />
-        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💊 Tedavi <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tedavi','Tedavi Önerileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." autocomplete="off" />
-        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💉 Verilen İlaçlar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_ilac','İlaç Önerileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="İlaç adları..." autocomplete="off" />
-        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔭 Yapılan Tetkikler <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tetkik','Tetkik Önerileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." autocomplete="off" />
-        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3620,12 +3623,12 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">🏷️ Tür <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_tur','Gıda Türleri')">✏️ Düzenle</span></label>
         <input type="hidden" id="f_tur" value="${v.tur||'Sebze'}" />
-        <div id="gida_tur_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px"></div>
+        <div id="gida_tur_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">🍽️ Adı <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_adi','Gıda Adları')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="Gıda adı..." autocomplete="off" />
-        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
@@ -3634,12 +3637,12 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📏 Miktar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_miktar','Miktar Seçenekleri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="Örn: 1.5 tatlı kaşığı" autocomplete="off" />
-        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">⚠️ Alerji Belirtileri <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_alerji','Alerji Belirtileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." autocomplete="off" />
-        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3656,7 +3659,7 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📝 Başlık <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gunluk_baslik','Başlık Önerileri')">✏️ Düzenle</span></label>
         <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="İlk adım, ilk kelime..." autocomplete="off" />
-        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
+        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">💬 Not</label>
@@ -3716,12 +3719,12 @@ function getFormHTML(section, r) {
            />
           <div id="asiDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--card);border:1.5px solid var(--primary);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;margin-top:3px"></div>
         </div>
-        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px" id="asiQuickBtns"></div>
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;overflow-x:auto;padding-bottom:4px;max-width:100%" id="asiQuickBtns"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">✅ Durum <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_durum','Durum Seçenekleri')">✏️ Düzenle</span></label>
         <input type="hidden" id="f_durum" value="${v.durum||'Planlandı'}" />
-        <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px"></div>
+        <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Açıklama</label>
