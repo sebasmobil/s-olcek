@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.86
+  Bebek Takip Pro v1.0.88
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.86">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.88">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.86</title>
+<title>Bebek Takip Pro v1.0.88</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2617,6 +2617,9 @@ function loadProfiles() {
     if (raw) profiles = JSON.parse(raw);
   } catch(e) { profiles = {}; }
 
+  // Mevcut profillerde eksik id alanlarını onar
+  Object.keys(profiles).forEach(k => { if (!profiles[k].id) profiles[k].id = k; });
+
   activeId = localStorage.getItem(ACTIVE_KEY);
 
   // İlk kullanım: tek profil oluştur
@@ -2793,6 +2796,7 @@ function renderDashboard() {
 }
 
 function saveData() {
+  data.id = activeId; // id alanının kaybolmamasını garantile
   profiles[activeId] = data;
   saveProfiles();
 }
@@ -2805,6 +2809,7 @@ function switchBaby(id) {
   setTimeout(() => {
     activeId = id;
     localStorage.setItem(ACTIVE_KEY, id);
+    profiles[id].id = id; // id alanını garantile
     data = profiles[id];
     loadTheme();
     updateCounts();
@@ -3193,8 +3198,12 @@ function setTheme(theme) {
   // color-scheme: dark/light
   const metaColorScheme = document.getElementById('metaColorScheme');
   if (metaColorScheme) metaColorScheme.content = theme === 'dark' ? 'dark' : 'light';
-  // Re-render chart if on dashboard
-  if (currentPage === 'dashboard') setTimeout(renderGrowthChart, 100);
+  // Re-render tema'ya duyarlı içerikler
+  setTimeout(() => {
+    if (currentPage === 'dashboard') { renderGrowthChart(); renderDisKart(); }
+    else if (currentPage === 'dis') renderDisPage();
+    else if (currentPage === 'gelisim') renderGrowthChart();
+  }, 50);
 }
 
 // ===== NAVIGATION =====
