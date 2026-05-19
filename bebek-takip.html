@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.96
+  Bebek Takip Pro v1.0.97
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.96">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.97">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.96</title>
+<title>Bebek Takip Pro v1.0.97</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2346,7 +2346,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.96</span>
+  <span>Pro 1.0.97</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4801,6 +4801,31 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
   const inp = document.getElementById(inputId);
   const box = document.getElementById(chipsId);
   if (!inp || !box) return;
+
+  if (opts && opts.multi) {
+    // Multi modda: sadece seçili olanları küçük kaldırılabilir etiket olarak göster
+    const selected = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+    box.innerHTML = '';
+    if (selected.length === 0) return;
+    selected.forEach(s => {
+      const tag = document.createElement('span');
+      tag.style.cssText = `display:inline-flex;align-items:center;gap:4px;background:var(--primary);color:#fff;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;font-family:var(--font);`;
+      tag.innerHTML = `${escHtml(s)}<button type="button" style="background:none;border:none;color:#fff;font-size:14px;cursor:pointer;padding:0 0 0 2px;line-height:1;opacity:0.85" data-val="${escHtml(s)}">✕</button>`;
+      tag.querySelector('button').addEventListener('click', () => {
+        const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
+        const idx = parts.indexOf(s);
+        if (idx >= 0) parts.splice(idx, 1);
+        inp.value = parts.join(', ');
+        const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+        if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+        renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
+      });
+      box.appendChild(tag);
+    });
+    return;
+  }
+
+  // Tek seçim modu: tüm listeyi chip olarak göster
   const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (all.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
@@ -4808,20 +4833,10 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = s;
-    const curVals = opts && opts.multi
-      ? inp.value.split(',').map(x => x.trim())
-      : [inp.value.trim()];
-    const isSelected = curVals.includes(s);
+    const isSelected = inp.value.trim() === s;
     btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
-      if (opts && opts.multi) {
-        const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
-        const idx = parts.indexOf(s);
-        if (idx >= 0) parts.splice(idx, 1); else parts.push(s);
-        inp.value = parts.join(', ');
-      } else {
-        inp.value = inp.value.trim() === s ? '' : s;
-      }
+      inp.value = inp.value.trim() === s ? '' : s;
       renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
     });
     box.appendChild(btn);
