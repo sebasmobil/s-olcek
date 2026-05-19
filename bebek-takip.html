@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.94
+  Bebek Takip Pro v1.0.96
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.94">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.96">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.94</title>
+<title>Bebek Takip Pro v1.0.96</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -998,6 +998,35 @@ canvas {
 .ac-input-wrap .ac-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text3); cursor: pointer; padding: 4px; line-height: 1; display: none; }
 .ac-input-wrap .ac-clear.visible { display: block; }
 .ac-input-wrap .form-input { padding-right: 36px; }
+.ac-search-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  z-index: 2;
+}
+.ac-search-bar input {
+  flex: 1;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 6px 10px;
+  outline: none;
+}
+.ac-search-bar input:focus { border-color: var(--primary); }
+.ac-search-count {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--font);
+  white-space: nowrap;
+}
 
 /* ===== TABLE ===== */
 .table-wrapper {
@@ -2317,7 +2346,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.94</span>
+  <span>Pro 1.0.96</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4627,8 +4656,8 @@ function autoCollectKontrolLists() {
 
 function getCustomList(key, fallback) {
   const lists = (data.settings && data.settings.customLists) || {};
-  if (lists[key] && lists[key].length > 0) return lists[key];
-  return fallback || CUSTOM_LIST_DEFAULTS[key] || [];
+  const raw = (lists[key] && lists[key].length > 0) ? lists[key] : (fallback || CUSTOM_LIST_DEFAULTS[key] || []);
+  return [...raw].sort((a, b) => a.toLocaleLowerCase('tr-TR').localeCompare(b.toLocaleLowerCase('tr-TR'), 'tr'));
 }
 
 function saveCustomList(key, arr) {
@@ -4644,12 +4673,10 @@ function saveCustomList(key, arr) {
 
 
 // ── Autocomplete Dropdown Sistemi ────────────────────────────────────
-// Eski chip kutusu yerine input altında açılan dropdown panel
-// setupAcField(inputId, chipsId, listKey, opts)
-//   opts.multi   → virgüllü çoklu seçim (olay türü gibi)
-//   opts.onSelect → seçim sonrası çağrılacak callback
+// Multi modda: input readonly (seçimler gösterilir), dropdown içinde arama barı
+// Tek modda: input'a yazınca dropdown filtreler
 
-const _acState = {}; // her input için aktif dropdown durumu
+const _acState = {};
 
 function _acHighlight(text, query) {
   if (!query) return escHtml(text);
@@ -4665,41 +4692,49 @@ function _acClose(inputId) {
   st.activeIdx = -1;
 }
 
+function _acBuildList(dd, all, selectedVals, segment, inputId, chipsId, listKey, opts) {
+  dd.querySelectorAll('.ac-item, .ac-empty').forEach(el => el.remove());
+  const q = segment ? segment.toLocaleLowerCase('tr-TR') : '';
+  const filtered = q ? all.filter(s => s.toLocaleLowerCase('tr-TR').includes(q)) : all;
+  const countEl = dd.querySelector('.ac-search-count');
+  if (countEl) countEl.textContent = filtered.length + '/' + all.length;
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'ac-empty';
+    empty.textContent = 'Eşleşen öğe yok';
+    dd.appendChild(empty);
+    return;
+  }
+  // Seçili olanları üste taşı
+  const sel = filtered.filter(s => selectedVals.includes(s));
+  const unsel = filtered.filter(s => !selectedVals.includes(s));
+  [...sel, ...unsel].forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'ac-item';
+    item.setAttribute('role', 'option');
+    const isSelected = selectedVals.includes(s);
+    if (isSelected) item.classList.add('ac-active');
+    const check = isSelected
+      ? '<span style="margin-right:8px;color:var(--primary);font-weight:900;font-size:15px">✓</span>'
+      : '<span style="margin-right:8px;opacity:0;font-size:15px">✓</span>';
+    item.innerHTML = check + _acHighlight(s, q);
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      _acSelect(inputId, chipsId, listKey, s, opts, dd, all);
+    });
+    dd.appendChild(item);
+  });
+}
+
 function _acOpen(inputId, chipsId, listKey, opts) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
   const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (all.length === 0) return;
-
-  // Çoklu seçimde mevcut seçili değerler
-  const selectedVals = (opts && opts.multi)
-    ? inp.value.split(',').map(s => s.trim()).filter(Boolean)
-    : [];
-
-  // Arama segmentini belirle
-  let segment = inp.value.trim().toLocaleLowerCase('tr-TR');
-  if (opts && opts.multi) {
-    const parts = inp.value.split(',');
-    segment = parts[parts.length - 1].trim().toLocaleLowerCase('tr-TR');
-    // Eğer son segment zaten tam seçili bir değerse filtre yapma
-    if (selectedVals.includes(parts[parts.length - 1].trim())) segment = '';
-  }
-
-  // Filtrele — segment yoksa tümünü göster
-  let filtered;
-  if (!segment) {
-    filtered = all;
-  } else {
-    filtered = all.filter(s => s.toLocaleLowerCase('tr-TR').includes(segment));
-    if (filtered.length === 0) filtered = all; // eşleşme yoksa tümünü göster
-  }
-
   _acClose(inputId);
-
   const st = _acState[inputId] || (_acState[inputId] = {});
   st.activeIdx = -1;
-  st.items = filtered;
-
+  st.items = all;
   const wrap = inp.parentNode;
   if (!wrap) return;
 
@@ -4707,67 +4742,57 @@ function _acOpen(inputId, chipsId, listKey, opts) {
   dd.className = 'ac-dropdown';
   dd.setAttribute('role', 'listbox');
 
-  filtered.forEach((s) => {
-    const item = document.createElement('div');
-    item.className = 'ac-item';
-    item.setAttribute('role', 'option');
-    const isSelected = selectedVals.includes(s);
-    if (isSelected) item.classList.add('ac-active');
-    // Seçili öğede ✓ işareti göster
-    const check = isSelected ? '<span style="margin-right:6px;color:var(--primary);font-weight:900">✓</span>' : '<span style="margin-right:6px;opacity:0">✓</span>';
-    item.innerHTML = check + _acHighlight(s, segment);
-    item.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      _acSelect(inputId, chipsId, listKey, s, opts);
+  if (opts && opts.multi) {
+    // Multi: dropdown içinde arama kutusu, dış input sadece gösterir
+    const selectedVals = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+    const bar = document.createElement('div');
+    bar.className = 'ac-search-bar';
+    bar.innerHTML = '<input type="text" placeholder="🔍 Ara..." autocomplete="off" /><span class="ac-search-count">' + all.length + '/' + all.length + '</span>';
+    dd.appendChild(bar);
+    const searchInp = bar.querySelector('input');
+    searchInp.addEventListener('mousedown', e => e.stopPropagation());
+    searchInp.addEventListener('input', () => {
+      const cur = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+      _acBuildList(dd, all, cur, searchInp.value.trim(), inputId, chipsId, listKey, opts);
     });
-    dd.appendChild(item);
-  });
+    _acBuildList(dd, all, selectedVals, '', inputId, chipsId, listKey, opts);
+    setTimeout(() => searchInp.focus(), 60);
+  } else {
+    // Tek seçim: dış input'a yazılan metin filtreler
+    const segment = inp.value.trim();
+    _acBuildList(dd, all, [], segment, inputId, chipsId, listKey, opts);
+  }
 
   wrap.appendChild(dd);
   st.dropdown = dd;
-
-  // Dropdown açıkken chips kutusunu gizle
   const box = document.getElementById(chipsId);
   if (box) box.style.display = 'none';
 }
 
-function _acSelect(inputId, chipsId, listKey, value, opts) {
+function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
 
   if (opts && opts.multi) {
     const parts = inp.value.split(',').map(s => s.trim()).filter(Boolean);
     const idx = parts.indexOf(value);
-    if (idx >= 0) {
-      // Zaten seçili → kaldır (toggle off)
-      parts.splice(idx, 1);
-    } else {
-      // Yeni seçim — son yarım yazılı segmenti temizle, değeri ekle
-      const last = parts[parts.length - 1] || '';
-      const isPartial = last && value.toLocaleLowerCase('tr-TR').includes(last.toLocaleLowerCase('tr-TR')) && last !== value;
-      if (isPartial) parts[parts.length - 1] = value;
-      else parts.push(value);
+    if (idx >= 0) parts.splice(idx, 1); else parts.push(value);
+    inp.value = parts.join(', ');
+    // Dropdown açık kalsın, listeyi güncelle
+    if (dd && dd.parentNode) {
+      const searchInp = dd.querySelector('.ac-search-bar input');
+      const seg = searchInp ? searchInp.value.trim() : '';
+      _acBuildList(dd, all || getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []), parts, seg, inputId, chipsId, listKey, opts);
     }
-    inp.value = parts.length ? parts.join(', ') : '';
+    const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+    if (clr) clr.classList.toggle('visible', inp.value.length > 0);
   } else {
     inp.value = value;
+    _acClose(inputId);
+    inp.focus();
+    const box = document.getElementById(chipsId);
+    if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
   }
-
-  _acClose(inputId);
-  inp.focus();
-
-  if (opts && opts.multi) {
-    // Çoklu seçimde dropdown'u tekrar aç (kullanıcı seçmeye devam edebilsin)
-    setTimeout(() => _acOpen(inputId, chipsId, listKey, opts), 0);
-  }
-
-  // Chip şeridini güncelle
-  const box = document.getElementById(chipsId);
-  if (box) {
-    box.style.display = opts && opts.multi ? 'none' : ''; // dropdown açıkken gizli kal
-    if (!(opts && opts.multi)) renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
-  }
-
   if (opts && opts.onSelect) opts.onSelect(value);
 }
 
@@ -4812,58 +4837,74 @@ function renderSuggestionChips(inputId, chipsId, listKey) {
 function setupAcField(inputId, chipsId, listKey, opts) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
-  if (inp._acSetup) return; // çift bağlamayı önle
+  if (inp._acSetup) return;
   inp._acSetup = true;
 
-  inp.addEventListener('input', () => {
-    _acOpen(inputId, chipsId, listKey, opts);
-    // temizle butonunu göster/gizle
-    const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-    if (clr) clr.classList.toggle('visible', inp.value.length > 0);
-  });
-
-  inp.addEventListener('focus', () => {
-    _acOpen(inputId, chipsId, listKey, opts);
-    const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-    if (clr) clr.classList.toggle('visible', inp.value.length > 0);
-  });
-
-  inp.addEventListener('blur', () => {
-    setTimeout(() => {
-      _acClose(inputId);
-      const box = document.getElementById(chipsId);
-      if (box) {
-        box.style.display = '';
-        renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
+  if (opts && opts.multi) {
+    // Multi: dış input sadece gösterir, tıklayınca dropdown açılır
+    inp.setAttribute('readonly', 'readonly');
+    inp.style.cursor = 'pointer';
+    inp.addEventListener('focus', () => _acOpen(inputId, chipsId, listKey, opts));
+    inp.addEventListener('click',  () => _acOpen(inputId, chipsId, listKey, opts));
+    inp.addEventListener('blur', () => {
+      // Arama barına geçişte kapanmasın — 300ms bekle
+      setTimeout(() => {
+        const st = _acState[inputId];
+        if (st && st.dropdown) {
+          // Dropdown içindeki bir elemente focus gittiyse kapat
+          const focused = document.activeElement;
+          if (!st.dropdown.contains(focused)) {
+            _acClose(inputId);
+            const box = document.getElementById(chipsId);
+            if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
+          }
+        }
+      }, 300);
+    });
+  } else {
+    // Tek seçim: input'a yazınca filtreler
+    inp.addEventListener('input', () => {
+      _acOpen(inputId, chipsId, listKey, opts);
+      const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+      if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+    });
+    inp.addEventListener('focus', () => {
+      _acOpen(inputId, chipsId, listKey, opts);
+      const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+      if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+    });
+    inp.addEventListener('blur', () => {
+      setTimeout(() => {
+        _acClose(inputId);
+        const box = document.getElementById(chipsId);
+        if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
+      }, 200);
+    });
+    inp.addEventListener('keydown', (e) => {
+      const st = _acState[inputId];
+      if (!st || !st.dropdown) return;
+      const items = st.dropdown.querySelectorAll('.ac-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        st.activeIdx = Math.min((st.activeIdx||0) + 1, items.length - 1);
+        items.forEach((el, i) => el.classList.toggle('ac-active', i === st.activeIdx));
+        items[st.activeIdx] && items[st.activeIdx].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        st.activeIdx = Math.max((st.activeIdx||0) - 1, 0);
+        items.forEach((el, i) => el.classList.toggle('ac-active', i === st.activeIdx));
+        items[st.activeIdx] && items[st.activeIdx].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter' && st.activeIdx >= 0) {
+        e.preventDefault();
+        const sel = st.items && st.items[st.activeIdx];
+        if (sel) _acSelect(inputId, chipsId, listKey, sel, opts);
+      } else if (e.key === 'Escape') {
+        _acClose(inputId);
       }
-    }, 200);
-  });
+    });
+  }
 
-  // Ok tuşları + Enter klavye navigasyonu
-  inp.addEventListener('keydown', (e) => {
-    const st = _acState[inputId];
-    if (!st || !st.dropdown) return;
-    const items = st.dropdown.querySelectorAll('.ac-item');
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      st.activeIdx = Math.min(st.activeIdx + 1, items.length - 1);
-      items.forEach((el, i) => el.classList.toggle('ac-active', i === st.activeIdx));
-      items[st.activeIdx] && items[st.activeIdx].scrollIntoView({ block: 'nearest' });
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      st.activeIdx = Math.max(st.activeIdx - 1, 0);
-      items.forEach((el, i) => el.classList.toggle('ac-active', i === st.activeIdx));
-      items[st.activeIdx] && items[st.activeIdx].scrollIntoView({ block: 'nearest' });
-    } else if (e.key === 'Enter' && st.activeIdx >= 0) {
-      e.preventDefault();
-      const sel = st.items[st.activeIdx];
-      if (sel) _acSelect(inputId, chipsId, listKey, sel, opts);
-    } else if (e.key === 'Escape') {
-      _acClose(inputId);
-    }
-  });
-
-  // Temizle butonu
+  // Temizle butonu (her iki modda da)
   const wrap = inp.parentNode;
   if (wrap && wrap.classList.contains('ac-input-wrap')) {
     const clr = wrap.querySelector('.ac-clear');
@@ -4875,12 +4916,15 @@ function setupAcField(inputId, chipsId, listKey, opts) {
         const box = document.getElementById(chipsId);
         if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
         clr.classList.remove('visible');
-        inp.focus();
+        if (!(opts && opts.multi)) inp.focus();
       });
     }
   }
 
-  // İlk yükleme: chips kutusunu doldur
+  // Temizle butonu görünürlüğü başlangıçta
+  const clr0 = wrap && wrap.querySelector('.ac-clear');
+  if (clr0) clr0.classList.toggle('visible', inp.value.length > 0);
+
   setTimeout(() => renderSuggestionChipsStatic(inputId, chipsId, listKey, opts), 50);
 }
 
