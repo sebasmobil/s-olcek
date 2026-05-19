@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.99
+  Bebek Takip Pro v1.1.0
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.99">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.0">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.99</title>
+<title>Bebek Takip Pro v1.1.0</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1159,6 +1159,8 @@ td {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+  overflow: hidden;
 }
 .form-group.full { grid-column: 1 / -1; }
 .form-label {
@@ -2346,7 +2348,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.99</span>
+  <span>Pro 1.1.0</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3582,7 +3584,7 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">⚡ Olay <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('olay_tur','Hızlı Olay Seçenekleri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="Örn: Titreme, Ateş, Öksürük..." autocomplete="off"/><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3628,33 +3630,33 @@ function getFormHTML(section, r) {
         <label class="form-label">🏥 Hastane <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_hastane','Hastaneler')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_hastane" value="${v.hastane||''}" placeholder="Hastane adı..."
           autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group">
         <label class="form-label">👨‍⚕️ Doktor <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_doktor','Doktorlar')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_doktor" value="${v.doktor||''}" placeholder="Doktor adı..."
           autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔬 Hastalık / Teşhis <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_teshis','Teşhis Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Teşhis..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💊 Tedavi <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tedavi','Tedavi Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💉 Verilen İlaçlar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_ilac','İlaç Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="İlaç adları..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔭 Yapılan Tetkikler <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tetkik','Tetkik Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3692,7 +3694,7 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">🍽️ Adı <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_adi','Gıda Adları')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="Gıda adı..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
@@ -3701,12 +3703,12 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📏 Miktar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_miktar','Miktar Seçenekleri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="Örn: 1.5 tatlı kaşığı" autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group">
         <label class="form-label">⚠️ Alerji Belirtileri <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_alerji','Alerji Belirtileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3723,7 +3725,7 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📝 Başlık <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gunluk_baslik','Başlık Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="İlk adım, ilk kelime..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
+        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;max-width:100%;overflow:hidden"></div>
       </div>
       <div class="form-group">
         <label class="form-label">💬 Not</label>
@@ -4844,7 +4846,7 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
     btn.type = 'button';
     btn.textContent = s;
     const isSelected = opts && opts.multi ? selectedVals.includes(s) : inp.value.trim() === s;
-    btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
+    btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       if (opts && opts.multi) {
         const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
@@ -4994,7 +4996,7 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
     btn.textContent = t;
     const color = colorMap ? (colorMap[t] || 'var(--primary)') : (accentColor || 'var(--primary)');
     const isSelected = selected.includes(t);
-    btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
+    btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       const cur = inp.value.split(',').map(s => s.trim()).filter(Boolean);
       const idx = cur.indexOf(t);
