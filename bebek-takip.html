@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.1.2
+  Bebek Takip Pro v1.1.3
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.2">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.3">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.1.2</title>
+<title>Bebek Takip Pro v1.1.3</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2368,7 +2368,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.1.2</span>
+  <span>Pro 1.1.3</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3833,7 +3833,15 @@ function setStar(containerId, val) {
 
 function getVal(id) {
   const el = document.getElementById(id);
-  return el ? el.value.trim() : '';
+  if (!el) return '';
+  // Multi seçimli input'lar dataset.values'da JSON array saklar
+  if (el.dataset.values !== undefined && el.dataset.values !== '') {
+    try {
+      const arr = JSON.parse(el.dataset.values);
+      return arr.join(', ');
+    } catch(e) {}
+  }
+  return el.value.trim();
 }
 
 function saveRecord() {
@@ -4795,7 +4803,7 @@ function _acOpen(inputId, chipsId, listKey, opts) {
 
   if (opts && opts.multi) {
     // Multi: dropdown içinde arama kutusu, dış input sadece gösterir
-    const selectedVals = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+    const selectedVals = _acGetVals(inp);
     const bar = document.createElement('div');
     bar.className = 'ac-search-bar';
     bar.innerHTML = '<input type="text" placeholder="🔍 Ara..." autocomplete="off" /><span class="ac-search-count">' + all.length + '/' + all.length + '</span>';
@@ -4803,7 +4811,7 @@ function _acOpen(inputId, chipsId, listKey, opts) {
     const searchInp = bar.querySelector('input');
     searchInp.addEventListener('mousedown', e => e.stopPropagation());
     searchInp.addEventListener('input', () => {
-      const cur = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+      const cur = _acGetVals(inp);
       _acBuildList(dd, all, cur, searchInp.value.trim(), inputId, chipsId, listKey, opts);
     });
     _acBuildList(dd, all, selectedVals, '', inputId, chipsId, listKey, opts);
@@ -4845,10 +4853,10 @@ function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
   if (!inp) return;
 
   if (opts && opts.multi) {
-    const parts = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+    const parts = _acGetVals(inp);
     const idx = parts.indexOf(value);
     if (idx >= 0) parts.splice(idx, 1); else parts.push(value);
-    inp.value = parts.join(', ');
+    inp.value = _acJoinVals(parts, inp);
     // Dropdown açık kalsın, listeyi güncelle
     if (dd && dd.parentNode) {
       const searchInp = dd.querySelector('.ac-search-bar input');
@@ -4876,7 +4884,7 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
   if (all.length === 0) { box.innerHTML = ''; return; }
 
   const selectedVals = (opts && opts.multi)
-    ? inp.value.split(',').map(s => s.trim()).filter(Boolean)
+    ? _acGetVals(inp)
     : [];
 
   box.innerHTML = '';
@@ -4894,10 +4902,10 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
     btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       if (opts && opts.multi) {
-        const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
+        const parts = _acGetVals(inp);
         const idx = parts.indexOf(s);
         if (idx >= 0) parts.splice(idx, 1); else parts.push(s);
-        inp.value = parts.join(', ');
+        inp.value = _acJoinVals(parts, inp);
         const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
         if (clr) clr.classList.toggle('visible', inp.value.length > 0);
       } else {
@@ -4914,7 +4922,17 @@ function renderSuggestionChips(inputId, chipsId, listKey) {
   renderSuggestionChipsStatic(inputId, chipsId, listKey, null);
 }
 
-// Accordion chip panel aç/kapat
+
+// Multi değerleri dataset.values (JSON) olarak sakla, input.value'da güzel göster
+// Virgüllü öğe adlarını da doğru ayırt eder
+function _acGetVals(inp) {
+  try { return JSON.parse(inp.dataset.values || '[]'); } catch(e) { return []; }
+}
+function _acJoinVals(parts, inp) {
+  inp.dataset.values = JSON.stringify(parts);
+  inp.value = parts.join(', ');
+}
+
 function acPanelOpen(chipsId, inputId) {
   // Önce aynı formdaki tüm panelleri kapat
   const inp = document.getElementById(inputId);
@@ -4998,8 +5016,8 @@ function setupAcField(inputId, chipsId, listKey, opts) {
       clr.addEventListener('mousedown', (e) => {
         e.preventDefault();
         inp.value = '';
+        inp.dataset.values = '[]';
         _acClose(inputId);
-        const box = document.getElementById(chipsId);
         renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
         clr.classList.remove('visible');
         if (!(opts && opts.multi)) inp.focus();
@@ -5010,6 +5028,23 @@ function setupAcField(inputId, chipsId, listKey, opts) {
   // Temizle butonu görünürlüğü başlangıçta
   const clr0 = wrap && wrap.querySelector('.ac-clear');
   if (clr0) clr0.classList.toggle('visible', inp.value.length > 0);
+
+  // Multi modda mevcut value'yu dataset.values'a yükle
+  if (opts && opts.multi && inp.value && !inp.dataset.values) {
+    // Kayıtlı değer virgüllü metin olarak geliyor, her öğeyi listeden eşleştir
+    const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
+    const raw = inp.value;
+    // Önce tam eşleşmeleri dene (liste öğeleriyle)
+    const matched = all.filter(s => raw.split(', ').some(v => v.trim() === s) || raw.includes(s));
+    if (matched.length > 0) {
+      inp.dataset.values = JSON.stringify(matched);
+      inp.value = matched.join(', ');
+    } else {
+      // Fallback: virgüllü split
+      const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+      inp.dataset.values = JSON.stringify(parts);
+    }
+  }
 
   setTimeout(() => renderSuggestionChipsStatic(inputId, chipsId, listKey, opts), 50);
 }
@@ -5058,7 +5093,7 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
   if (items.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
   // Mevcut seçili değerleri virgülle ayır
-  const selected = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+  const selected = _acGetVals(inp);
   items.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -5067,10 +5102,10 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
     const isSelected = selected.includes(t);
     btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s`;
     btn.addEventListener('click', () => {
-      const cur = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+      const cur = _acGetVals(inp);
       const idx = cur.indexOf(t);
       if (idx >= 0) cur.splice(idx, 1); else cur.push(t);
-      inp.value = cur.join(', ');
+      inp.value = _acJoinVals(cur, inp);
       renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap);
     });
     box.appendChild(btn);
