@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.2.4
+  Bebek Takip Pro v1.2.5
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.2.4">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.2.5">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.2.4</title>
+<title>Bebek Takip Pro v1.2.5</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2381,7 +2381,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.2.4</span>
+  <span>Pro 1.2.5</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4528,9 +4528,43 @@ function renderNextVaccine() {
   }
 
   if (!gecmis.length && !yaklasan.length) {
-    html += `<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)">
-      <div style="font-size:30px;margin-bottom:8px">🎉</div>Tüm takvim aşıları tamamlandı!
-    </div>`;
+    // Elle girilen ama uygulanmamış kayıtlar var mı?
+    const manuelBekleyen = data.asi.filter(a => a.durum !== 'Uygulandı' && a.asi && a.asi !== '-');
+    if (manuelBekleyen.length > 0) {
+      html += `<div style="padding:6px 14px 2px;font-size:10px;font-weight:900;color:#FFA726;letter-spacing:0.8px;font-family:var(--font)">📋 TAKVİM DIŞI / BEKLEYEN</div>`;
+      manuelBekleyen.sort((a,b) => (a.tarih||'').localeCompare(b.tarih||'')).forEach(a => {
+        const durumColor = a.durum === 'Ertelendi' ? '#E53E3E' : a.durum === 'Beklemede' ? '#FFA726' : '#4299E1';
+        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--text);font-family:var(--font)">${escHtml(a.asi)}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px">${a.donem||''}</div>
+            ${a.tarih ? `<div style="font-size:10px;color:var(--text3);margin-top:1px">📅 ${formatDate(a.tarih)}</div>` : ''}
+          </div>
+          <span style="background:${durumColor};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap">${a.durum||'Beklemede'}</span>
+        </div>`;
+      });
+    } else {
+      html += `<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)">
+        <div style="font-size:30px;margin-bottom:8px">🎉</div>Tüm takvim aşıları tamamlandı!
+      </div>`;
+    }
+  } else {
+    // Gecikmiş/yaklaşan varken de elle girilmiş bekleyenler varsa göster
+    const manuelBekleyen = data.asi.filter(a => a.durum !== 'Uygulandı' && a.asi && a.asi !== '-');
+    if (manuelBekleyen.length > 0) {
+      html += `<div style="padding:6px 14px 2px;font-size:10px;font-weight:900;color:#FFA726;letter-spacing:0.8px;font-family:var(--font)">📋 DİĞER BEKLEYEN</div>`;
+      manuelBekleyen.sort((a,b) => (a.tarih||'').localeCompare(b.tarih||'')).forEach(a => {
+        const durumColor = a.durum === 'Ertelendi' ? '#E53E3E' : a.durum === 'Beklemede' ? '#FFA726' : '#4299E1';
+        html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--text);font-family:var(--font)">${escHtml(a.asi)}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px">${a.donem||''}</div>
+            ${a.tarih ? `<div style="font-size:10px;color:var(--text3);margin-top:1px">📅 ${formatDate(a.tarih)}</div>` : ''}
+          </div>
+          <span style="background:${durumColor};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap">${a.durum||'Beklemede'}</span>
+        </div>`;
+      });
+    }
   }
 
   container.innerHTML = html;
